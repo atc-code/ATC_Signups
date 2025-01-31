@@ -12,11 +12,18 @@
         input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
         button { background-color: #007bff; color: white; border: none; cursor: pointer; margin-top: 15px; }
         button:hover { background-color: #0056b3; }
+        .signup-list { margin-top: 20px; text-align: left; padding: 10px; }
+        .signup-list ul { list-style: none; padding: 0; }
+        .signup-list li { background: #f1f1f1; padding: 10px; margin: 5px 0; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Good Friday Signup - April 18, 2025</h2>
+        <div class="signup-list">
+            <h3>Current Signups:</h3>
+            <ul id="signupDisplay"></ul>
+        </div>
         <form id="signupForm">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
@@ -28,15 +35,7 @@
             <input type="tel" id="phone" name="phone" required>
 
             <label for="saying">Select Saying:</label>
-            <select id="saying" name="saying">
-                <option value="1">Word -1: "Father, forgive them; for they know not what they do" - Luke 23:34</option>
-                <option value="2">Word -2: "Truly, I say to you, today you will be with me in paradise" - Luke 23:43</option>
-                <option value="3">Word -3: "Woman, behold your son! Behold your mother!" - John 19:26-27</option>
-                <option value="4">Word -4: "My God, my God, why have you forsaken me?" - Matthew 27:46</option>
-                <option value="5">Word -5: "I thirst." - John 19:28</option>
-                <option value="6">Word -6: "It is finished." - John 19:30</option>
-                <option value="7">Word -7: "Father, into your hands I commit my spirit!" - Luke 23:46</option>
-            </select>
+            <select id="saying" name="saying"></select>
 
             <button type="submit">Sign Up</button>
         </form>
@@ -44,6 +43,50 @@
 
     <script>
         const apiUrl = 'https://sheetdb.io/api/v1/ys5q918dlycrm'; // Replace with your actual SheetDB API URL
+        let takenSayings = {};
+
+        function fetchSignups() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    let signupList = document.getElementById('signupDisplay');
+                    signupList.innerHTML = "";
+                    takenSayings = {};
+                    
+                    data.forEach(entry => {
+                        takenSayings[entry.saying] = entry.name;
+                        let listItem = document.createElement('li');
+                        listItem.innerText = `${entry.name} - ${entry.saying}`;
+                        signupList.appendChild(listItem);
+                    });
+                    populateDropdown();
+                })
+                .catch(error => console.error('Error fetching signups:', error));
+        }
+
+        function populateDropdown() {
+            let sayingSelect = document.getElementById('saying');
+            sayingSelect.innerHTML = "";
+
+            const sayings = {
+                "1": "Word -1: \"Father, forgive them; for they know not what they do\" - Luke 23:34",
+                "2": "Word -2: \"Truly, I say to you, today you will be with me in paradise\" - Luke 23:43",
+                "3": "Word -3: \"Woman, behold your son! Behold your mother!\" - John 19:26-27",
+                "4": "Word -4: \"My God, my God, why have you forsaken me?\" - Matthew 27:46",
+                "5": "Word -5: \"I thirst.\" - John 19:28",
+                "6": "Word -6: \"It is finished.\" - John 19:30",
+                "7": "Word -7: \"Father, into your hands I commit my spirit!\" - Luke 23:46"
+            };
+
+            for (let key in sayings) {
+                if (!takenSayings[key]) {
+                    let option = document.createElement("option");
+                    option.value = key;
+                    option.textContent = sayings[key];
+                    sayingSelect.appendChild(option);
+                }
+            }
+        }
 
         document.getElementById('signupForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -55,8 +98,6 @@
 
             const formData = { name, email, phone, saying };
 
-            console.log("Submitting:", formData);
-
             fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -64,12 +105,14 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("Response from API:", data);
                 alert('Signup Successful!');
                 document.getElementById('signupForm').reset();
+                fetchSignups(); // Refresh signup list
             })
             .catch(error => console.error('Error:', error));
         });
+
+        fetchSignups(); // Load signups when the page loads
     </script>
 </body>
 </html>
