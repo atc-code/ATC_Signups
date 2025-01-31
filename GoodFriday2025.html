@@ -18,7 +18,7 @@
 
         .container {
             width: 70%;
-            max-width: 600px;
+            max-width: 900px;
             background: white;
             padding: 30px;
             border-radius: 12px;
@@ -36,6 +36,7 @@
             margin-left: 20px;
             text-align: left;
         }
+
         h2 {
             text-align: center;
         }
@@ -137,23 +138,23 @@
     </style>
 </head>
 <body>
-    <div class="logo-container" style="position: absolute; top: 10px; left: 10px; width: 120px;">
+    <div class="logo-container" style="position: relative; top: 0; left: 0; width: 120px; padding-bottom: 10px;">
         <img src="images/ATC_LOGO.png" alt="ATC Logo" style="width: 100px; height: auto;">
     </div>
-    <div class="container">
+    <div class="container" style="position: relative;">
         <h2 style="text-align: center; line-height: 1.5; font-size: 38px; font-weight: bold; color: black; margin-bottom: 15px;">
             ATC Good Friday 2025<br>
             <span style="font-size: 32px; font-weight: bold; color: black; text-decoration: underline;">Seven Words SignUp - April 18</span>
         </h2>
         <form id="signupForm">
             <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" placeholder="John Doe" required>
+            <input type="text" id="name" name="name" placeholder="John Doe" required style="font-size: 20px;">
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+            <input type="email" id="email" name="email" placeholder="example@email.com" required style="font-size: 20px;">
 
             <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
+            <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required style="font-size: 20px;">
 
             <label for="saying">Select Saying:</label>
             <select id="saying" name="saying" style="background-color: white; color: black; border: 1px solid #ccc; font-size: 18px; padding: 12px;">
