@@ -15,15 +15,17 @@
             position: relative;
             flex-wrap: wrap;
         }
+
         .container {
             width: 70%;
-            max-width: 900px;
+            max-width: 600px;
             background: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             text-align: left;
         }
+
         .sidebar {
             width: 30%;
             max-width: 400px;
@@ -76,7 +78,7 @@
             padding: 12px;
             font-size: 16px;
         }
-        
+
         button:hover {
             background-color: #0056b3;
         }
@@ -135,8 +137,8 @@
     </style>
 </head>
 <body>
-    <div class="logo-container">
-        <img src="images/ATC_LOGO.png" alt="ATC Logo">
+    <div class="logo-container" style="position: absolute; top: 10px; left: 10px; width: 120px;">
+        <img src="images/ATC_LOGO.png" alt="ATC Logo" style="width: 100px; height: auto;">
     </div>
     <div class="container">
         <h2 style="text-align: center; line-height: 1.5; font-size: 38px; font-weight: bold; color: black; margin-bottom: 15px;">
@@ -169,7 +171,7 @@
     </div>
 
     <div class="sidebar">
-        <h3 style="text-decoration: underline;">Current Signups:</h3>
+        <h3>Current Signups:</h3>
         <ul id="signupDisplay"></ul>
     </div>
 
