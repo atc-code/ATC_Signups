@@ -11,7 +11,7 @@
         h2 { text-align: center; }
         h3 { color: #333; }
         label { display: block; margin-top: 10px; font-weight: bold; }
-        input, select, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
+        input, select, button { width: 100%; padding: 18px; background-color: white; color: black; border: 1px solid #ccc; font-size: 20px; margin-top: 5px; border-radius: 6px; }
         input::placeholder { color: grey; opacity: 0.7; }
         button { background-color: #007bff; color: white; border: none; cursor: pointer; margin-top: 15px; padding: 12px; font-size: 16px; }
         button:hover { background-color: #0056b3; }
@@ -27,9 +27,9 @@
         <img src="images/ATC_LOGO.png" alt="ATC Logo">
     </div>
     <div class="container">
-        <h2 style="text-align: center; line-height: 1.5; font-size: 36px; font-weight: bold; color: black; margin-bottom: 15px;">
+        <h2 style="text-align: center; line-height: 1.5; font-size: 38px; font-weight: bold; color: black; margin-bottom: 15px;">
             ATC Good Friday 2025<br>
-            <span style="font-size: 28px; font-weight: bold; color: black; text-decoration: underline;">Seven Words SignUp - April 18</span>
+            <span style="font-size: 32px; font-weight: bold; color: black; text-decoration: underline;">Seven Words SignUp - April 18</span>
         </h2>
         <form id="signupForm">
             <label for="name">Full Name:</label>
@@ -42,7 +42,15 @@
             <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
 
             <label for="saying">Select Saying:</label>
-            <select id="saying" name="saying"></select>
+            <select id="saying" name="saying" style="background-color: white; color: black; border: 1px solid #ccc; font-size: 18px; padding: 12px;">
+                <option value="1">Word -1: "Father, forgive them; for they know not what they do" - Luke 23:34</option>
+                <option value="2">Word -2: "Truly, I say to you, today you will be with me in paradise" - Luke 23:43</option>
+                <option value="3">Word -3: "Woman, behold your son! Behold your mother!" - John 19:26-27</option>
+                <option value="4">Word -4: "My God, my God, why have you forsaken me?" - Matthew 27:46</option>
+                <option value="5">Word -5: "I thirst." - John 19:28</option>
+                <option value="6">Word -6: "It is finished." - John 19:30</option>
+                <option value="7">Word -7: "Father, into your hands I commit my spirit!" - Luke 23:46</option>
+            </select>
 
             <button type="submit">Sign Up</button>
         </form>
@@ -72,6 +80,8 @@
         });
 
         function fetchSignups() {
+            document.getElementById("signupDisplay").innerHTML = "<p>Loading signups...</p>";
+            
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
@@ -93,7 +103,10 @@
                     });
                     populateDropdown();
                 })
-                .catch(error => console.error('Error fetching signups:', error));
+                .catch(error => {
+                    document.getElementById("signupDisplay").innerHTML = "<p style='color: red;'>Error loading signups.</p>";
+                    console.error('Error fetching signups:', error);
+                });
         }
 
         function populateDropdown() {
