@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><u>ATC Good Friday Seven Sayings Signup - April 18, 2025</u></title>
+    <title><u>ATC Good Friday : Seven Sayings Signup | April 18, 2025</u></title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #e6f7ff; text-align: center; padding: 20px; display: flex; justify-content: center; position: relative; }
+        body { font-family: Arial, sans-serif; background-color: #E6E6FA; text-align: center; padding: 20px; display: flex; justify-content: center; position: relative; }
         .container { max-width: 700px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); text-align: left; }
         .sidebar { max-width: 350px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); margin-left: 20px; text-align: left; }
-        h2 { text-align: center; text-decoration: underline; }
+        h2 { text-align: center; }
         h3 { color: #333; }
         label { display: block; margin-top: 10px; font-weight: bold; }
         input, select, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
@@ -27,7 +27,10 @@
         <img src="images/ATC_LOGO.png" alt="ATC Logo">
     </div>
     <div class="container">
-        <h2>ATC Good Friday Seven Sayings Signup - April 18, 2025</h2>
+        <h2 style="text-align: center; line-height: 1.5; font-size: 36px; font-weight: bold; color: black; margin-bottom: 15px;">
+            ATC Good Friday 2025<br>
+            <span style="font-size: 28px; font-weight: bold; color: black; text-decoration: underline;">Seven Words SignUp - April 18</span>
+        </h2>
         <form id="signupForm">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" placeholder="John Doe" required>
@@ -46,7 +49,7 @@
     </div>
 
     <div class="sidebar">
-        <h3>Current Signups:</h3>
+        <h3 style="text-decoration: underline;">Current Signups:</h3>
         <ul id="signupDisplay"></ul>
     </div>
 
@@ -76,6 +79,8 @@
                     signupList.innerHTML = "";
                     takenSayings = {};
                     signedUpUsers = {};
+                    
+                    data.sort((a, b) => parseInt(a.saying) - parseInt(b.saying)); // Sorting by Word 1-7
                     
                     data.forEach(entry => {
                         takenSayings[entry.saying] = entry.name;
@@ -122,6 +127,12 @@
             const email = document.getElementById('email').value.trim();
             const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
             const saying = document.getElementById('saying').value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
+
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
 
             if (!name || !email || !phone) {
                 alert('Name, email, and phone number cannot be empty.');
