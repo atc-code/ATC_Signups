@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Good Friday Signup - April 18, 2025</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f8f9fa; text-align: center; padding: 20px; }
-        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; margin: auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        h2 { color: #333; }
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; text-align: center; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .sidebar { max-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-left: 20px; }
+        h2, h3 { color: #333; }
         label { display: block; margin-top: 10px; font-weight: bold; }
         input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
         input::placeholder { color: grey; opacity: 0.7; }
         button { background-color: #007bff; color: white; border: none; cursor: pointer; margin-top: 15px; }
         button:hover { background-color: #0056b3; }
-        .signup-list { margin-top: 20px; text-align: left; padding: 10px; }
+        .signup-list { text-align: left; }
         .signup-list ul { list-style: none; padding: 0; }
         .signup-list li { background: #f1f1f1; padding: 10px; margin: 5px 0; border-radius: 5px; }
     </style>
@@ -21,10 +22,6 @@
 <body>
     <div class="container">
         <h2>Good Friday Signup - April 18, 2025</h2>
-        <div class="signup-list">
-            <h3>Current Signups:</h3>
-            <ul id="signupDisplay"></ul>
-        </div>
         <form id="signupForm">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" placeholder="John Doe" required>
@@ -40,6 +37,11 @@
 
             <button type="submit">Sign Up</button>
         </form>
+    </div>
+
+    <div class="sidebar">
+        <h3>Current Signups:</h3>
+        <ul id="signupDisplay"></ul>
     </div>
 
     <script>
@@ -62,7 +64,7 @@
                         signedUpUsers[entry.email.toLowerCase()] = entry.saying;
                         signedUpUsers[entry.phone] = entry.saying;
                         let listItem = document.createElement('li');
-                        listItem.innerText = `${entry.name} - ${entry.saying}`;
+                        listItem.innerText = `Word - ${entry.saying} : ${entry.name}`;
                         signupList.appendChild(listItem);
                     });
                     populateDropdown();
