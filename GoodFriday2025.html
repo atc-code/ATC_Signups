@@ -93,6 +93,30 @@
                 .catch(error => console.error('Error fetching signups:', error));
         }
 
+        function populateDropdown() {
+            let sayingSelect = document.getElementById('saying');
+            sayingSelect.innerHTML = "";
+
+            const sayings = {
+                "1": "Word -1: \"Father, forgive them; for they know not what they do\" - Luke 23:34",
+                "2": "Word -2: \"Truly, I say to you, today you will be with me in paradise\" - Luke 23:43",
+                "3": "Word -3: \"Woman, behold your son! Behold your mother!\" - John 19:26-27",
+                "4": "Word -4: \"My God, my God, why have you forsaken me?\" - Matthew 27:46",
+                "5": "Word -5: \"I thirst.\" - John 19:28",
+                "6": "Word -6: \"It is finished.\" - John 19:30",
+                "7": "Word -7: \"Father, into your hands I commit my spirit!\" - Luke 23:46"
+            };
+
+            for (let key in sayings) {
+                if (!takenSayings[key]) {
+                    let option = document.createElement("option");
+                    option.value = key;
+                    option.textContent = sayings[key];
+                    sayingSelect.appendChild(option);
+                }
+            }
+        }
+
         document.getElementById('signupForm').addEventListener('submit', function(event) {
             event.preventDefault();
             
@@ -100,14 +124,15 @@
             const email = document.getElementById('email').value.trim();
             const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
             const saying = document.getElementById('saying').value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
 
-            if (!name || !email || !phone) {
-                alert('Name, email, and phone number cannot be empty.');
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address');
                 return;
             }
 
-            if (!email.endsWith('.com')) {
-                alert('Email must end with .com');
+            if (!name || !email || !phone) {
+                alert('Name, email, and phone number cannot be empty.');
                 return;
             }
 
