@@ -44,6 +44,7 @@
     <script>
         const apiUrl = 'https://sheetdb.io/api/v1/ys5q918dlycrm'; // Replace with your actual SheetDB API URL
         let takenSayings = {};
+        let signedUpUsers = {};
 
         function fetchSignups() {
             fetch(apiUrl)
@@ -52,9 +53,11 @@
                     let signupList = document.getElementById('signupDisplay');
                     signupList.innerHTML = "";
                     takenSayings = {};
+                    signedUpUsers = {};
                     
                     data.forEach(entry => {
                         takenSayings[entry.saying] = entry.name;
+                        signedUpUsers[entry.email] = entry.saying;
                         let listItem = document.createElement('li');
                         listItem.innerText = `${entry.name} - ${entry.saying}`;
                         signupList.appendChild(listItem);
@@ -95,6 +98,11 @@
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
             const saying = document.getElementById('saying').value;
+
+            if (signedUpUsers[email]) {
+                alert('You have already signed up for a saying!');
+                return;
+            }
 
             const formData = { name, email, phone, saying };
 
