@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATC Good Friday Seven Sayings Signup - April 18, 2025</title>
+    <title><u>ATC Good Friday Seven Sayings Signup - April 18, 2025</u></title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f8f9fa; text-align: center; padding: 20px; display: flex; justify-content: center; }
-        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: left; }
-        .sidebar { max-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-left: 20px; text-align: left; }
-        h2, h3 { color: #333; }
+        body { font-family: Arial, sans-serif; background-color: #e6f7ff; text-align: center; padding: 20px; display: flex; justify-content: center; }
+        .container { max-width: 700px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); text-align: left; }
+        .sidebar { max-width: 350px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); margin-left: 20px; text-align: left; }
+        h2 { text-align: center; text-decoration: underline; }
+        h3 { color: #333; }
         label { display: block; margin-top: 10px; font-weight: bold; }
-        input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
         input::placeholder { color: grey; opacity: 0.7; }
-        button { background-color: #007bff; color: white; border: none; cursor: pointer; margin-top: 15px; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; margin-top: 15px; padding: 12px; font-size: 16px; }
         button:hover { background-color: #0056b3; }
         .signup-list { text-align: left; }
         .signup-list ul { list-style: none; padding: 0; }
-        .signup-list li { background: #f1f1f1; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .signup-list li { background: #f1f1f1; padding: 12px; margin: 6px 0; border-radius: 6px; font-weight: bold; }
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        .logo-container img { width: 150px; height: auto; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo-container">
+            <img src="ATC_LOGO.png" alt="ATC Logo">
+        </div>
         <h2>ATC Good Friday Seven Sayings Signup - April 18, 2025</h2>
         <form id="signupForm">
             <label for="name">Full Name:</label>
@@ -143,12 +149,12 @@
             .then(data => {
                 alert('Signup Successful!');
                 document.getElementById('signupForm').reset();
-                fetchSignups(); // Refresh signup list
+                fetchSignups();
             })
             .catch(error => console.error('Error:', error));
         });
 
-        fetchSignups(); // Load signups when the page loads
+        fetchSignups();
     </script>
 </body>
 </html>
