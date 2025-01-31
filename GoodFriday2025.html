@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Good Friday Signup - April 18, 2025</title>
+    <title>ATC Good Friday Seven Sayings Signup - April 18, 2025</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f8f9fa; text-align: center; padding: 20px; display: flex; justify-content: center; }
-        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .sidebar { max-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-left: 20px; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: left; }
+        .sidebar { max-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-left: 20px; text-align: left; }
         h2, h3 { color: #333; }
         label { display: block; margin-top: 10px; font-weight: bold; }
         input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>ATC Good Friday Signup - April 18, 2025</h2>
+        <h2>ATC Good Friday Seven Sayings Signup - April 18, 2025</h2>
         <form id="signupForm">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" placeholder="John Doe" required>
@@ -30,7 +30,7 @@
             <input type="email" id="email" name="email" placeholder="example@email.com" required>
 
             <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required pattern="\(\d{3}\)-\d{3}-\d{4}">
+            <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
 
             <label for="saying">Select Saying:</label>
             <select id="saying" name="saying"></select>
@@ -48,6 +48,19 @@
         const apiUrl = 'https://sheetdb.io/api/v1/ys5q918dlycrm'; // Replace with your actual SheetDB API URL
         let takenSayings = {};
         let signedUpUsers = {};
+
+        function formatPhoneNumber(input) {
+            let cleaned = ('' + input).replace(/\D/g, '');
+            let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                return `(${match[1]})-${match[2]}-${match[3]}`;
+            }
+            return input;
+        }
+
+        document.getElementById('phone').addEventListener('input', function(event) {
+            event.target.value = formatPhoneNumber(event.target.value);
+        });
 
         function fetchSignups() {
             fetch(apiUrl)
@@ -101,7 +114,7 @@
             
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
             const saying = document.getElementById('saying').value;
 
             if (!name || !email || !phone) {
