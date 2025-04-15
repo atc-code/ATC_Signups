@@ -55,8 +55,8 @@
       cursor: pointer;
     }
     .checkbox-group input[type="checkbox"] {
-      transform: scale(1.4);
-      margin-left: 12px;
+      transform: scale(1.3);
+      margin-left: 16px;
     }
     table {
       width: 100%;
@@ -78,19 +78,34 @@
       margin-top: 10px;
       font-size: 16px;
     }
-    input, button {
+    input {
       padding: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
+    }
+    input::placeholder {
+      color: grey;
+      opacity: 0.7;
     }
     button {
       background-color: #007bff;
       color: white;
       border: none;
       cursor: pointer;
+      padding: 12px;
+      border-radius: 6px;
     }
     button:hover {
       background-color: #0056b3;
+    }
+    .logo-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    .logo-container img {
+      width: 100px;
+      height: auto;
     }
     @media screen and (max-width: 768px) {
       body {
@@ -105,13 +120,16 @@
   </style>
 </head>
 <body>
+  <div class="logo-container">
+    <img src="images/ATC_LOGO.png" alt="ATC Logo">
+  </div>
   <div class="container">
     <h2>ATC Good Friday Snacks Signup<br><small>April 18, 2025</small></h2>
     <form id="snackSignupForm">
       <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" required />
+      <input type="text" id="name" name="name" placeholder="John Doe" required />
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" required />
+      <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required />
       <label>Select Snack/Supply Items:</label>
       <div class="checkbox-group" id="snackCheckboxGroup"></div>
       <button type="submit">Sign Up</button>
@@ -147,11 +165,13 @@
       snackOptions.forEach(item => {
         if (!takenItems[item]) {
           const label = document.createElement("label");
+          const text = document.createElement("span");
           const checkbox = document.createElement("input");
+          text.textContent = item;
           checkbox.type = "checkbox";
           checkbox.name = "snack";
           checkbox.value = item;
-          label.appendChild(document.createTextNode(item));
+          label.appendChild(text);
           label.appendChild(checkbox);
           group.appendChild(label);
         }
@@ -172,12 +192,7 @@
         const tbody = document.createElement("tbody");
         items.forEach(item => {
           const tr = document.createElement("tr");
-          const td1 = document.createElement("td");
-          const td2 = document.createElement("td");
-          td1.textContent = item;
-          td2.textContent = takenItems[item] || "Available";
-          tr.appendChild(td1);
-          tr.appendChild(td2);
+          tr.innerHTML = `<td>${item}</td><td>${takenItems[item] || "Available"}</td>`;
           tbody.appendChild(tr);
         });
         table.appendChild(thead);
