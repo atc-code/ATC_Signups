@@ -15,7 +15,6 @@
       position: relative;
       flex-wrap: wrap;
     }
-
     .container {
       width: 70%;
       max-width: 700px;
@@ -25,7 +24,6 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       text-align: left;
     }
-
     .sidebar {
       width: 30%;
       max-width: 300px;
@@ -36,60 +34,44 @@
       margin-left: 20px;
       text-align: left;
     }
-
-    .checkbox-group {
+    .checkbox-grid {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 5px 0;
+      margin-top: 5px;
     }
-
-    .checkbox-group label {
-      display: flex;
-      flex-direction: row;
+    .checkbox-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
       align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
       padding: 10px 12px;
       background-color: #f8f8f8;
       border-radius: 6px;
       border: 1px solid #ddd;
       font-size: 15px;
+      border-bottom: 1px solid #ccc;
     }
-
-    .checkbox-group input[type="checkbox"] {
-      transform: scale(1.3);
-      margin: 0;
+    .checkbox-row input[type="checkbox"] {
+      transform: scale(1.4);
     }
-
-    .checkbox-group span {
-      flex: 1;
-      text-align: left;
-      white-space: nowrap;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
     th, td {
       padding: 8px;
       border: 1px solid #ccc;
       text-align: left;
     }
-
     th {
       background-color: #f2f2f2;
     }
-
     td.available {
       background-color: #fffac8;
       font-style: italic;
       min-width: 120px;
     }
-
     label, input, button {
       display: block;
       width: 95%;
@@ -97,25 +79,21 @@
       margin-top: 10px;
       font-size: 16px;
     }
-
     input {
       padding: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     input::placeholder {
       color: grey;
       opacity: 0.7;
     }
-
     .form-note {
       margin-top: 12px;
       font-size: 14px;
       color: #555;
       font-style: italic;
     }
-
     button {
       background-color: #007bff;
       color: white;
@@ -125,31 +103,37 @@
       border-radius: 6px;
       margin-top: 10px;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
     .logo-container {
       position: absolute;
       top: 10px;
       left: 10px;
     }
-
     .logo-container img {
       width: 100px;
       height: auto;
     }
-
     @media screen and (max-width: 768px) {
       body {
         flex-direction: column;
         align-items: center;
       }
-
       .container, .sidebar {
-        width: 90%;
+        width: 95%;
         margin: 10px 0;
+        padding: 20px;
+      }
+      .checkbox-row {
+        font-size: 17px;
+        padding: 14px 12px;
+      }
+      input, button {
+        font-size: 18px;
+      }
+      .checkbox-row input[type="checkbox"] {
+        transform: scale(1.6);
       }
     }
   </style>
@@ -158,28 +142,21 @@
   <div class="logo-container">
     <img src="images/ATC_LOGO.png" alt="ATC Logo">
   </div>
-
   <div class="container">
     <h2>ATC Good Friday Snacks Signup<br><small>April 18, 2025</small></h2>
-
     <form id="snackSignupForm">
       <label for="name">Full Name:</label>
       <input type="text" id="name" name="name" placeholder="John Doe" required>
-
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
-
       <label>Snacks:</label>
-      <div class="checkbox-group" id="snackCheckboxGroupSnacks"></div>
-
+      <div class="checkbox-grid" id="snackCheckboxGroupSnacks"></div>
       <label>Supplies:</label>
-      <div class="checkbox-group" id="snackCheckboxGroupSupplies"></div>
-
+      <div class="checkbox-grid" id="snackCheckboxGroupSupplies"></div>
       <div class="form-note">Each item can only be signed up by one person. You may select multiple items.</div>
       <button type="submit">Sign Up</button>
     </form>
   </div>
-
   <div class="sidebar">
     <h3>Current Signups</h3>
     <div id="signupDisplay"></div>
@@ -196,7 +173,7 @@
     let takenItems = {}, userItemMap = {};
 
     function formatPhoneNumber(input) {
-      let cleaned = ('' + input).replace(/\D/g, '');
+      let cleaned = ('' + input).replace(/\\D/g, '');
       let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
       return match ? `(${match[1]})-${match[2]}-${match[3]}` : input;
     }
@@ -213,27 +190,28 @@
 
       snackOptions.forEach(item => {
         if (!takenItems[item]) {
-          const label = document.createElement("label");
+          const row = document.createElement("div");
+          row.className = "checkbox-row";
+
+          const label = document.createElement("span");
+          label.textContent = item;
+
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.name = "snack";
           checkbox.value = item;
 
-          const span = document.createElement("span");
-          span.textContent = item;
-
-          label.appendChild(checkbox);
-          label.appendChild(span);
+          row.appendChild(label);
+          row.appendChild(checkbox);
 
           if (snacksSet.has(item)) {
-            snacksDiv.appendChild(label);
+            snacksDiv.appendChild(row);
           } else {
-            suppliesDiv.appendChild(label);
+            suppliesDiv.appendChild(row);
           }
         }
       });
     }
-
     function renderGroupedSignupDisplay() {
       const display = document.getElementById("signupDisplay");
       display.innerHTML = "";
@@ -252,14 +230,12 @@
           const td1 = document.createElement("td");
           const td2 = document.createElement("td");
           td1.textContent = item;
-
           if (takenItems[item]) {
             td2.textContent = takenItems[item];
           } else {
             td2.textContent = "Available";
             td2.classList.add("available");
           }
-
           tr.appendChild(td1);
           tr.appendChild(td2);
           tbody.appendChild(tr);
@@ -272,10 +248,8 @@
         display.appendChild(section);
       };
 
-      const snackItems = snackOptions.filter(i => snacksSet.has(i));
-      const supplyItems = snackOptions.filter(i => !snacksSet.has(i));
-      groupTable("Snacks", snackItems);
-      groupTable("Supplies", supplyItems);
+      groupTable("Snacks", snackOptions.filter(i => snacksSet.has(i)));
+      groupTable("Supplies", snackOptions.filter(i => !snacksSet.has(i)));
     }
 
     function fetchSnackSignups() {
@@ -285,27 +259,20 @@
           takenItems = {};
           userItemMap = {};
           data.forEach(entry => {
-            const { snack, name, phone } = entry;
-            takenItems[snack] = name;
-            userItemMap[`${name.toLowerCase()}_${snack}`] = true;
-            userItemMap[`${phone}_${snack}`] = true;
+            takenItems[entry.snack] = entry.name;
+            userItemMap[`${entry.name.toLowerCase()}_${entry.snack}`] = true;
+            userItemMap[`${entry.phone}_${entry.snack}`] = true;
           });
 
           renderGroupedSignupDisplay();
           populateCheckboxes();
 
-          const availableItems = snackOptions.filter(item => !takenItems[item]);
-          if (availableItems.length === 0) {
+          if (snackOptions.every(item => takenItems[item])) {
             document.getElementById('snackSignupForm').style.display = 'none';
-            const thankYouMsg = document.createElement('div');
-            thankYouMsg.style.padding = '20px';
-            thankYouMsg.style.backgroundColor = '#dff0d8';
-            thankYouMsg.style.color = '#3c763d';
-            thankYouMsg.style.border = '1px solid #d6e9c6';
-            thankYouMsg.style.borderRadius = '8px';
-            thankYouMsg.style.marginTop = '20px';
-            thankYouMsg.innerHTML = "<strong>All snack and supply items have been signed up.</strong><br>Thank you for your support!";
-            document.querySelector('.container').appendChild(thankYouMsg);
+            const msg = document.createElement('div');
+            msg.innerHTML = "<strong>All snack and supply items have been signed up.</strong><br>Thank you for your support!";
+            msg.style = "margin-top: 20px; padding: 20px; background-color: #dff0d8; border-radius: 8px;";
+            document.querySelector('.container').appendChild(msg);
           }
         });
     }
@@ -321,7 +288,7 @@
         return;
       }
 
-      if (!/^\(\d{3}\)-\d{3}-\d{4}$/.test(phone)) {
+      if (!/^\\(\\d{3}\\)-\\d{3}-\\d{4}$/.test(phone)) {
         alert('Phone number must be in the format (xxx)-xxx-xxxx');
         return;
       }
@@ -331,7 +298,7 @@
       );
 
       if (duplicates.length > 0) {
-        alert(`Cannot sign up for: ${duplicates.join(", ")} — already taken or you've signed up before.`);
+        alert("You’ve already signed up for: " + duplicates.join(", "));
         return;
       }
 
