@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +16,6 @@
       position: relative;
       flex-wrap: wrap;
     }
-
     .container {
       width: 70%;
       max-width: 700px;
@@ -25,7 +25,6 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       text-align: left;
     }
-
     .sidebar {
       width: 30%;
       max-width: 300px;
@@ -36,176 +35,101 @@
       margin-left: 20px;
       text-align: left;
     }
-
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 5px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .checkbox-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background-color: #f8f8f8;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .checkbox-group input[type="checkbox"] {
+      transform: scale(1.4);
+      margin-left: 12px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
     th, td {
       padding: 8px;
       border: 1px solid #ccc;
       text-align: left;
     }
-
     th {
       background-color: #f2f2f2;
     }
-
-    label {
+    label, input, button {
       display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input, button, .checkbox-wrapper {
       width: 95%;
       max-width: 600px;
-      padding: 16px;
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-      font-size: 18px;
-      margin-top: 5px;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      max-height: 300px;
-      overflow-y: auto;
-      gap: 8px;
-      padding: 5px;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-
-    .checkbox-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin-top: 10px;
       font-size: 16px;
-      padding: 10px 12px;
-      border-bottom: 1px solid #eee;
     }
-
-    .checkbox-item:last-child {
-      border-bottom: none;
+    input, button {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
-
-    .checkbox-item input[type="checkbox"] {
-      transform: scale(1.4);
-      margin-left: 12px;
-    }
-
     button {
       background-color: #007bff;
       color: white;
       border: none;
       cursor: pointer;
-      margin-top: 15px;
-      padding: 12px;
-      font-size: 16px;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
-    .logo-container {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 120px;
-    }
-
-    .logo-container img {
-      width: 120px;
-      height: auto;
-    }
-
     @media screen and (max-width: 768px) {
       body {
         flex-direction: column;
         align-items: center;
       }
-
       .container, .sidebar {
         width: 90%;
         margin: 10px 0;
-        padding: 20px;
-      }
-
-      input, button, .checkbox-wrapper {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <div class="logo-container">
-    <img src="images/ATC_LOGO.png" alt="ATC Logo">
-  </div>
-
   <div class="container">
-    <h2 style="font-size: 34px; font-weight: bold; color: black;">
-      ATC Good Friday Snacks <br>
-      <span style="font-size: 28px; text-decoration: underline;">Snacks & Supplies SignUp - April 18</span>
-    </h2>
-
+    <h2>ATC Good Friday Snacks Signup<br><small>April 18, 2025</small></h2>
     <form id="snackSignupForm">
       <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" placeholder="John Doe" required autofocus>
-
+      <input type="text" id="name" name="name" required />
       <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
-
+      <input type="tel" id="phone" name="phone" required />
       <label>Select Snack/Supply Items:</label>
-      <div class="checkbox-wrapper">
-        <div class="checkbox-group" id="snackCheckboxGroup"></div>
-      </div>
-
+      <div class="checkbox-group" id="snackCheckboxGroup"></div>
       <button type="submit">Sign Up</button>
     </form>
   </div>
-
   <div class="sidebar">
-    <h3>Current Signups:</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Signed Up By</th>
-        </tr>
-      </thead>
-      <tbody id="signupDisplay"></tbody>
-    </table>
+    <h3>Current Signups</h3>
+    <div id="signupDisplay"></div>
   </div>
-
   <script>
     const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23';
     const snackOptions = [
-      "Tea",
-      "Lemonade",
-      "Fruit Juice for kids",
-      "Fruits (Watermelon / Apple / Banana)",
-      "Samosa",
-      "Onion Pakoda",
-      "Paper Plates / Bowls",
-      "Tea Cups",
-      "Water Bottles",
-      "Spoons",
-      "Napkins",
-      "Table Cover"
+      "Tea", "Lemonade", "Juice for kids", "Fruits (Watermelon / Apple / Banana)",
+      "Samosa", "Onion Pakoda",
+      "Paper Plates / Bowls", "Tea Cups", "Water Bottles", "Spoons", "Napkins", "Table Cover"
     ];
-
-    let takenItems = {};
-    let userItemMap = {};
+    const snacksSet = new Set(["Tea", "Lemonade", "Juice for kids", "Fruits (Watermelon / Apple / Banana)", "Samosa", "Onion Pakoda"]);
+    let takenItems = {}, userItemMap = {};
 
     function formatPhoneNumber(input) {
       let cleaned = ('' + input).replace(/\D/g, '');
@@ -222,61 +146,72 @@
       group.innerHTML = "";
       snackOptions.forEach(item => {
         if (!takenItems[item]) {
-          const label = document.createElement("div");
-          label.className = 'checkbox-item';
-
-          const labelText = document.createElement("span");
-          labelText.textContent = item;
-
+          const label = document.createElement("label");
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.name = "snack";
           checkbox.value = item;
-
-          label.appendChild(labelText);
+          label.appendChild(document.createTextNode(item));
           label.appendChild(checkbox);
           group.appendChild(label);
         }
       });
     }
 
-    function fetchSnackSignups() {
-      document.getElementById("signupDisplay").innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
+    function renderGroupedSignupDisplay() {
+      const display = document.getElementById("signupDisplay");
+      display.innerHTML = "";
 
+      const groupTable = (title, items) => {
+        const section = document.createElement("div");
+        const heading = document.createElement("h4");
+        heading.textContent = title;
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        thead.innerHTML = "<tr><th>Item</th><th>Signed Up By</th></tr>";
+        const tbody = document.createElement("tbody");
+        items.forEach(item => {
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          td1.textContent = item;
+          td2.textContent = takenItems[item] || "Available";
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        section.appendChild(heading);
+        section.appendChild(table);
+        display.appendChild(section);
+      };
+
+      const snackItems = snackOptions.filter(i => snacksSet.has(i));
+      const supplyItems = snackOptions.filter(i => !snacksSet.has(i));
+      groupTable("Snacks", snackItems);
+      groupTable("Supplies", supplyItems);
+    }
+
+    function fetchSnackSignups() {
       fetch(snackApiUrl)
         .then(response => response.json())
         .then(data => {
           takenItems = {};
           userItemMap = {};
-          const displayBody = document.getElementById('signupDisplay');
-          displayBody.innerHTML = "";
-
           data.forEach(entry => {
-            const item = entry.snack;
-            const name = entry.name;
-            const phone = entry.phone;
-            takenItems[item] = name;
-            userItemMap[`${name.toLowerCase()}_${item}`] = true;
-            userItemMap[`${phone}_${item}`] = true;
+            const { snack, name, phone } = entry;
+            takenItems[snack] = name;
+            userItemMap[`${name.toLowerCase()}_${snack}`] = true;
+            userItemMap[`${phone}_${snack}`] = true;
           });
 
-          snackOptions.forEach(item => {
-            const tr = document.createElement("tr");
-            const tdItem = document.createElement("td");
-            const tdName = document.createElement("td");
-            tdItem.textContent = item;
-            tdName.textContent = takenItems[item] || "Available";
-            tr.appendChild(tdItem);
-            tr.appendChild(tdName);
-            displayBody.appendChild(tr);
-          });
-
+          renderGroupedSignupDisplay();
           populateCheckboxes();
 
           const availableItems = snackOptions.filter(item => !takenItems[item]);
           if (availableItems.length === 0) {
             document.getElementById('snackSignupForm').style.display = 'none';
-
             const thankYouMsg = document.createElement('div');
             thankYouMsg.style.padding = '20px';
             thankYouMsg.style.backgroundColor = '#dff0d8';
@@ -284,27 +219,19 @@
             thankYouMsg.style.border = '1px solid #d6e9c6';
             thankYouMsg.style.borderRadius = '8px';
             thankYouMsg.style.marginTop = '20px';
-            thankYouMsg.innerHTML = `<strong>All snack and supply items have been signed up.</strong><br>Thank you for your support!`;
-
+            thankYouMsg.innerHTML = "<strong>All snack and supply items have been signed up.</strong><br>Thank you for your support!";
             document.querySelector('.container').appendChild(thankYouMsg);
           }
-        })
-        .catch(error => {
-          document.getElementById("signupDisplay").innerHTML = "<tr><td colspan='2'>Error loading signups.</td></tr>";
-          console.error('Error:', error);
         });
     }
 
     document.getElementById('snackSignupForm').addEventListener('submit', function(event) {
       event.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
       const name = document.getElementById('name').value.trim();
       const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
-      const checkboxes = document.querySelectorAll('input[name="snack"]:checked');
-      const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+      const selected = Array.from(document.querySelectorAll('input[name="snack"]:checked')).map(cb => cb.value);
 
-      if (!name || !phone || selectedItems.length === 0) {
+      if (!name || !phone || selected.length === 0) {
         alert('Please fill in name, phone, and select at least one item.');
         return;
       }
@@ -314,7 +241,7 @@
         return;
       }
 
-      const duplicates = selectedItems.filter(item =>
+      const duplicates = selected.filter(item =>
         userItemMap[`${name.toLowerCase()}_${item}`] || userItemMap[`${phone}_${item}`] || takenItems[item]
       );
 
@@ -323,20 +250,17 @@
         return;
       }
 
-      const formData = selectedItems.map(snack => ({ name, phone, snack }));
-
+      const formData = selected.map(snack => ({ name, phone, snack }));
       fetch(snackApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: formData })
       })
-        .then(response => response.json())
         .then(() => {
           alert('Signup Successful!');
           document.getElementById('snackSignupForm').reset();
           fetchSnackSignups();
-        })
-        .catch(error => console.error('Error:', error));
+        });
     });
 
     fetchSnackSignups();
