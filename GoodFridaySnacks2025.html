@@ -1,4 +1,3 @@
-<!-- START OF UPDATED FILE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,8 +37,20 @@
       text-align: left;
     }
 
-    h2 {
-      text-align: center;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
     }
 
     label {
@@ -61,11 +72,6 @@
       text-align: center;
     }
 
-    input::placeholder {
-      color: grey;
-      opacity: 0.7;
-    }
-
     button {
       background-color: #007bff;
       color: white;
@@ -78,19 +84,6 @@
 
     button:hover {
       background-color: #0056b3;
-    }
-
-    .signup-list ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .signup-list li {
-      background: #f1f1f1;
-      padding: 12px;
-      margin: 6px 0;
-      border-radius: 6px;
-      font-weight: bold;
     }
 
     .logo-container {
@@ -150,14 +143,19 @@
 
   <div class="sidebar">
     <h3>Current Signups:</h3>
-    <ul id="signupDisplay"></ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Signed Up By</th>
+        </tr>
+      </thead>
+      <tbody id="signupDisplay"></tbody>
+    </table>
   </div>
 
   <script>
-    const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23'; // Replace if needed
-    let takenItems = {};
-    let snackSignups = {};
-
+    const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23'; // Your SheetDB endpoint
     const snackOptions = [
       "Tea",
       "Lemonade",
@@ -166,13 +164,16 @@
       "Samosa",
       "Onion Pakoda",
       "Rice item (Pulihora or Kichidi)",
-      "Paper Plates / Bowls",
+      "Plates",
       "Tea Cups",
       "Water Bottles",
       "Spoons",
       "Napkins",
       "Table Cover"
     ];
+
+    let takenItems = {}; // snack => name
+    let userItemMap = {}; // name+snack or phone+snack => true
 
     function formatPhoneNumber(input) {
       let cleaned = ('' + input).replace(/\D/g, '');
@@ -198,33 +199,42 @@
     }
 
     function fetchSnackSignups() {
-      document.getElementById("signupDisplay").innerHTML = "<p>Loading signups...</p>";
+      document.getElementById("signupDisplay").innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
 
       fetch(snackApiUrl)
         .then(response => response.json())
         .then(data => {
-          let signupList = document.getElementById('signupDisplay');
-          signupList.innerHTML = "";
           takenItems = {};
-          snackSignups = {};
+          userItemMap = {};
+          const displayBody = document.getElementById('signupDisplay');
+          displayBody.innerHTML = "";
 
           data.forEach(entry => {
-            const snack = entry.snack;
-            takenItems[snack] = true;
+            const item = entry.snack;
+            const name = entry.name;
+            const phone = entry.phone;
 
-            snackSignups[entry.name.toLowerCase()] = true;
-            snackSignups[entry.phone] = true;
+            takenItems[item] = name;
+            userItemMap[`${name.toLowerCase()}_${item}`] = true;
+            userItemMap[`${phone}_${item}`] = true;
+          });
 
-            let listItem = document.createElement('li');
-            listItem.innerText = `${snack} : ${entry.name}`;
-            signupList.appendChild(listItem);
+          snackOptions.forEach(item => {
+            const tr = document.createElement("tr");
+            const tdItem = document.createElement("td");
+            const tdName = document.createElement("td");
+            tdItem.textContent = item;
+            tdName.textContent = takenItems[item] || "Available";
+            tr.appendChild(tdItem);
+            tr.appendChild(tdName);
+            displayBody.appendChild(tr);
           });
 
           populateDropdown();
         })
         .catch(error => {
-          document.getElementById("signupDisplay").innerHTML = "<p style='color: red;'>Error loading signups.</p>";
-          console.error('Error fetching snack signups:', error);
+          document.getElementById("signupDisplay").innerHTML = "<tr><td colspan='2'>Error loading signups.</td></tr>";
+          console.error('Error:', error);
         });
     }
 
@@ -236,7 +246,7 @@
       const snack = document.getElementById('snack').value;
 
       if (!name || !phone || !snack) {
-        alert('Name, phone number, and snack item are required.');
+        alert('Please fill out all fields.');
         return;
       }
 
@@ -245,13 +255,13 @@
         return;
       }
 
-      if (snackSignups[name.toLowerCase()] || snackSignups[phone]) {
-        alert('You have already signed up!');
+      if (takenItems[snack]) {
+        alert(`The item "${snack}" is already taken.`);
         return;
       }
 
-      if (takenItems[snack]) {
-        alert(`The item "${snack}" is already taken. Please choose another.`);
+      if (userItemMap[`${name.toLowerCase()}_${snack}`] || userItemMap[`${phone}_${snack}`]) {
+        alert(`You have already signed up for "${snack}".`);
         return;
       }
 
