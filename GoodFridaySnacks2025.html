@@ -279,44 +279,50 @@
         });
     }
 
-    document.getElementById('snackSignupForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
-      const selected = Array.from(document.querySelectorAll('input[name="snack"]:checked')).map(cb => cb.value);
+document.getElementById('snackSignupForm').addEventListener('submit', function(event) {
+  event.preventDefault();
 
-      if (!name || !phone || selected.length === 0) {
-        alert('Please fill in name, phone, and select at least one item.');
-        return;
-      }
+  const name = document.getElementById('name').value.trim();
+  const phoneRaw = document.getElementById('phone').value.trim();
+  const phone = formatPhoneNumber(phoneRaw); // ⬅️ Format first!
+  const selected = Array.from(document.querySelectorAll('input[name="snack"]:checked')).map(cb => cb.value);
 
-      if (!/^\\(\\d{3}\\)-\\d{3}-\\d{4}$/.test(phone)) {
-        alert('Phone number must be in the format (xxx)-xxx-xxxx');
-        return;
-      }
+  // Re-assign the formatted phone number back to the input field
+  document.getElementById('phone').value = phone;
 
-      const duplicates = selected.filter(item =>
-        userItemMap[`${name.toLowerCase()}_${item}`] || userItemMap[`${phone}_${item}`] || takenItems[item]
-      );
+  if (!name || !phone || selected.length === 0) {
+    alert('Please fill in name, phone, and select at least one item.');
+    return;
+  }
 
-      if (duplicates.length > 0) {
-        alert("You’ve already signed up for: " + duplicates.join(", "));
-        return;
-      }
+  if (!/^\(\d{3}\)-\d{3}-\d{4}$/.test(phone)) {
+    alert('Phone number must be in the format (xxx)-xxx-xxxx');
+    return;
+  }
 
-      const formData = selected.map(snack => ({ name, phone, snack }));
-      fetch(snackApiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: formData })
-      })
-        .then(() => {
-          alert('Signup Successful!');
-          document.getElementById('snackSignupForm').reset();
-          fetchSnackSignups();
+  const duplicates = selected.filter(item =>
+    userItemMap[`${name.toLowerCase()}_${item}`] || userItemMap[`${phone}_${item}`] || takenItems[item]
+  );
+
+  if (duplicates.length > 0) {
+    alert("You’ve already signed up for: " + duplicates.join(", "));
+    return;
+  }
+
+  const formData = selected.map(snack => ({ name, phone, snack }));
+
+  fetch(snackApiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: formData })
+  })
+    .then(() => {
+      alert('Signup Successful!');
+      document.getElementById('snackSignupForm').reset();
+      fetchSnackSignups();
         });
     });
-
+    
     fetchSnackSignups();
   </script>
 </body>
