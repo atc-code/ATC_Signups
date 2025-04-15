@@ -37,7 +37,7 @@
     .checkbox-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       padding: 5px;
       max-height: 300px;
       overflow-y: auto;
@@ -50,12 +50,17 @@
       background-color: #f8f8f8;
       border-radius: 6px;
       border: 1px solid #ddd;
-      font-size: 16px;
-      cursor: pointer;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .checkbox-group span {
+      flex-grow: 1;
+      text-align: left;
     }
     .checkbox-group input[type="checkbox"] {
       transform: scale(1.3);
-      margin-left: 16px;
+      margin-left: auto;
+      margin-right: 4px;
     }
     table {
       width: 100%;
@@ -69,6 +74,11 @@
     }
     th {
       background-color: #f2f2f2;
+    }
+    td.available {
+      background-color: #fffac8;
+      font-style: italic;
+      min-width: 120px;
     }
     label, input, button {
       display: block;
@@ -86,6 +96,12 @@
       color: grey;
       opacity: 0.7;
     }
+    .form-note {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #555;
+      font-style: italic;
+    }
     button {
       background-color: #007bff;
       color: white;
@@ -93,6 +109,7 @@
       cursor: pointer;
       padding: 12px;
       border-radius: 6px;
+      margin-top: 10px;
     }
     button:hover {
       background-color: #0056b3;
@@ -116,26 +133,7 @@
         margin: 10px 0;
       }
     }
-  
-    .checkbox-group label {
-      white-space: nowrap;
-      font-size: 15px;
-    }
-    .checkbox-group input[type="checkbox"] {
-      margin-left: auto;
-      margin-right: 4px;
-    }
-    td.available {
-      min-width: 120px;
-    }
-    .form-note {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #555;
-      font-style: italic;
-    }
-    </style>
-
+  </style>
 </head>
 <body>
   <div class="logo-container">
@@ -169,7 +167,7 @@
     let takenItems = {}, userItemMap = {};
 
     function formatPhoneNumber(input) {
-      let cleaned = ('' + input).replace(/\D/g, '');
+      let cleaned = ('' + input).replace(/\\D/g, '');
       let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
       return match ? `(${match[1]})-${match[2]}-${match[3]}` : input;
     }
@@ -211,7 +209,17 @@
         const tbody = document.createElement("tbody");
         items.forEach(item => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${item}</td><td>${takenItems[item] || "Available"}</td>`;
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          td1.textContent = item;
+          if (takenItems[item]) {
+            td2.textContent = takenItems[item];
+          } else {
+            td2.textContent = "Available";
+            td2.classList.add("available");
+          }
+          tr.appendChild(td1);
+          tr.appendChild(td2);
           tbody.appendChild(tr);
         });
         table.appendChild(thead);
@@ -270,7 +278,7 @@
         return;
       }
 
-      if (!/^\(\d{3}\)-\d{3}-\d{4}$/.test(phone)) {
+      if (!/^\\(\\d{3}\\)-\\d{3}-\\d{4}$/.test(phone)) {
         alert('Phone number must be in the format (xxx)-xxx-xxxx');
         return;
       }
