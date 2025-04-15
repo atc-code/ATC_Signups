@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATC Good Friday Snacks Signup | April 18, 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #E6E6FA;
+      text-align: center;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      flex-wrap: wrap;
+    }
+
+    .container {
+      width: 70%;
+      max-width: 700px;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      text-align: left;
+    }
+
+    .sidebar {
+      width: 30%;
+      max-width: 300px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      margin-left: 20px;
+      text-align: left;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 95%;
+      max-width: 600px;
+      padding: 18px;
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      font-size: 20px;
+      margin-top: 5px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    input::placeholder {
+      color: grey;
+      opacity: 0.7;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .signup-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .signup-list li {
+      background: #f1f1f1;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .logo-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 120px;
+    }
+
+    .logo-container img {
+      width: 120px;
+      height: auto;
+    }
+
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .container, .sidebar {
+        width: 90%;
+        margin: 10px 0;
+        padding: 20px;
+      }
+
+      input, select, button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="images/ATC_LOGO.png" alt="ATC Logo">
+  </div>
+
+  <div class="container">
+    <h2 style="font-size: 34px; font-weight: bold; color: black;">
+      ATC Good Friday Snacks <br>
+      <span style="font-size: 28px; text-decoration: underline;">Snacks & Supplies SignUp - April 18</span>
+    </h2>
+
+    <form id="snackSignupForm">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" placeholder="John Doe" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" placeholder="example@email.com" required>
+
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
+
+      <label for="snack">Select Snack/Supply Item:</label>
+      <select id="snack" name="snack">
+        <option value="Tea">Tea</option>
+        <option value="Lemonade">Lemonade</option>
+        <option value="Fruit Juice">Fruit Juice</option>
+        <option value="Fruits (Watermelon / Apple / Banana)">Fruits (Watermelon / Apple / Banana)</option>
+        <option value="Samosa">Samosa</option>
+        <option value="Onion Pakoda">Onion Pakoda</option>
+        <option value="Rice item (Pulihora or Kichidi)">Rice item (Pulihora or Kichidi)</option>
+        <option value="Plates">Plates</option>
+        <option value="Tea Cups">Tea Cups</option>
+        <option value="Water Bottles">Water Bottles</option>
+        <option value="Spoons">Spoons</option>
+        <option value="Napkins">Napkins</option>
+        <option value="Table Cover">Table Cover</option>
+      </select>
+
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+
+  <div class="sidebar">
+    <h3>Current Signups:</h3>
+    <ul id="signupDisplay"></ul>
+  </div>
+
+  <script>
+    const snackApiUrl = 'https://sheetdb.io/api/v1/YOUR_SNACK_DB_ID'; // Replace with your actual SheetDB endpoint
+    let snackSignups = {};
+
+    function formatPhoneNumber(input) {
+      let cleaned = ('' + input).replace(/\D/g, '');
+      let match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+      return match ? `(${match[1]})-${match[2]}-${match[3]}` : input;
+    }
+
+    document.getElementById('phone').addEventListener('input', function(event) {
+      event.target.value = formatPhoneNumber(event.target.value);
+    });
+
+    function fetchSnackSignups() {
+      document.getElementById("signupDisplay").innerHTML = "<p>Loading signups...</p>";
+
+      fetch(snackApiUrl)
+        .then(response => response.json())
+        .then(data => {
+          let signupList = document.getElementById('signupDisplay');
+          signupList.innerHTML = "";
+          snackSignups = {};
+
+          data.forEach(entry => {
+            snackSignups[entry.name.toLowerCase()] = true;
+            snackSignups[entry.email.toLowerCase()] = true;
+            snackSignups[entry.phone] = true;
+
+            let listItem = document.createElement('li');
+            listItem.innerText = `${entry.snack} : ${entry.name}`;
+            signupList.appendChild(listItem);
+          });
+        })
+        .catch(error => {
+          document.getElementById("signupDisplay").innerHTML = "<p style='color: red;'>Error loading signups.</p>";
+          console.error('Error fetching snack signups:', error);
+        });
+    }
+
+    document.getElementById('snackSignupForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
+      const snack = document.getElementById('snack').value;
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
+
+      if (!emailPattern.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
+      if (!name || !email || !phone) {
+        alert('Name, email, and phone number cannot be empty.');
+        return;
+      }
+
+      if (!/^\(\d{3}\)-\d{3}-\d{4}$/.test(phone)) {
+        alert('Phone number must be in the format (xxx)-xxx-xxxx');
+        return;
+      }
+
+      if (snackSignups[name.toLowerCase()] || snackSignups[email.toLowerCase()] || snackSignups[phone]) {
+        alert('You have already signed up!');
+        return;
+      }
+
+      const formData = { name, email, phone, snack };
+
+      fetch(snackApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: [formData] })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert('Signup Successful!');
+        document.getElementById('snackSignupForm').reset();
+        fetchSnackSignups();
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    fetchSnackSignups();
+  </script>
+</body>
+</html>
