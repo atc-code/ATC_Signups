@@ -1,0 +1,46 @@
+Use Google Sheets Email Notifications (No Code)
+📌 What it does:
+Sends you (or your team) an email every time a new row is added (i.e., when someone signs up).
+
+✅ How to Set It Up:
+
+1. Open your Google Sheet
+
+2. Go to Extensions > Apps Script
+
+3. Paste this code into the script editor:
+
+function sendSignupNotification(e) {
+  const row = e.values;
+  const name = row[0]; // Assuming name is in column A
+  const phone = row[1]; // Assuming phone is in column B
+  const snack = row[2]; // Assuming snack is in column C
+
+  const emailBody = `
+    New Good Friday Signup:
+    Name: ${name}
+    Phone: ${phone}
+    Snack: ${snack}
+  `;
+
+  MailApp.sendEmail({
+    to: "your_email@example.com",
+    subject: "New Snack Signup - Good Friday",
+    body: emailBody
+  });
+}
+
+function createTrigger() {
+  ScriptApp.newTrigger('sendSignupNotification')
+    .forSpreadsheet(SpreadsheetApp.getActiveSpreadsheet())
+    .onFormSubmit()
+    .create();
+}
+
+
+4. Save it.
+
+5. Run createTrigger() once to set up the listener.
+
+6. ✅ Done! You'll now get email alerts when new signups come in.
+
