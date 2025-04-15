@@ -59,7 +59,7 @@
       font-weight: bold;
     }
 
-    input, button {
+    input, button, .checkbox-wrapper {
       width: 95%;
       max-width: 600px;
       padding: 16px;
@@ -69,7 +69,7 @@
       font-size: 18px;
       margin-top: 5px;
       border-radius: 6px;
-      text-align: center;
+      box-sizing: border-box;
     }
 
     .checkbox-group {
@@ -79,26 +79,26 @@
       overflow-y: auto;
       gap: 8px;
       padding: 5px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
     }
 
-    .checkbox-group label {
+    .checkbox-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 12px;
-      background-color: #f8f8f8;
-      border-radius: 6px;
-      border: 1px solid #ddd;
       font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
     }
 
-    .checkbox-group label:hover {
-      background-color: #e0e0ff;
+    .checkbox-item:last-child {
+      border-bottom: none;
     }
 
-    .checkbox-group input[type="checkbox"] {
+    .checkbox-item input[type="checkbox"] {
       transform: scale(1.4);
       margin-left: 12px;
     }
@@ -141,7 +141,7 @@
         padding: 20px;
       }
 
-      input, button {
+      input, button, .checkbox-wrapper {
         width: 100%;
       }
     }
@@ -166,7 +166,9 @@
       <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
 
       <label>Select Snack/Supply Items:</label>
-      <div class="checkbox-group" id="snackCheckboxGroup"></div>
+      <div class="checkbox-wrapper">
+        <div class="checkbox-group" id="snackCheckboxGroup"></div>
+      </div>
 
       <button type="submit">Sign Up</button>
     </form>
@@ -190,11 +192,10 @@
     const snackOptions = [
       "Tea",
       "Lemonade",
-      "Fruit Juice",
+      "Fruit Juice for kids",
       "Fruits (Watermelon / Apple / Banana)",
       "Samosa",
       "Onion Pakoda",
-      "Rice item (Pulihora or Kichidi)",
       "Paper Plates / Bowls",
       "Tea Cups",
       "Water Bottles",
@@ -221,12 +222,18 @@
       group.innerHTML = "";
       snackOptions.forEach(item => {
         if (!takenItems[item]) {
-          const label = document.createElement("label");
+          const label = document.createElement("div");
+          label.className = 'checkbox-item';
+
+          const labelText = document.createElement("span");
+          labelText.textContent = item;
+
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
           checkbox.name = "snack";
           checkbox.value = item;
-          label.appendChild(document.createTextNode(item));
+
+          label.appendChild(labelText);
           label.appendChild(checkbox);
           group.appendChild(label);
         }
