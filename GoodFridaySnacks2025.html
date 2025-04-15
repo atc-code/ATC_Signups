@@ -15,6 +15,7 @@
       position: relative;
       flex-wrap: wrap;
     }
+
     .container {
       width: 70%;
       max-width: 700px;
@@ -24,6 +25,7 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       text-align: left;
     }
+
     .sidebar {
       width: 30%;
       max-width: 300px;
@@ -34,52 +36,52 @@
       margin-left: 20px;
       text-align: left;
     }
+
     .checkbox-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 5px;
-      max-height: 300px;
-      overflow-y: auto;
+      padding: 5px 0;
     }
+
     .checkbox-group label {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 12px;
       padding: 10px 12px;
       background-color: #f8f8f8;
       border-radius: 6px;
       border: 1px solid #ddd;
       font-size: 15px;
-      white-space: nowrap;
     }
-    .checkbox-group span {
-      flex-grow: 1;
-      text-align: left;
-    }
+
     .checkbox-group input[type="checkbox"] {
       transform: scale(1.3);
-      margin-left: auto;
-      margin-right: 4px;
+      margin: 0;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
+
     th, td {
       padding: 8px;
       border: 1px solid #ccc;
       text-align: left;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
     td.available {
       background-color: #fffac8;
       font-style: italic;
       min-width: 120px;
     }
+
     label, input, button {
       display: block;
       width: 95%;
@@ -87,21 +89,25 @@
       margin-top: 10px;
       font-size: 16px;
     }
+
     input {
       padding: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
     input::placeholder {
       color: grey;
       opacity: 0.7;
     }
+
     .form-note {
       margin-top: 12px;
       font-size: 14px;
       color: #555;
       font-style: italic;
     }
+
     button {
       background-color: #007bff;
       color: white;
@@ -111,23 +117,28 @@
       border-radius: 6px;
       margin-top: 10px;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     .logo-container {
       position: absolute;
       top: 10px;
       left: 10px;
     }
+
     .logo-container img {
       width: 100px;
       height: auto;
     }
+
     @media screen and (max-width: 768px) {
       body {
         flex-direction: column;
         align-items: center;
       }
+
       .container, .sidebar {
         width: 90%;
         margin: 10px 0;
@@ -144,18 +155,26 @@
     <form id="snackSignupForm">
       <label for="name">Full Name:</label>
       <input type="text" id="name" name="name" placeholder="John Doe" required />
+
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required />
-      <label>Select Snack/Supply Items:</label>
-      <div class="checkbox-group" id="snackCheckboxGroup"></div>
+
+      <label>Snacks:</label>
+      <div class="checkbox-group" id="snackCheckboxGroupSnacks"></div>
+
+      <label>Supplies:</label>
+      <div class="checkbox-group" id="snackCheckboxGroupSupplies"></div>
+
       <div class="form-note">Each item can only be signed up by one person. You may select multiple items.</div>
       <button type="submit">Sign Up</button>
     </form>
   </div>
+
   <div class="sidebar">
     <h3>Current Signups</h3>
     <div id="signupDisplay"></div>
   </div>
+
   <script>
     const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23';
     const snackOptions = [
@@ -177,20 +196,26 @@
     });
 
     function populateCheckboxes() {
-      const group = document.getElementById("snackCheckboxGroup");
-      group.innerHTML = "";
+      const snacksDiv = document.getElementById("snackCheckboxGroupSnacks");
+      const suppliesDiv = document.getElementById("snackCheckboxGroupSupplies");
+      snacksDiv.innerHTML = "";
+      suppliesDiv.innerHTML = "";
+
       snackOptions.forEach(item => {
         if (!takenItems[item]) {
           const label = document.createElement("label");
-          const text = document.createElement("span");
           const checkbox = document.createElement("input");
-          text.textContent = item;
           checkbox.type = "checkbox";
           checkbox.name = "snack";
           checkbox.value = item;
-          label.appendChild(text);
           label.appendChild(checkbox);
-          group.appendChild(label);
+          label.appendChild(document.createTextNode(item));
+
+          if (snacksSet.has(item)) {
+            snacksDiv.appendChild(label);
+          } else {
+            suppliesDiv.appendChild(label);
+          }
         }
       });
     }
@@ -207,21 +232,25 @@
         const thead = document.createElement("thead");
         thead.innerHTML = "<tr><th>Item</th><th>Signed Up By</th></tr>";
         const tbody = document.createElement("tbody");
+
         items.forEach(item => {
           const tr = document.createElement("tr");
           const td1 = document.createElement("td");
           const td2 = document.createElement("td");
           td1.textContent = item;
+
           if (takenItems[item]) {
             td2.textContent = takenItems[item];
           } else {
             td2.textContent = "Available";
             td2.classList.add("available");
           }
+
           tr.appendChild(td1);
           tr.appendChild(td2);
           tbody.appendChild(tr);
         });
+
         table.appendChild(thead);
         table.appendChild(tbody);
         section.appendChild(heading);
