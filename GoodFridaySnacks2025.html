@@ -1,3 +1,4 @@
+<!-- START OF UPDATED FILE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,28 +138,11 @@
       <label for="name">Full Name:</label>
       <input type="text" id="name" name="name" placeholder="John Doe" required>
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" placeholder="example@email.com" required>
-
       <label for="phone">Phone Number:</label>
       <input type="tel" id="phone" name="phone" placeholder="(123)-456-7890" required>
 
       <label for="snack">Select Snack/Supply Item:</label>
-      <select id="snack" name="snack">
-        <option value="Tea">Tea</option>
-        <option value="Lemonade">Lemonade</option>
-        <option value="Fruit Juice">Fruit Juice</option>
-        <option value="Fruits (Watermelon / Apple / Banana)">Fruits (Watermelon / Apple / Banana)</option>
-        <option value="Samosa">Samosa</option>
-        <option value="Onion Pakoda">Onion Pakoda</option>
-        <option value="Rice item (Pulihora or Kichidi)">Rice item (Pulihora or Kichidi)</option>
-        <option value="Plates">Plates</option>
-        <option value="Tea Cups">Tea Cups</option>
-        <option value="Water Bottles">Water Bottles</option>
-        <option value="Spoons">Spoons</option>
-        <option value="Napkins">Napkins</option>
-        <option value="Table Cover">Table Cover</option>
-      </select>
+      <select id="snack" name="snack"></select>
 
       <button type="submit">Sign Up</button>
     </form>
@@ -170,8 +154,25 @@
   </div>
 
   <script>
-    const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23'; // Replace with your actual SheetDB endpoint
+    const snackApiUrl = 'https://sheetdb.io/api/v1/cemf00gqyzq23'; // Replace if needed
+    let takenItems = {};
     let snackSignups = {};
+
+    const snackOptions = [
+      "Tea",
+      "Lemonade",
+      "Fruit Juice",
+      "Fruits (Watermelon / Apple / Banana)",
+      "Samosa",
+      "Onion Pakoda",
+      "Rice item (Pulihora or Kichidi)",
+      "Paper Plates / Bowls",
+      "Tea Cups",
+      "Water Bottles",
+      "Spoons",
+      "Napkins",
+      "Table Cover"
+    ];
 
     function formatPhoneNumber(input) {
       let cleaned = ('' + input).replace(/\D/g, '');
@@ -183,6 +184,19 @@
       event.target.value = formatPhoneNumber(event.target.value);
     });
 
+    function populateDropdown() {
+      const select = document.getElementById("snack");
+      select.innerHTML = "";
+      snackOptions.forEach(item => {
+        if (!takenItems[item]) {
+          const option = document.createElement("option");
+          option.value = item;
+          option.textContent = item;
+          select.appendChild(option);
+        }
+      });
+    }
+
     function fetchSnackSignups() {
       document.getElementById("signupDisplay").innerHTML = "<p>Loading signups...</p>";
 
@@ -191,17 +205,22 @@
         .then(data => {
           let signupList = document.getElementById('signupDisplay');
           signupList.innerHTML = "";
+          takenItems = {};
           snackSignups = {};
 
           data.forEach(entry => {
+            const snack = entry.snack;
+            takenItems[snack] = true;
+
             snackSignups[entry.name.toLowerCase()] = true;
-            snackSignups[entry.email.toLowerCase()] = true;
             snackSignups[entry.phone] = true;
 
             let listItem = document.createElement('li');
-            listItem.innerText = `${entry.snack} : ${entry.name}`;
+            listItem.innerText = `${snack} : ${entry.name}`;
             signupList.appendChild(listItem);
           });
+
+          populateDropdown();
         })
         .catch(error => {
           document.getElementById("signupDisplay").innerHTML = "<p style='color: red;'>Error loading signups.</p>";
@@ -213,19 +232,11 @@
       event.preventDefault();
 
       const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
       const phone = formatPhoneNumber(document.getElementById('phone').value.trim());
       const snack = document.getElementById('snack').value;
 
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/;
-
-      if (!emailPattern.test(email)) {
-        alert('Please enter a valid email address');
-        return;
-      }
-
-      if (!name || !email || !phone) {
-        alert('Name, email, and phone number cannot be empty.');
+      if (!name || !phone || !snack) {
+        alert('Name, phone number, and snack item are required.');
         return;
       }
 
@@ -234,12 +245,17 @@
         return;
       }
 
-      if (snackSignups[name.toLowerCase()] || snackSignups[email.toLowerCase()] || snackSignups[phone]) {
+      if (snackSignups[name.toLowerCase()] || snackSignups[phone]) {
         alert('You have already signed up!');
         return;
       }
 
-      const formData = { name, email, phone, snack };
+      if (takenItems[snack]) {
+        alert(`The item "${snack}" is already taken. Please choose another.`);
+        return;
+      }
+
+      const formData = { name, phone, snack };
 
       fetch(snackApiUrl, {
         method: 'POST',
