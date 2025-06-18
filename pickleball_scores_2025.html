@@ -22,20 +22,43 @@
   <h1>2025 Picnic Pickleball Tournament</h1>
   <p>📍 Dobbs Creek Recreation Center, 1115 Dahlonega Hwy, Cumming, GA 30040 · 🗓️ June 19, 2025 · 🕕 6:00 PM ET onwards</p>
 
-  <h2>Groups & Teams</h2>
-<div id="groupInfo">Loading groups...</div>
-<div id="groupMatches">Loading matches...</div>
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 400px;">
+    <h2>Group A (Pro Level)</h2>
+    <ul>
+      <li>Pradeep & Nicky</li>
+      <li>Venkat K & Chakri</li>
+      <li>Raj & Prem</li>
+      <li>Praveen & Rufus</li>
+    </ul>
+    <h3>Standings</h3>
+    <table id="groupAStandings">
+      <thead>
+        <tr><th>Team</th><th>Wins</th><th>Losses</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div style="flex: 1; min-width: 400px;">
+    <h2>Group B (Beginner Level)</h2>
+    <ul>
+      <li>Preetham & Krishna</li>
+      <li>Raju D & Kiran S</li>
+      <li>Venkat V & Kiran K</li>
+      <li>Vijay B & Suresh</li>
+    </ul>
+    <h3>Standings</h3>
+    <table id="groupBStandings">
+      <thead>
+        <tr><th>Team</th><th>Wins</th><th>Losses</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
 <p><strong>Finals:</strong> After all group matches are complete, the top two teams from each group will play a best-of-three series. If one team wins the first two matches, the third match will not be played.</p>
 
-  <h2>Live Match Scores</h2>
-  <table id="scoresTable">
-    <thead>
-      <tr><th>Match</th><th>Score</th><th>Status</th></tr>
-    </thead>
-    <tbody id="scoresBody">Loading...</tbody>
-  </table>
-
-  <div class="standings">
+  
     <h2>Team Standings</h2>
     <table id="standingsTable">
       <thead>
@@ -45,24 +68,7 @@
     </table>
   </div>
 
-  <div class="admin-form">
-    <h2>Admin Score Update</h2>
-    <form id="scoreForm">
-      <label for="match">Match</label>
-      <input type="text" id="match" name="match" required>
-
-      <label for="score">Score</label>
-      <input type="text" id="score" name="score" required>
-
-      <label for="status">Status</label>
-      <select id="status" name="status">
-        <option value="In Progress">In Progress</option>
-        <option value="Completed">Completed</option>
-      </select>
-
-      <button type="submit">Update Match</button>
-    </form>
-  </div>
+  
 
   <div class="standings">
   <h2>Final Match Results</h2>
@@ -168,7 +174,13 @@ const groupAStandings = standings.filter(t => groupATeams.includes(t.team));
             <td>${s.wins}</td>
             <td>${s.losses}</td>
           </tr>`).join('');
-        document.getElementById('standingsBody').innerHTML = standingRows;
+        document.querySelector('#groupAStandings tbody').innerHTML = groupAStandings.map(s => `
+  <tr><td>${s.team}</td><td>${s.wins}</td><td>${s.losses}</td></tr>
+`).join('');
+
+document.querySelector('#groupBStandings tbody').innerHTML = groupBStandings.map(s => `
+  <tr><td>${s.team}</td><td>${s.wins}</td><td>${s.losses}</td></tr>
+`).join('');
 
         // Finals best-of-3 match extraction
         const finalAName = `${top2A[0].team} vs ${top2A[1].team}`;
