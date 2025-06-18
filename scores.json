@@ -1,66 +1,94 @@
 {
   "matches": [
     {
-      "match": "Pradeep & Nicky vs Venkat K & Chakri",
-      "score": "",
-      "status": ""
+      "match": "Team A1 vs Team A2",
+      "score": ""
     },
     {
-      "match": "Raj & Prem vs Praveen & Rufus",
-      "score": "",
-      "status": ""
+      "match": "Team A1 vs Team A3",
+      "score": ""
     },
     {
-      "match": "Preetham & Krishna vs Raju D & Kiran S",
-      "score": "",
-      "status": ""
+      "match": "Team A1 vs Team A4",
+      "score": ""
     },
     {
-      "match": "Preetham & Krishna vs Vijay B & Suresh",
-      "score": "",
-      "status": ""
+      "match": "Team A2 vs Team A3",
+      "score": ""
+    },
+    {
+      "match": "Team A2 vs Team A4",
+      "score": ""
+    },
+    {
+      "match": "Team A3 vs Team A4",
+      "score": ""
+    },
+    {
+      "match": "Team B1 vs Team B2",
+      "score": ""
+    },
+    {
+      "match": "Team B1 vs Team B3",
+      "score": ""
+    },
+    {
+      "match": "Team B1 vs Team B4",
+      "score": ""
+    },
+    {
+      "match": "Team B2 vs Team B3",
+      "score": ""
+    },
+    {
+      "match": "Team B2 vs Team B4",
+      "score": ""
+    },
+    {
+      "match": "Team B3 vs Team B4",
+      "score": ""
     }
   ],
   "standings": [
     {
-      "team": "Pradeep & Nicky",
-      "wins": ,
-      "losses": 
+      "team": "Team A1",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Venkat K & Chakri",
-      "wins": ,
-      "losses": 
+      "team": "Team A2",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Raj & Prem",
-      "wins": ,
-      "losses": 
+      "team": "Team A3",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Praveen & Rufus",
-      "wins": ,
-      "losses": 
+      "team": "Team A4",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Preetham & Krishna",
-      "wins": ,
-      "losses": 
+      "team": "Team B1",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Raju D & Kiran S",
-      "wins": ,
-      "losses": 
+      "team": "Team B2",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Venkat V & Kiran K",
-      "wins": ,
-      "losses": 
+      "team": "Team B3",
+      "wins": 0,
+      "losses": 0
     },
     {
-      "team": "Vijay B & Suresh",
-      "wins": ,
-      "losses": 
+      "team": "Team B4",
+      "wins": 0,
+      "losses": 0
     }
   ]
 }
