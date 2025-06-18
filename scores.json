@@ -17,50 +17,50 @@
     },
     {
       "match": "Preetham & Krishna vs Vijay B & Suresh",
-      "score": "9-11, 11-5",
-      "status": "In Progress"
+      "score": "",
+      "status": ""
     }
   ],
   "standings": [
     {
       "team": "Pradeep & Nicky",
-      "wins": 1,
-      "losses": 1
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Venkat K & Chakri",
-      "wins": 1,
-      "losses": 1
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Raj & Prem",
-      "wins": 2,
-      "losses": 0
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Praveen & Rufus",
-      "wins": 0,
-      "losses": 2
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Preetham & Krishna",
-      "wins": 2,
-      "losses": 0
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Raju D & Kiran S",
-      "wins": 1,
-      "losses": 1
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Venkat V & Kiran K",
-      "wins": 0,
-      "losses": 2
+      "wins": ,
+      "losses": 
     },
     {
       "team": "Vijay B & Suresh",
-      "wins": 1,
-      "losses": 1
+      "wins": ,
+      "losses": 
     }
   ]
 }
