@@ -150,8 +150,28 @@
         const groupATeams = config.groupA.teams;
 const groupBTeams = config.groupB.teams;
 
-const groupAStandings = standings.filter(t => groupATeams.includes(t.team));
-        const groupBStandings = standings.filter(t => groupBTeams.includes(t.team));
+const groupAResults = {};
+const groupBResults = {};
+
+// Calculate match results based on scores
+matches.forEach(({ match, score }) => {
+  if (!score.includes('-')) return;
+  const [team1, team2] = match.split(' vs ').map(t => t.trim());
+  const group = groupATeams.includes(team1) ? 'A' : (groupBTeams.includes(team1) ? 'B' : null);
+  if (!group || !team1 || !team2) return;
+  const [score1, score2] = score.split(',')[0].split('-').map(s => parseInt(s.trim()));
+  if (isNaN(score1) || isNaN(score2)) return;
+  const winner = score1 > score2 ? team1 : team2;
+  const loser = score1 > score2 ? team2 : team1;
+  const results = group === 'A' ? groupAResults : groupBResults;
+  results[winner] = results[winner] || { team: winner, wins: 0, losses: 0 };
+  results[loser] = results[loser] || { team: loser, wins: 0, losses: 0 };
+  results[winner].wins += 1;
+  results[loser].losses += 1;
+});
+
+const groupAStandings = Object.values(groupAResults);
+const groupBStandings = Object.values(groupBResults);
 
         // Determine top 2 from each group
         const top2A = groupAStandings.sort((a, b) => b.wins - a.wins).slice(0, 2);
