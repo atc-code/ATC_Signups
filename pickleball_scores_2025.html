@@ -59,13 +59,7 @@
 <p><strong>Finals:</strong> After all group matches are complete, the top two teams from each group will play a best-of-three series. If one team wins the first two matches, the third match will not be played.</p>
 
   
-    <h2>Team Standings</h2>
-    <table id="standingsTable">
-      <thead>
-        <tr><th>Team</th><th>Wins</th><th>Losses</th></tr>
-      </thead>
-      <tbody id="standingsBody">Loading...</tbody>
-    </table>
+    
   </div>
 
   
@@ -157,21 +151,48 @@ const groupBResults = {};
 matches.forEach(({ match, score }) => {
   if (!score.includes('-')) return;
   const [team1, team2] = match.split(' vs ').map(t => t.trim());
-  const group = groupATeams.includes(team1) ? 'A' : (groupBTeams.includes(team1) ? 'B' : null);
+  const isFinal = match.toLowerCase().includes('final');
+  const group = config.groupA.teams.includes(team1) ? 'A' : (config.groupB.teams.includes(team1) ? 'B' : null);
   if (!group || !team1 || !team2) return;
-  const [score1, score2] = score.split(',')[0].split('-').map(s => parseInt(s.trim()));
-  if (isNaN(score1) || isNaN(score2)) return;
-  const winner = score1 > score2 ? team1 : team2;
-  const loser = score1 > score2 ? team2 : team1;
+
+  const sets = score.split(',').map(s => s.trim());
   const results = group === 'A' ? groupAResults : groupBResults;
-  results[winner] = results[winner] || { team: winner, wins: 0, losses: 0 };
-  results[loser] = results[loser] || { team: loser, wins: 0, losses: 0 };
-  results[winner].wins += 1;
-  results[loser].losses += 1;
+  results[team1] = results[team1] || { team: team1, wins: 0, losses: 0, points: 0 };
+  results[team2] = results[team2] || { team: team2, wins: 0, losses: 0, points: 0 };
+
+  let team1SetWins = 0;
+  let team2SetWins = 0;
+  let team1Points = 0;
+  let team2Points = 0;
+
+  sets.forEach(set => {
+    const [s1, s2] = set.split('-').map(x => parseInt(x));
+    if (isNaN(s1) || isNaN(s2)) return;
+    team1Points += s1;
+    team2Points += s2;
+    if (s1 > s2) team1SetWins++; else if (s2 > s1) team2SetWins++;
+  });
+
+  if (isFinal) {
+    const winner = team1SetWins > team2SetWins ? team1 : team2;
+    const loser = team1SetWins > team2SetWins ? team2 : team1;
+    results[winner].wins += 1;
+    results[loser].losses += 1;
+  } else {
+    results[team1].points += team1Points;
+    results[team2].points += team2Points;
+    if (team1SetWins > team2SetWins) {
+      results[team1].wins += 1;
+      results[team2].losses += 1;
+    } else if (team2SetWins > team1SetWins) {
+      results[team2].wins += 1;
+      results[team1].losses += 1;
+    }
+  }
 });
 
-const groupAStandings = Object.values(groupAResults);
-const groupBStandings = Object.values(groupBResults);
+const groupAStandings = Object.values(groupAResults).sort((a, b) => b.wins - a.wins || b.points - a.points);
+const groupBStandings = Object.values(groupBResults).sort((a, b) => b.wins - a.wins || b.points - a.points);
 
         // Determine top 2 from each group
         const top2A = groupAStandings.sort((a, b) => b.wins - a.wins).slice(0, 2);
