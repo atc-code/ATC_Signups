@@ -1,8 +1,8 @@
 {
   "matches": [
     {
-      "match": "Team A1 vs Team A2",
-      "score": ""
+      "match": "Pradeep & Nicky 🆚 Venkat K & Chakri",
+      "score": "6-11"
     },
     {
       "match": "Team A1 vs Team A3",
@@ -47,48 +47,6 @@
     {
       "match": "Team B3 vs Team B4",
       "score": ""
-    }
-  ],
-  "standings": [
-    {
-      "team": "Team A1",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team A2",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team A3",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team A4",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team B1",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team B2",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team B3",
-      "wins": 0,
-      "losses": 0
-    },
-    {
-      "team": "Team B4",
-      "wins": 0,
-      "losses": 0
     }
   ]
 }
