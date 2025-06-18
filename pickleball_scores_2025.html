@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025 Picnic Pickleball Tournament</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    h1, h2 { margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    th { background: #efefef; }
+    .in-progress { background: #fffbe6; }
+    .completed { background: #e6ffe6; }
+    .standings { margin-top: 40px; }
+    .admin-form { margin-top: 50px; border: 1px solid #ccc; padding: 20px; background: #f9f9f9; }
+    .admin-form input, .admin-form select { margin: 5px 0; padding: 8px; width: 100%; }
+    .admin-form button { padding: 10px 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>2025 Picnic Pickleball Tournament</h1>
+  <p>📍 Dobbs Creek Recreation Center, 1115 Dahlonega Hwy, Cumming, GA 30040 · 🗓️ June 19, 2025 · 🕕 6:00 PM ET onwards</p>
+
+  <h2>Groups & Teams</h2>
+<div id="groupInfo">Loading groups...</div>
+<div id="groupMatches">Loading matches...</div>
+<p><strong>Finals:</strong> After all group matches are complete, the top two teams from each group will play a best-of-three series. If one team wins the first two matches, the third match will not be played.</p>
+
+  <h2>Live Match Scores</h2>
+  <table id="scoresTable">
+    <thead>
+      <tr><th>Match</th><th>Score</th><th>Status</th></tr>
+    </thead>
+    <tbody id="scoresBody">Loading...</tbody>
+  </table>
+
+  <div class="standings">
+    <h2>Team Standings</h2>
+    <table id="standingsTable">
+      <thead>
+        <tr><th>Team</th><th>Wins</th><th>Losses</th></tr>
+      </thead>
+      <tbody id="standingsBody">Loading...</tbody>
+    </table>
+  </div>
+
+  <div class="admin-form">
+    <h2>Admin Score Update</h2>
+    <form id="scoreForm">
+      <label for="match">Match</label>
+      <input type="text" id="match" name="match" required>
+
+      <label for="score">Score</label>
+      <input type="text" id="score" name="score" required>
+
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+
+      <button type="submit">Update Match</button>
+    </form>
+  </div>
+
+  <div class="standings">
+  <h2>Final Match Results</h2>
+  <h3>Group A Final</h3>
+  <p><strong>Teams:</strong> <span id="finalA">TBD</span></p>
+  <table id="finalAResults">
+    <thead><tr><th>Match</th><th>Score</th><th>Status</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>Group B Final</h3>
+  <p><strong>Teams:</strong> <span id="finalB">TBD</span></p>
+  <table id="finalBResults">
+    <thead><tr><th>Match</th><th>Score</th><th>Status</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+  <script>
+    function renderGroupsAndMatches() {
+      // Render Teams
+      const groupInfo = document.getElementById('groupInfo');
+      groupInfo.innerHTML = '';
+      for (const groupKey of Object.keys(config)) {
+        const group = config[groupKey];
+        const groupLabel = document.createElement('h3');
+        groupLabel.textContent = group.label;
+        const list = document.createElement('ul');
+        group.teams.forEach(team => {
+          const li = document.createElement('li');
+          li.textContent = team;
+          list.appendChild(li);
+        });
+        groupInfo.appendChild(groupLabel);
+        groupInfo.appendChild(list);
+      }
+
+      // Render Matches
+      const groupMatches = document.getElementById('groupMatches');
+      groupMatches.innerHTML = '';
+      for (const groupKey of Object.keys(config)) {
+        const group = config[groupKey];
+        const teams = group.teams;
+        const matchHeader = document.createElement('h3');
+        matchHeader.textContent = `${group.label} Matches`;
+        const list = document.createElement('ol');
+        for (let i = 0; i < teams.length; i++) {
+          for (let j = i + 1; j < teams.length; j++) {
+            const li = document.createElement('li');
+            li.textContent = `${teams[i]} 🆚 ${teams[j]}`;
+            list.appendChild(li);
+          }
+        }
+        groupMatches.appendChild(matchHeader);
+        groupMatches.appendChild(list);
+      }
+    }
+    // Configuration for teams and group labels
+    const config = {
+      groupA: {
+        label: 'Group A (Pro Level)',
+        teams: [
+          'Pradeep & Nicky', 'Venkat K & Chakri', 'Raj & Prem', 'Praveen & Rufus'
+        ]
+      },
+      groupB: {
+        label: 'Group B (Beginner Level)',
+        teams: [
+          'Preetham & Krishna', 'Raju D & Kiran S', 'Venkat V & Kiran K', 'Vijay B & Suresh'
+        ]
+      }
+    };
+    async function updateScores() {
+      try {
+        const res = await fetch('scores.json?' + Date.now());
+        const { matches, standings } = await res.json();
+
+        // Group standings separation
+        const groupATeams = config.groupA.teams;
+const groupBTeams = config.groupB.teams;
+
+const groupAStandings = standings.filter(t => groupATeams.includes(t.team));
+        const groupBStandings = standings.filter(t => groupBTeams.includes(t.team));
+
+        // Determine top 2 from each group
+        const top2A = groupAStandings.sort((a, b) => b.wins - a.wins).slice(0, 2);
+        const top2B = groupBStandings.sort((a, b) => b.wins - a.wins).slice(0, 2);
+
+        document.getElementById('finalA').textContent = `${top2A[0].team} vs ${top2A[1].team}`;
+        document.getElementById('finalB').textContent = `${top2B[0].team} vs ${top2B[1].team}`;
+
+        const scoreRows = matches.map(m => `
+          <tr class="${m.status === 'In Progress' ? 'in-progress' : 'completed'}">
+            <td>${m.match}</td>
+            <td>${m.score}</td>
+            <td>${m.status}</td>
+          </tr>`).join('');
+        document.getElementById('scoresBody').innerHTML = scoreRows;
+
+        const standingRows = standings.map(s => `
+          <tr>
+            <td>${s.team}</td>
+            <td>${s.wins}</td>
+            <td>${s.losses}</td>
+          </tr>`).join('');
+        document.getElementById('standingsBody').innerHTML = standingRows;
+
+        // Finals best-of-3 match extraction
+        const finalAName = `${top2A[0].team} vs ${top2A[1].team}`;
+        const finalBName = `${top2B[0].team} vs ${top2B[1].team}`;
+
+        const finalAMatches = matches.filter(m => m.match === finalAName);
+        const finalBMatches = matches.filter(m => m.match === finalBName);
+
+        const renderFinals = (data, tableId) => {
+          const rows = data.map((m, i) => `<tr>
+            <td>Game ${i + 1}</td>
+            <td>${m.score}</td>
+            <td>${m.status}</td>
+          </tr>`).join('');
+          document.querySelector(`#${tableId} tbody`).innerHTML = rows;
+        };
+
+        renderFinals(finalAMatches, 'finalAResults');
+        renderFinals(finalBMatches, 'finalBResults');
+
+        // Highlight winner if 2-0
+        const highlightWinner = (finalMatches, top2) => {
+          const wins = {};
+          finalMatches.forEach(m => {
+            const [score1, score2] = m.score.split(',')[0].split('-').map(s => parseInt(s.trim()));
+            if (!isNaN(score1) && !isNaN(score2)) {
+              const winner = score1 > score2 ? top2[0].team : top2[1].team;
+              wins[winner] = (wins[winner] || 0) + 1;
+            }
+          });
+          const winner = Object.keys(wins).find(k => wins[k] >= 2);
+          return winner ? ` 🏆 Champion: ${winner}` : '';
+        };
+
+        const finalAChampion = highlightWinner(finalAMatches, top2A);
+        const finalBChampion = highlightWinner(finalBMatches, top2B);
+
+        document.getElementById('finalA').textContent += finalAChampion;
+        document.getElementById('finalB').textContent += finalBChampion;
+      } catch (err) {
+        console.error('Error loading scores', err);
+      }
+    }
+
+    renderGroupsAndMatches();
+    updateScores();
+    setInterval(updateScores, 15000);
+
+    document.getElementById('scoreForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Score submitted (mock form). Connect to backend to make it live.');
+      this.reset();
+    });
+  </script>
+</body>
+</html>
