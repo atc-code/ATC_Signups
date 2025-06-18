@@ -75,14 +75,14 @@
   <h3>Group A Final</h3>
   <p><strong>Teams:</strong> <span id="finalA">TBD</span></p>
   <table id="finalAResults">
-    <thead><tr><th>Match</th><th>Score</th><th>Status</th></tr></thead>
+    <thead><tr><th>Game</th><th>Score</th></tr></thead>
     <tbody></tbody>
   </table>
 
   <h3>Group B Final</h3>
   <p><strong>Teams:</strong> <span id="finalB">TBD</span></p>
   <table id="finalBResults">
-    <thead><tr><th>Match</th><th>Score</th><th>Status</th></tr></thead>
+    <thead><tr><th>Game</th><th>Score</th></tr></thead>
     <tbody></tbody>
   </table>
 </div>
@@ -193,7 +193,6 @@ document.querySelector('#groupBStandings tbody').innerHTML = groupBStandings.map
           const rows = data.map((m, i) => `<tr>
             <td>Game ${i + 1}</td>
             <td>${m.score}</td>
-            <td>${m.status}</td>
           </tr>`).join('');
           document.querySelector(`#${tableId} tbody`).innerHTML = rows;
         };
