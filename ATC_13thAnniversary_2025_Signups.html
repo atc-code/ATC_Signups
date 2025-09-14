@@ -1,56 +1,156 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Church 13th Anniversary Sign‑Up — Sept 21, 2025</title>
-<style>
-:root { --max: 900px; }
-* { box-sizing: border-box; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; }
-header { background: #222; color: #fff; padding: 28px 18px; }
-header h1 { margin: 0 0 6px; font-size: 1.6rem; }
-header p { margin: 0; opacity: .9; }
-main { max-width: var(--max); margin: 20px auto; padding: 0 18px; }
-.card { background: #fff; border-radius: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 20px; }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
-label { font-weight: 600; display: block; margin-bottom: 6px; }
-input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; }
-textarea { min-height: 90px; resize: vertical; }
-.hint { font-size: .9rem; color: #666; }
-.teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 8px; }
-@media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
-.team { display: flex; gap: 10px; align-items: flex-start; }
-.team input { margin-top: 3px; }
-.req { color: #c00; margin-left: 4px; }
-.actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
-button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.primary { background: #2b6cb0; color: #fff; }
-.secondary { background: #edf2f7; }
-.msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
-.success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
-.error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
-footer { text-align: center; color: #555; padding: 20px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATC 13th Anniversary Sign‑Up — Sept 21, 2025</title>
+  <style>
+    :root { --max: 900px; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; }
+    header { background: #222; color: #fff; padding: 28px 18px; }
+    header h1 { margin: 0 0 6px; font-size: 1.6rem; }
+    header p { margin: 0; opacity: .9; }
+    main { max-width: var(--max); margin: 20px auto; padding: 0 18px; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 20px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+    label { font-weight: 600; display: block; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; }
+    textarea { min-height: 90px; resize: vertical; }
+    .hint { font-size: .9rem; color: #666; }
+    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 8px; }
+    @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
+    .team { display: flex; gap: 10px; align-items: flex-start; }
+    .team input { margin-top: 3px; }
+    .req { color: #c00; margin-left: 4px; }
+    .actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+    button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .primary { background: #2b6cb0; color: #fff; }
+    .secondary { background: #edf2f7; }
+    .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
+    .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
+    .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
+    footer { text-align: center; color: #555; padding: 20px; }
+  </style>
 </head>
 <body>
-<header>
-<h1>Church 13th Anniversary — Volunteer Sign‑Up</h1>
-<p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
-</header>
-<main>
-<div class="card">
-<form id="signupForm" autocomplete="on">
-<div class="row">
-<div>
-<label for="name">Full Name<span class="req">*</span></label>
-<input id="name" name="name" type="text" required placeholder="e.g., John & Mary Doe" />
-</div>
-<div>
-<label for="email">Email<span class="req">*</span></label>
-<input id="email" name="email" type="email" required placeholder="name@example.com" />
-</div>
-</div>
-<div class="row">
+  <header>
+    <h1>ATC 13th Anniversary — Volunteer Sign‑Up</h1>
+    <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
+  </header>
+  <main>
+    <div class="card">
+      <form id="signupForm" autocomplete="on">
+        <div class="row">
+          <div>
+            <label for="name">Full Name<span class="req">*</span></label>
+            <input id="name" name="name" type="text" required placeholder="e.g., John & Mary Doe" />
+          </div>
+          <div>
+            <label for="email">Email<span class="req">*</span></label>
+            <input id="email" name="email" type="email" required placeholder="name@example.com" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="text" inputmode="tel" placeholder="(###) ###‑####" />
+            <div class="hint">Optional; used only for day‑of coordination.</div>
+          </div>
+          <div>
+            <label>Teams you can serve on<span class="req">*</span></label>
+            <div class="teams">
+              <label class="team"><input type="checkbox" name="teams" value="Set up team" /> Set up team</label>
+              <label class="team"><input type="checkbox" name="teams" value="Decoration team" /> Decoration team</label>
+              <label class="team"><input type="checkbox" name="teams" value="Overseer of the program" /> Overseer of the program</label>
+              <label class="team"><input type="checkbox" name="teams" value="Slides" /> Slides</label>
+              <label class="team"><input type="checkbox" name="teams" value="Live stream" /> Live stream</label>
+              <label class="team"><input type="checkbox" name="teams" value="Photography" /> Photography</label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner coordinator" /> Dinner coordinator</label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner organizing team" /> Dinner organizing team</label>
+              <label class="team"><input type="checkbox" name="teams" value="Serving team" /> Serving team</label>
+              <label class="team"><input type="checkbox" name="teams" value="Cleanup team" /> Cleanup team</label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label for="comments">Comments / Notes</label>
+          <textarea id="comments" name="comments" placeholder="Any preferences or availability details…"></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit" id="submitBtn">Submit Sign‑Up</button>
+          <button class="secondary" type="reset">Clear</button>
+        </div>
+        <div id="success" class="msg success">Thank you! Your sign‑up was recorded. You may select more teams by submitting again.</div>
+        <div id="error" class="msg error">Sorry, something went wrong. Please try again or contact the coordinator.</div>
+      </form>
+    </div>
+    <footer>
+      “Requesting every person to involve in at least one activity; more than one is better.”
+    </footer>
+  </main>
+
+  <script>
+    const ENDPOINT = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+    // Simple US phone formatting
+    const phoneEl = document.getElementById('phone');
+    phoneEl.addEventListener('input', () => {
+      let v = phoneEl.value.replace(/\D/g, '').slice(0, 10);
+      const parts = [];
+      if (v.length > 0) parts.push('(' + v.substring(0, Math.min(3, v.length)));
+      if (v.length >= 4) parts[0] += ') ' + v.substring(3, Math.min(6, v.length));
+      if (v.length >= 7) parts[0] += '-' + v.substring(6, 10);
+      phoneEl.value = parts[0] || v;
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      const success = document.getElementById('success');
+      const error = document.getElementById('error');
+      success.style.display = 'none';
+      error.style.display = 'none';
+
+      const form = e.currentTarget;
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const comments = form.comments.value.trim();
+      const teams = Array.from(document.querySelectorAll('input[name="teams"]:checked')).map(cb => cb.value);
+
+      if (!name || !email || teams.length === 0) {
+        error.textContent = 'Please provide your name, email, and select at least one team.';
+        error.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, teams, comments })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          success.style.display = 'block';
+          form.reset();
+        } else {
+          error.textContent = data.error || 'Submission failed. Please try again.';
+          error.style.display = 'block';
+        }
+      } catch (err) {
+        error.textContent = 'Network error. Please check your connection and try again.';
+        error.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Sign‑Up';
+      }
+    });
+  </script>
+</body>
 </html>
