@@ -1,21 +1,23 @@
-ATC 13th Anniversary Signup — Roster: Manual Refresh + After Submit
-======================================================================
+ATC 13th Anniversary Signup — CORS Fix (Manual Refresh + After Submit)
+============================================================================
 
-Behavior:
-- Roster loads **once** on page load.
-- Roster also refreshes **after each form submit** (success or error).
-- A **Refresh** button lets you update the roster on demand.
-- No auto-interval; no focus-based refresh. Low traffic by default.
-- Backend caches roster/counts for **60s** to reduce sheet reads.
+Why you saw "Network error":
+- When the HTML runs from file:// or another domain, a JSON POST triggers a **CORS preflight (OPTIONS)** request.
+- The Apps Script Web App doesn't handle that preflight, so the browser blocked the POST and showed "Network error".
 
-Renamed team:
-- "Cleanup Crew" → **"Cleanup Team"** (updated both frontend + backend)
+What this version does:
+- **Frontend** sends POST as **application/x-www-form-urlencoded** (a "simple" request — **no preflight**).
+- **Backend** accepts **both** JSON and form-encoded bodies.
+- Everything else stays the same: caps=5, confirmation emails, roster loads on page load + after submit + via the Refresh button.
+- 60s server-side cache to reduce sheet reads.
 
-Deploy:
-1) Paste **Code_WITH_ROSTER_MANUAL_PLUS_AFTER_SUBMIT.gs** into Apps Script and Deploy → Web App.
-2) Open/host **ATC_13thAnniversary_2025_Signups_ROSTER_MANUAL_PLUS_AFTER_SUBMIT.html** (ENDPOINT pre-filled).
-3) Ensure your Google Sheet tab is named **Signups** with headers:
-   Timestamp | Name | Email | Phone | Teams | Comments
+Deploy steps:
+1) Replace your Apps Script code with **Code_WITH_ROSTER_MANUAL_PLUS_AFTER_SUBMIT_CORS_FIX.gs** and Deploy → Web App.
+2) Open/host **ATC_13thAnniversary_2025_Signups_ROSTER_MANUAL_PLUS_AFTER_SUBMIT_CORS_FIX.html** (ENDPOINT pre-filled).
+3) Test:
+   - Open the page → check badges show "5 left".
+   - Submit a test (1 team) → row appears in Sheet, you get a confirmation email, roster updates.
+   - Try the **Refresh** button.
 
 Configured:
 - SHEET_ID: 1-lZeAABGKI6OCkGZn0Bjy_d43F9GAL5RLH3vqd0NKLU
@@ -23,4 +25,4 @@ Configured:
 - Teams (order): Setup Team, Decoration team, Program leads, Slides, Live stream, Photography, Dinner coordinator, Dinner Serving team, Cleanup Team
 - Cap per team: 5
 
-Generated: 2025-09-14T18:47:05.729208
+Generated: 2025-09-14T18:59:12.940469
