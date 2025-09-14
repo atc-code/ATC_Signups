@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC 13th Anniversary Sign‑Up — Sept 21, 2025</title>
+  <title>ATC 13th Anniversary Signups — Sept 21, 2025</title>
   <style>
     :root { --max: 900px; }
     * { box-sizing: border-box; }
@@ -36,15 +36,13 @@
 </head>
 <body>
   <header>
-  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-    <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png"
-         alt="Church Logo"
-         style="height:56px; width:auto; border-radius:8px; background:#fff; padding:6px;" />
-    <div>
-      <h1>ATC 13th Anniversary — Volunteer Sign-Up</h1>
-      <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" style="height:56px; width:auto; border-radius:8px; background:#fff; padding:6px;" />
+      <div>
+        <h1>ATC 13th Anniversary — Signups</h1>
+        <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
+      </div>
     </div>
-  </div>
   </header>
   <main>
     <div class="card">
@@ -101,34 +99,34 @@
 
   <script>
     const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwXU2Ve_2iUKTeeo_wxn8Xs-KDB4qgl-O7dvYFEv35txV_Fjan5AExcOldu3vGk-idW/exec';
-    // Fetch availability and disable full teams
-const teamCheckboxes = Array.from(document.querySelectorAll('input[name="teams"]'));
 
-async function refreshAvailability() {
-  try {
-    const res = await fetch(ENDPOINT);
-    const data = await res.json();
-    if (!data || !data.ok) return;
-    const remaining = data.remaining || {};
-    teamCheckboxes.forEach(cb => {
-      const left = remaining[cb.value] ?? 0;
-      cb.disabled = left <= 0;
-      cb.parentElement.style.opacity = left <= 0 ? 0.6 : 1;
-      cb.parentElement.title = left <= 0 ? 'This team is full' : `${left} spot(s) left`;
-    });
-  } catch (_) { /* ignore */ }
-}
-refreshAvailability();
+    // Ask backend for remaining spots; disable full teams
+    const teamCheckboxes = Array.from(document.querySelectorAll('input[name="teams"]'));
+    async function refreshAvailability() {
+      try {
+        const res = await fetch(ENDPOINT);
+        const data = await res.json();
+        if (!data || !data.ok) return;
+        const remaining = data.remaining || {};
+        teamCheckboxes.forEach(cb => {
+          const left = remaining[cb.value] ?? 0;
+          cb.disabled = left <= 0;
+          cb.parentElement.style.opacity = left <= 0 ? 0.6 : 1;
+          cb.parentElement.title = left <= 0 ? 'This team is full' : `${left} spot(s) left`;
+        });
+      } catch (e) { /* no-op */ }
+    }
+    refreshAvailability();
 
-    // Simple US phone formatting
+    // Simple US phone formatting (no regex)
     const phoneEl = document.getElementById('phone');
     phoneEl.addEventListener('input', () => {
-      let v = phoneEl.value.replace(/\D/g, '').slice(0, 10);
-      const parts = [];
-      if (v.length > 0) parts.push('(' + v.substring(0, Math.min(3, v.length)));
-      if (v.length >= 4) parts[0] += ') ' + v.substring(3, Math.min(6, v.length));
-      if (v.length >= 7) parts[0] += '-' + v.substring(6, 10);
-      phoneEl.value = parts[0] || v;
+      const digits = Array.from(phoneEl.value).filter(ch => ch >= '0' && ch <= '9').join('').slice(0, 10);
+      let out = '';
+      if (digits.length >= 1) out = '(' + digits.slice(0, Math.min(3, digits.length));
+      if (digits.length >= 4) out += ') ' + digits.slice(3, Math.min(6, digits.length));
+      if (digits.length >= 7) out += '-' + digits.slice(6);
+      phoneEl.value = out || digits;
     });
 
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -164,9 +162,11 @@ refreshAvailability();
         if (res.ok && data.ok) {
           success.style.display = 'block';
           form.reset();
+          await refreshAvailability();
         } else {
           error.textContent = data.error || 'Submission failed. Please try again.';
           error.style.display = 'block';
+          await refreshAvailability();
         }
       } catch (err) {
         error.textContent = 'Network error. Please check your connection and try again.';
