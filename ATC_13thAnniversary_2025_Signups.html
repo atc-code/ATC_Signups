@@ -151,7 +151,7 @@
         const data = await res.json();
         if (!(data && data.ok)) return;
         const roster = data.roster || {};
-        const counts = data.counts || {};
+               const counts = data.counts || {};
         const cap = data.cap || 5;
         const wrap = document.getElementById('rosterWrap');
         const meta = document.getElementById('rosterMeta');
@@ -221,11 +221,20 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Submitting…';
       try {
+        // IMPORTANT: use application/x-www-form-urlencoded to avoid CORS preflight
+        const params = new URLSearchParams();
+        params.append('name', name);
+        params.append('email', email);
+        params.append('phone', phone);
+        params.append('comments', comments);
+        teams.forEach(t => params.append('teams', t));
+
         const res = await fetch(ENDPOINT, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, teams, comments })
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: params.toString(),
         });
+
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.ok) {
           success.style.display = 'block';
@@ -233,7 +242,7 @@
           await refreshAvailability(); // keep counts accurate
           await refreshRoster();       // refresh roster AFTER submit (success)
         } else {
-          error.textContent = data.error || 'Submission failed. Please try again.';
+          error.textContent = (data && data.error) ? data.error : 'Submission failed. Please try again.';
           error.style.display = 'block';
           await refreshAvailability();
           await refreshRoster();       // also refresh roster so user sees current state
