@@ -36,8 +36,15 @@
 </head>
 <body>
   <header>
-    <h1>ATC 13th Anniversary — Volunteer Sign‑Up</h1>
-    <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
+  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+    <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png"
+         alt="Church Logo"
+         style="height:56px; width:auto; border-radius:8px; background:#fff; padding:6px;" />
+    <div>
+      <h1>ATC 13th Anniversary — Volunteer Sign-Up</h1>
+      <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
+    </div>
+  </div>
   </header>
   <main>
     <div class="card">
@@ -93,7 +100,25 @@
   </main>
 
   <script>
-    const ENDPOINT = 'PASTE_YOUR_WEB_APP_URL_HERE';
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwXU2Ve_2iUKTeeo_wxn8Xs-KDB4qgl-O7dvYFEv35txV_Fjan5AExcOldu3vGk-idW/exec';
+    // Fetch availability and disable full teams
+const teamCheckboxes = Array.from(document.querySelectorAll('input[name="teams"]'));
+
+async function refreshAvailability() {
+  try {
+    const res = await fetch(ENDPOINT);
+    const data = await res.json();
+    if (!data || !data.ok) return;
+    const remaining = data.remaining || {};
+    teamCheckboxes.forEach(cb => {
+      const left = remaining[cb.value] ?? 0;
+      cb.disabled = left <= 0;
+      cb.parentElement.style.opacity = left <= 0 ? 0.6 : 1;
+      cb.parentElement.title = left <= 0 ? 'This team is full' : `${left} spot(s) left`;
+    });
+  } catch (_) { /* ignore */ }
+}
+refreshAvailability();
 
     // Simple US phone formatting
     const phoneEl = document.getElementById('phone');
