@@ -5,44 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATC 13th Anniversary — Signups (Sept 21, 2025)</title>
   <style>
-    :root { --max: 900px; }
+    :root { --max: 960px; --pad: 18px; --radius: 16px; }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; }
-    header { background: #222; color: #fff; padding: 28px 18px; }
-    header h1 { margin: 0 0 6px; font-size: 1.6rem; }
-    header p { margin: 0; opacity: .9; }
-    main { max-width: var(--max); margin: 20px auto; padding: 0 18px; }
-    .card { background: #fff; border-radius: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 20px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
+    header { background: #222; color: #fff; padding: 24px var(--pad); }
+    header h1 { margin: 0 0 6px; font-size: clamp(1.25rem, 2.5vw, 1.8rem); }
+    header p { margin: 0; opacity: .9; font-size: clamp(.9rem, 2vw, 1rem); }
+    main { max-width: var(--max); margin: 20px auto; padding: 0 var(--pad); display:grid; gap:16px; }
+    .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
     label { font-weight: 600; display: block; margin-bottom: 6px; }
     input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; }
+    input[type="checkbox"] { width: 20px; height: 20px; }
     textarea { min-height: 90px; resize: vertical; }
     .hint { font-size: .9rem; color: #666; }
     .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 8px; }
     @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
-    .team { display: flex; gap: 10px; align-items: flex-start; }
-    .team input { margin-top: 3px; }
+    .team { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border:1px solid #e2e8f0; border-radius: 12px; }
+    .team[title] { position: relative; }
+    .leftBadge { margin-left: auto; font-weight:600; font-size:.9rem; background:#edf2f7; border-radius:999px; padding:2px 8px; }
     .req { color: #c00; margin-left: 4px; }
-    .actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
-    button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    .actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap:wrap; }
+    button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size:1rem; }
     .primary { background: #2b6cb0; color: #fff; }
     .secondary { background: #edf2f7; }
     .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
     .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
     .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
-    footer { text-align: center; color: #555; padding: 20px; }
+    footer { text-align: center; color: #555; padding: 16px; }
+    h2 { margin:0 0 10px; font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+    .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
+    .muted { color:#666; }
+    .hdr { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .hdr img { height:56px; width:auto; border-radius:8px; background:#fff; padding:6px; }
+    .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
   </style>
 </head>
 <body>
   <header>
-    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-      <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png"
-           alt="Church Logo"
-           style="height:56px; width:auto; border-radius:8px; background:#fff; padding:6px;" />
+    <div class="hdr">
+      <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" />
       <div>
         <h1>ATC 13th Anniversary — Signups</h1>
-        <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team.</p>
+        <p>Sunday, Sept 21, 2025 • Please sign up for <strong>at least one</strong> team (more is better).</p>
       </div>
     </div>
   </header>
@@ -68,15 +74,15 @@
           <div>
             <label>Teams you can serve on<span class="req">*</span></label>
             <div class="teams">
-              <label class="team"><input type="checkbox" name="teams" value="Setup Team" /> Setup Team</label>
-              <label class="team"><input type="checkbox" name="teams" value="Decoration team" /> Decoration team</label>
-              <label class="team"><input type="checkbox" name="teams" value="Program leads" /> Program leads</label>
-              <label class="team"><input type="checkbox" name="teams" value="Slides" /> Slides</label>
-              <label class="team"><input type="checkbox" name="teams" value="Live stream" /> Live stream</label>
-              <label class="team"><input type="checkbox" name="teams" value="Photography" /> Photography</label>
-              <label class="team"><input type="checkbox" name="teams" value="Dinner coordinator" /> Dinner coordinator</label>
-              <label class="team"><input type="checkbox" name="teams" value="Dinner Serving team" /> Dinner Serving team</label>
-              <label class="team"><input type="checkbox" name="teams" value="Cleanup Team" /> Cleanup Crew</label>
+              <label class="team"><input type="checkbox" name="teams" value="Setup Team" /> <span class="teamName">Setup Team</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Decoration team" /> <span class="teamName">Decoration team</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Program leads" /> <span class="teamName">Program leads</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Slides" /> <span class="teamName">Slides</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Live stream" /> <span class="teamName">Live stream</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Photography" /> <span class="teamName">Photography</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner coordinator" /> <span class="teamName">Dinner coordinator</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner Serving team" /> <span class="teamName">Dinner Serving team</span> <span class="leftBadge" aria-live="polite"></span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Cleanup Team" /> <span class="teamName">Cleanup Team</span> <span class="leftBadge" aria-live="polite"></span></label>
 
             </div>
           </div>
@@ -94,9 +100,18 @@
         <div id="error" class="msg error">Sorry, something went wrong. Please try again or contact the coordinator.</div>
       </form>
     </div>
-    <footer>
-      “Requesting every person to involve in at least one activity.”
-    </footer>
+
+    <section class="card" id="rosterCard">
+      <div class="toolbar">
+        <h2 style="flex:1 1 auto; margin:0;">Live Roster</h2>
+        <button id="refreshBtn" class="secondary" type="button" title="Refresh roster now">Refresh</button>
+      </div>
+      <div id="rosterWrap" class="muted">Loading…</div>
+      <div id="rosterMeta" class="muted" style="margin-top:8px;font-size:.9rem;"></div>
+      <div class="muted" style="margin-top:6px;font-size:.9rem;">(Updates on page load, after submit, or when you press Refresh.)</div>
+    </section>
+
+    <footer>“Requesting every person to involve in at least one activity; more than one is better.”</footer>
   </main>
 
   <script>
@@ -114,6 +129,8 @@
           const left = Number.isFinite(raw) ? raw : 99; // fallback: treat unknown as plenty
           cb.disabled = Number.isFinite(raw) ? (left <= 0) : false; // only disable if backend explicitly says 0
           cb.parentElement.style.opacity = cb.disabled ? 0.6 : 1;
+          const badge = cb.parentElement.querySelector('.leftBadge');
+          if (badge) badge.textContent = Number.isFinite(raw) ? `${left} left` : '';
           cb.parentElement.title = Number.isFinite(raw) ? `${left} spot(s) left` : 'Spots available';
         });
       } catch (e) {
@@ -121,11 +138,53 @@
         teamCheckboxes.forEach(cb => {
           cb.disabled = false;
           cb.parentElement.style.opacity = 1;
+          const badge = cb.parentElement.querySelector('.leftBadge');
+          if (badge) badge.textContent = '';
           cb.parentElement.title = 'Spots available';
         });
       }
     }
+
+    async function refreshRoster() {
+      try {
+        const res = await fetch(ENDPOINT + '?mode=roster');
+        const data = await res.json();
+        if (!(data && data.ok)) return;
+        const roster = data.roster || {};
+        const counts = data.counts || {};
+        const cap = data.cap || 5;
+        const wrap = document.getElementById('rosterWrap');
+        const meta = document.getElementById('rosterMeta');
+        const teams = Object.keys(roster);
+
+        let html = '';
+        teams.forEach(t => {
+          const names = roster[t] || [];
+          const filled = typeof counts[t] === 'number' ? counts[t] : names.length;
+          html += `<div style="margin-bottom:12px;">
+            <strong>${t} — ${filled}/${cap}</strong><br>
+            ${
+              names.length === 0
+                ? `<span class="muted">No signups yet.</span>`
+                : names.map(n => `<span class="chip">${n}</span>`).join(' ')
+            }
+          </div>`;
+        });
+
+        wrap.innerHTML = html;
+        const now = new Date();
+        meta.textContent = 'Last updated: ' + now.toLocaleString();
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Initial load
     refreshAvailability();
+    refreshRoster();
+
+    // Manual refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => { refreshRoster(); });
 
     // Simple US phone formatting
     const phoneEl = document.getElementById('phone');
@@ -171,11 +230,13 @@
         if (res.ok && data.ok) {
           success.style.display = 'block';
           form.reset();
-          await refreshAvailability();
+          await refreshAvailability(); // keep counts accurate
+          await refreshRoster();       // refresh roster AFTER submit (success)
         } else {
           error.textContent = data.error || 'Submission failed. Please try again.';
           error.style.display = 'block';
           await refreshAvailability();
+          await refreshRoster();       // also refresh roster so user sees current state
         }
       } catch (err) {
         error.textContent = 'Network error. Please check your connection and try again.';
