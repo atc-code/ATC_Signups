@@ -9,8 +9,8 @@
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
     header { background: #222; color: #fff; padding: 24px var(--pad); }
-    header h1 { margin: 0 0 8px; font-size: clamp(1.25rem, 2.5vw, 1.9rem); }
-    header p { margin: 0; opacity: .95; font-size: clamp(.95rem, 2vw, 1.05rem); font-style: italic; }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3.2vw, 2.2rem); line-height: 1.25; }
+    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; }
     main { max-width: var(--max); margin: 20px auto; padding: 0 var(--pad); display:grid; gap:16px; }
     .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -44,22 +44,8 @@
     .overlay p{ opacity:.9; }
     .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
     .brandRow { position: relative; min-height: 104px; }
-    .brandRow .logo{
-      position: absolute;
-      left: var(--pad);
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    .brandRow > :nth-child(2){
-      text-align: center;
-      max-width: 900px;
-      margin: 0 auto;
-      text-wrap: balance;
-      padding-left: 0;
-    }
-    header h1 { line-height: 1.25; font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
-    header p  { margin-top: 4px; opacity: .9; }
-
+    .brandRow .logo{ position: absolute; left: 18px; top: 50%; transform: translateY(-50%); }
+    .brandRow > :nth-child(2){ text-align: center; max-width: 900px; margin: 0 auto; text-wrap: balance; padding-left: 0; }
     footer { text-align:center; color:#374151; padding: 16px; }
     .hero { background:#0f172a; color:#e5e7eb; border:0; text-align:center; }
     .hero h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin:0 0 8px; color:#fff; }
@@ -74,6 +60,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+  <!-- Sign-in overlay -->
   <div id="signinOverlay" class="overlay" style="display:none">
     <div class="inner">
       <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
@@ -86,12 +73,13 @@
     </div>
   </div>
 
+  <!-- App -->
   <div id="app" style="display:none">
     <header>
       <div class="brandRow">
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
         <div>
-          <h1>ATC 13th Anniversary ( 21 Sept, 2025 ) — RSVP</h1>
+          <h1>ATC 13th Anniversary, Sept 21, 2025 — RSVP</h1>
           <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
         </div>
       </div>
@@ -100,8 +88,8 @@
     <main>
       <!-- Big banner after RSVPs close -->
       <section class="card hero" id="closedBanner" style="display:none">
-        <h2>Thanks for your RSVP & Hearts to Serve. God Bless You !</h2>
-        <p>See You Next Time !</p>
+        <h2>Thanks for your RSVP and hearts to serve. God bless you!</h2>
+        <p>see you next time!</p>
       </section>
 
       <!-- Submit form (visible only while RSVPs are open) -->
@@ -190,6 +178,7 @@
   </div>
 
   <script>
+    // --- Config (edit per event) ---
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFiksRBfhbHD5bvRAyv5Stec7WO6zC9PLjgU1zcLXfzHW_RDms1CLbyawR5F3ATbG4/exec";
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
@@ -265,9 +254,15 @@
     }
 
     const teamCheckboxes = () => Array.from(document.querySelectorAll('input[name="teams"]'));
+
     async function refreshAvailability() {
       try {
         const res = await fetch(ENDPOINT + '?id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          const data = await res.json().catch(()=>({}));
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This RSVP is limited to ATC members.')+'</p></section>';
+          return;
+        }
         const data = await res.json();
         const remaining = data && data.ok ? (data.remaining || {}) : null;
         teamCheckboxes().forEach(cb => {
@@ -314,6 +309,11 @@
       const errBox = document.getElementById('rosterError');
       try {
         const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          const data = await res.json().catch(()=>({}));
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This RSVP is limited to ATC members.')+'</p></section>';
+          return;
+        }
         if (!res.ok) { errBox.textContent = 'Could not load RSVP status (' + res.status + ').'; errBox.style.display = 'block'; return; }
         const data = await res.json();
         if (!(data && data.ok)) { errBox.textContent = 'Could not load RSVP status (invalid response).'; errBox.style.display = 'block'; return; }
@@ -336,6 +336,10 @@
     async function loadMetrics() {
       try {
         const res = await fetch(ENDPOINT + '?mode=view_breakdown&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          document.getElementById('adminMetrics').style.display = 'none';
+          return;
+        }
         const data = await res.json();
         const wrap = document.getElementById('adminMetrics');
         const body = document.getElementById('metricsBody');
