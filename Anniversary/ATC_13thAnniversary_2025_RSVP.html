@@ -46,7 +46,17 @@
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
     .logo { height:56px;width:auto;border-radius:8px;background:#fff;padding:6px; }
-    .brandRow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .brandRow {
+  display: grid;
+  grid-template-columns: auto 1fr; /* logo | text */
+  align-items: center;
+  gap: 14px;
+}
+    /* Make the text block span full width and center-align it */
+.brandRow > :nth-child(2) {
+  grid-column: 1 / -1;     /* span across both columns */
+  text-align: center;      /* center the heading + verse */
+}
     .subtle { color:#94a3b8; font-size:.95rem; }
     .divider { height:1px; background:#e5e7eb; margin:12px 0; }
     footer { text-align:center; color:#374151; padding: 16px; }
