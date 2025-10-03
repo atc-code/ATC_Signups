@@ -42,24 +42,22 @@
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
-    .logo { height:56px;width:auto;border-radius:8px;background:#fff;padding:6px; }
+    .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
     .brandRow { position: relative; min-height: 104px; }
     .brandRow .logo{
       position: absolute;
       left: var(--pad);
       top: 50%;
       transform: translateY(-50%);
-      height: 88px; width: 88px;
-      padding: 10px; border-radius: 12px; background: #fff;
-      box-shadow: 0 6px 20px rgba(0,0,0,.18);
     }
     .brandRow > :nth-child(2){
       text-align: center;
       max-width: 900px;
       margin: 0 auto;
       text-wrap: balance;
+      padding-left: 0;
     }
-    header h1 { line-height: 1.25; font-size: clamp(1.4rem, 3.2vw, 2rem); }
+    header h1 { line-height: 1.25; font-size: clamp(1.6rem, 3.2vw, 2.2rem); }
     header p  { margin-top: 4px; opacity: .9; }
 
     footer { text-align:center; color:#374151; padding: 16px; }
@@ -67,8 +65,10 @@
     .hero h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin:0 0 8px; color:#fff; }
     .hero p { margin:0; font-size: clamp(1rem, 2.2vw, 1.15rem); }
     @media (max-width: 560px){
-      header .brandRow .logo{ height:56px;width:56px; }
-      header h1{ font-size: clamp(1.2rem, 6vw, 1.6rem); }
+      header .brandRow{ min-height: 120px; padding-top: 12px; }
+      header .brandRow .logo{ top: 12px; transform: none; height: 64px; width: 64px; }
+      header .brandRow > :nth-child(2){ max-width: 92%; margin: 0 auto; padding-left: 72px; }
+      header h1{ font-size: clamp(1.2rem, 6vw, 1.8rem); }
     }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -190,12 +190,10 @@
   </div>
 
   <script>
-    // --- Config (edit these three for each event) ---
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFiksRBfhbHD5bvRAyv5Stec7WO6zC9PLjgU1zcLXfzHW_RDms1CLbyawR5F3ATbG4/exec";
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
     const EVENT_DATE_ISO = "2025-09-21T23:59:59-04:00";
-
     const TEAM_ORDER = ["Setup Team","Decoration team","Program leads","Slides","Live stream","Photography","Dinner coordinator","Dinner Serving team","Cleanup Team"];
 
     let ID_TOKEN = null;
@@ -357,7 +355,6 @@
       refreshAvailability();
       refreshRoster();
 
-      // Ensure the view is logged before loading metrics so the count updates on each refresh.
       await logView('load');
 
       if (isAdmin(USER_EMAIL)) {
