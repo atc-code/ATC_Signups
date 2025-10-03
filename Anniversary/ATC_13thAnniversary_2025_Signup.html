@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC 13th Anniversary, Sept 21, 2025 — RSVP</title>
+  <title>ATC 13th Anniversary, Sept 21, 2025 — Signup</title>
   <style>
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
@@ -65,11 +65,11 @@
     <div class="inner">
       <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
-        <h2 style="margin:0">Sign in to RSVP</h2>
+        <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
       </div>
-      <p>Please sign in with your Google account to access this RSVP page.</p>
+      <p>Please sign in with your Google account to access this ATC Signup page.</p>
       <div id="gSignIn" style="display:inline-block;"></div>
-      <div class="subtle" style="margin-top:10px;">Your email is used to confirm your RSVP.</div>
+      <div class="subtle" style="margin-top:10px;">Your email is used to confirm your ATC Signup.</div>
     </div>
   </div>
 
@@ -79,20 +79,20 @@
       <div class="brandRow">
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
         <div>
-          <h1>ATC 13th Anniversary, Sept 21, 2025 — RSVP</h1>
+          <h1>ATC 13th Anniversary, Sept 21, 2025 — Signup</h1>
           <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
         </div>
       </div>
     </header>
 
     <main>
-      <!-- Big banner after RSVPs close -->
+      <!-- Big banner after Signups close -->
       <section class="card hero" id="closedBanner" style="display:none">
-        <h2>Thanks for your RSVP and hearts to serve. God bless you!</h2>
+        <h2>Thanks for your Signup and hearts to serve. God bless you!</h2>
         <p>see you next time!</p>
       </section>
 
-      <!-- Submit form (visible only while RSVPs are open) -->
+      <!-- Submit form (visible only while Signups are open) -->
       <section class="card" id="formCard">
         <form id="signupForm" autocomplete="on">
           <fieldset>
@@ -144,14 +144,14 @@
             <button class="primary" type="submit" id="submitBtn">Submit</button>
             <button class="secondary" type="reset">Clear</button>
           </div>
-          <div id="success" class="msg success">Thank you! Your RSVP was recorded. You may select more teams by submitting again.</div>
+          <div id="success" class="msg success">Thank you! Your Signup was recorded. You may select more teams by submitting again.</div>
           <div id="error" class="msg error">Sorry, something went wrong. Please try again or contact the coordinator.</div>
         </form>
       </section>
 
-      <!-- Live RSVP always visible -->
+      <!-- Live Signup always visible -->
       <section class="card" id="rosterCard">
-        <h2 style="margin-top:0;">LIVE RSVP STATUS</h2>
+        <h2 style="margin-top:0;">LIVE Signup STATUS</h2>
         <div class="tableWrap">
           <table class="roster" id="rosterTable">
             <thead><tr><th>Team</th><th>Volunteers</th></tr></thead>
@@ -260,7 +260,7 @@
         const res = await fetch(ENDPOINT + '?id_token=' + encodeURIComponent(ID_TOKEN || ''));
         if (res.status === 403) {
           const data = await res.json().catch(()=>({}));
-          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This RSVP is limited to ATC members.')+'</p></section>';
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This Signup is limited to ATC members.')+'</p></section>';
           return;
         }
         const data = await res.json();
@@ -299,7 +299,7 @@
         const td = document.createElement('td');
         td.colSpan = 2;
         td.className = 'muted';
-        td.textContent = 'No RSVPs yet.';
+        td.textContent = 'No Signups yet.';
         tr.appendChild(td);
         tbody.appendChild(tr);
       }
@@ -311,14 +311,14 @@
         const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
         if (res.status === 403) {
           const data = await res.json().catch(()=>({}));
-          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This RSVP is limited to ATC members.')+'</p></section>';
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This Signup is limited to ATC members.')+'</p></section>';
           return;
         }
-        if (!res.ok) { errBox.textContent = 'Could not load RSVP status (' + res.status + ').'; errBox.style.display = 'block'; return; }
+        if (!res.ok) { errBox.textContent = 'Could not load Signup status (' + res.status + ').'; errBox.style.display = 'block'; return; }
         const data = await res.json();
-        if (!(data && data.ok)) { errBox.textContent = 'Could not load RSVP status (invalid response).'; errBox.style.display = 'block'; return; }
+        if (!(data && data.ok)) { errBox.textContent = 'Could not load Signup status (invalid response).'; errBox.style.display = 'block'; return; }
         renderRoster(data.roster || {});
-      } catch (e) { errBox.textContent = 'Could not load RSVP status (network error).'; errBox.style.display = 'block'; }
+      } catch (e) { errBox.textContent = 'Could not load Signup status (network error).'; errBox.style.display = 'block'; }
     }
 
     async function logView(kind='load') {
@@ -395,7 +395,7 @@
           const teams = Array.from(document.querySelectorAll('input[name="teams"]:checked')).map(cb => cb.value);
 
           if (new Date() > new Date(EVENT_DATE_ISO)) {
-            error.textContent = 'RSVP is closed — the event has concluded. Thank you for serving!';
+            error.textContent = 'Signup is closed — the event has concluded. Thank you for serving!';
             error.style.display = 'block';
             return;
           }
