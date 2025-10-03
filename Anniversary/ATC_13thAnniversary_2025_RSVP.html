@@ -21,7 +21,6 @@
     input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; background:#fff; }
     input[type="checkbox"] { width: 18px; height: 18px; }
     textarea { min-height: 90px; resize: vertical; }
-    .hint { font-size: .9rem; color: #666; }
     .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 4px; }
     @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
     .team { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border:1px solid #e2e8f0; border-radius: 12px; }
@@ -33,7 +32,6 @@
     .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
     .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
     .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
-    .info  { background: #eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; }
     h2 { margin:0 0 10px; font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
     .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
     .muted { color:#666; }
@@ -41,34 +39,37 @@
     table.roster, table.metrics { width:100%; border-collapse: collapse; }
     table.roster th, table.roster td, table.metrics th, table.metrics td { text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align: top; }
     table.roster th, table.metrics th { font-size:.95rem; color:#334155; }
-    table.roster td .muted { color:#6b7280; }
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
     .logo { height:56px;width:auto;border-radius:8px;background:#fff;padding:6px; }
-    .brandRow {
-  display: grid;
-  grid-template-columns: auto 1fr; /* logo | text */
-  align-items: center;
-  gap: 14px;
-}
-    
-header .brandRow > :nth-child(2){
-  grid-column: 1 / -1;
-  text-align: center;
-  max-width: 900px;
-  margin-inline: auto;
-  text-wrap: balance;
-}
+    .brandRow { position: relative; min-height: 88px; }
+    .brandRow .logo{
+      position: absolute;
+      left: var(--pad);
+      top: 50%;
+      transform: translateY(-50%);
+      height: 72px; width: 72px;
+      padding: 8px; border-radius: 12px; background: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .brandRow > :nth-child(2){
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+      text-wrap: balance;
+    }
+    header h1 { line-height: 1.25; font-size: clamp(1.4rem, 3.2vw, 2rem); }
+    header p  { margin-top: 4px; opacity: .9; }
 
-header h1 { line-height: 1.25; }
-header p  { margin-top: 4px; opacity: .9; }
-    .subtle { color:#94a3b8; font-size:.95rem; }
-    .divider { height:1px; background:#e5e7eb; margin:12px 0; }
     footer { text-align:center; color:#374151; padding: 16px; }
     .hero { background:#0f172a; color:#e5e7eb; border:0; text-align:center; }
     .hero h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin:0 0 8px; color:#fff; }
     .hero p { margin:0; font-size: clamp(1rem, 2.2vw, 1.15rem); }
+    @media (max-width: 560px){
+      header .brandRow .logo{ height:56px;width:56px; }
+      header h1{ font-size: clamp(1.2rem, 6vw, 1.6rem); }
+    }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -99,8 +100,8 @@ header p  { margin-top: 4px; opacity: .9; }
     <main>
       <!-- Big banner after RSVPs close -->
       <section class="card hero" id="closedBanner" style="display:none">
-        <h2>Thanks for your RSVP and Hearts to Serve. God Bless You !</h2>
-        <p>See You Next Time !</p>
+        <h2>Thanks for your RSVP and hearts to serve. God bless you!</h2>
+        <p>see you next time!</p>
       </section>
 
       <!-- Submit form (visible only while RSVPs are open) -->
@@ -189,11 +190,13 @@ header p  { margin-top: 4px; opacity: .9; }
   </div>
 
   <script>
+    // --- Config (edit these three for each event) ---
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFiksRBfhbHD5bvRAyv5Stec7WO6zC9PLjgU1zcLXfzHW_RDms1CLbyawR5F3ATbG4/exec";
-    const TEAM_ORDER = ["Setup Team", "Decoration team", "Program leads", "Slides", "Live stream", "Photography", "Dinner coordinator", "Dinner Serving team", "Cleanup Team"];
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
-    const ADMIN_EMAILS = ["atc.noting@gmail.com", "chakdom@gmail.com"];
+    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
     const EVENT_DATE_ISO = "2025-09-21T23:59:59-04:00";
+
+    const TEAM_ORDER = ["Setup Team","Decoration team","Program leads","Slides","Live stream","Photography","Dinner coordinator","Dinner Serving team","Cleanup Team"];
 
     let ID_TOKEN = null;
     let USER_EMAIL = '';
@@ -201,7 +204,6 @@ header p  { margin-top: 4px; opacity: .9; }
     function decodeJwtResponse(token) {
       try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch(e){ return {}; }
     }
-
     function isAdmin(email) { email = (email||'').toLowerCase(); return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email); }
 
     function tokenFromSession() {
@@ -360,7 +362,6 @@ header p  { margin-top: 4px; opacity: .9; }
 
       if (isAdmin(USER_EMAIL)) {
         await loadMetrics();
-        // Small follow-up refresh to catch any tiny write delays
         setTimeout(loadMetrics, 600);
         setInterval(loadMetrics, 60000);
       }
@@ -398,7 +399,7 @@ header p  { margin-top: 4px; opacity: .9; }
             return;
           }
 
-          if (!validateNames(first, last) || !email || !phone || teams.length === 0) {
+          if (!validateNames(firstName, lastName) || !email || !phone || teams.length === 0) {
             error.textContent = 'Please enter a valid First and Last Name (at least 4 letters each), email, phone, and pick at least one team.';
             error.style.display = 'block';
             return;
