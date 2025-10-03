@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC 13th Anniv., Sept 21, 2025 — RSVP</title>
+  <title>ATC 13th Anniversary, Sept 21, 2025 — RSVP</title>
   <style>
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
@@ -33,13 +33,14 @@
     .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
     .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
     .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
+    .info  { background: #eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; }
     h2 { margin:0 0 10px; font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
     .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
     .muted { color:#666; }
     .tableWrap { overflow-x:auto; }
-    table.roster { width:100%; border-collapse: collapse; }
-    table.roster th, table.roster td { text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align: top; }
-    table.roster th { font-size:.95rem; color:#334155; }
+    table.roster, table.metrics { width:100%; border-collapse: collapse; }
+    table.roster th, table.roster td, table.metrics th, table.metrics td { text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align: top; }
+    table.roster th, table.metrics th { font-size:.95rem; color:#334155; }
     table.roster td .muted { color:#6b7280; }
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
@@ -48,8 +49,8 @@
     .brandRow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
     .subtle { color:#94a3b8; font-size:.95rem; }
     .divider { height:1px; background:#e5e7eb; margin:12px 0; }
-    footer { text-align:center; color:#374151; padding: 12px; }
-    .adminBadge { font-size:.85rem; color:#334155; background:#eef2ff; border:1px solid #c7d2fe; padding:4px 8px; border-radius:999px; display:none; }
+    footer { text-align:center; color:#374151; padding: 16px; }
+    .thanksTitle { margin:0 0 6px; }
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -73,13 +74,21 @@
         <div>
           <h1>ATC 13th Anniversary, Sept 21, 2025 — RSVP</h1>
           <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
-          <div id="adminBadge" class="adminBadge">Views: <span id="vTotal">—</span> • People: <span id="vPeople">—</span></div>
         </div>
       </div>
     </header>
 
     <main>
-      <!-- Top banner removed -->
+      <!-- Closed banner (only after event day) -->
+      <section class="card info" id="closedBanner" style="display:none">
+        <h2 style="margin:0 0 6px">Thanks for serving—see you next time!</h2>
+      </section>
+
+      <!-- Thank-You section (only after event day) -->
+      <section class="card" id="thanksCard" style="display:none">
+        <h2 class="thanksTitle">Thank you for serving!</h2>
+        <p>Thank you for your prayers, time, and hearts to serve. God bless you!</p>
+      </section>
 
       <section class="card">
         <form id="signupForm" autocomplete="on">
@@ -88,11 +97,11 @@
             <div class="grid-2">
               <div>
                 <label for="firstName">First Name<span class="req">*</span></label>
-                <input id="firstName" name="firstName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\s\-']{2,}" placeholder="e.g., John" />
+                <input id="firstName" name="firstName" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John" />
               </div>
               <div>
                 <label for="lastName">Last Name<span class="req">*</span></label>
-                <input id="lastName" name="lastName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\s\-']{2,}" placeholder="e.g., Doe" />
+                <input id="lastName" name="lastName" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe" />
               </div>
             </div>
             <div class="grid-2">
@@ -101,9 +110,8 @@
                 <input id="email" name="email" type="email" required placeholder="name@example.com" />
               </div>
               <div>
-                <label for="phone">Phone</label>
-                <input id="phone" name="phone" type="text" inputmode="tel" placeholder="(###) ###-####" />
-                <div class="hint">Optional; used only for day-of coordination.</div>
+                <label for="phone">Phone<span class="req">*</span></label>
+                <input id="phone" name="phone" type="text" inputmode="tel" required placeholder="(###) ###-####" />
               </div>
             </div>
             <div>
@@ -148,11 +156,20 @@
         </div>
         <div id="rosterError" class="msg error" style="display:none;"></div>
       </section>
+
+      <section class="card" id="adminMetrics" style="display:none">
+        <h2 style="margin-top:0">Admin — Activity Metrics</h2>
+        <div class="muted" id="metricsTotals" style="margin-bottom:8px"></div>
+        <div class="tableWrap">
+          <table class="metrics" id="metricsTable">
+            <thead><tr><th>Email</th><th>Submits</th><th>Views</th></tr></thead>
+            <tbody id="metricsBody"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </main>
 
-    <footer>
-      <div>Thank you for serving!<br/>Thank you for your prayers, time, and hearts to serve. God bless you!</div>
-    </footer>
+    <footer></footer>
   </div>
 
   <script>
@@ -160,62 +177,83 @@
     const TEAM_ORDER = ["Setup Team", "Decoration team", "Program leads", "Slides", "Live stream", "Photography", "Dinner coordinator", "Dinner Serving team", "Cleanup Team"];
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com", "chakdom@gmail.com"];
+    const EVENT_DATE_ISO = "2025-09-21T23:59:59-04:00";
 
     let ID_TOKEN = null;
     let USER_EMAIL = '';
 
     function decodeJwtResponse(token) {
-      const parts = token.split('.');
-      if (parts.length !== 3) return {};
-      const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
-      return payload || {};
+      try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch(e){ return {}; }
     }
 
-    function isAdmin(email) {
-      email = (email || '').toLowerCase();
-      return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email);
+    function isAdmin(email) { email = (email||'').toLowerCase(); return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email); }
+
+    function tokenFromSession() {
+      try {
+        const t = sessionStorage.getItem('ID_TOKEN');
+        const exp = Number(sessionStorage.getItem('ID_TOKEN_EXP') || '0');
+        if (!t || !exp) return null;
+        const now = Math.floor(Date.now()/1000);
+        if (now >= exp - 30) { sessionStorage.removeItem('ID_TOKEN'); sessionStorage.removeItem('ID_TOKEN_EXP'); return null; }
+        return t;
+      } catch(e){ return null; }
+    }
+    function saveTokenToSession(t) {
+      try {
+        const info = decodeJwtResponse(t || '');
+        const exp = info && info.exp ? Number(info.exp) : 0;
+        sessionStorage.setItem('ID_TOKEN', t || '');
+        if (exp) sessionStorage.setItem('ID_TOKEN_EXP', String(exp));
+      } catch(e){ /* ignore */ }
+    }
+
+    function showClosedBannerIfNeeded() {
+      const closed = (new Date() > new Date(EVENT_DATE_ISO));
+      document.getElementById('closedBanner').style.display = closed ? 'block' : 'none';
+      document.getElementById('thanksCard').style.display = closed ? 'block' : 'none';
+      if (closed) {
+        document.querySelectorAll('#signupForm input, #signupForm textarea, #signupForm button').forEach(el => {
+          el.disabled = true;
+        });
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('success').style.display = 'none';
+      }
+      return closed;
     }
 
     function initGoogleSignIn() {
       const overlay = document.getElementById('signinOverlay');
+
+      // Try to reuse token from this tab
+      const cached = tokenFromSession();
+      if (cached) {
+        ID_TOKEN = cached;
+        const info = decodeJwtResponse(ID_TOKEN || '');
+        USER_EMAIL = (info.email || '').toLowerCase();
+        document.getElementById('app').style.display = 'block';
+        initApp();
+        return;
+      }
+
       overlay.style.display = 'flex';
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response) => {
           ID_TOKEN = response.credential || null;
+          if (!ID_TOKEN) return;
+          saveTokenToSession(ID_TOKEN);
           const info = decodeJwtResponse(ID_TOKEN || '');
           if (info && (info.email || info.sub)) {
             USER_EMAIL = (info.email || '').toLowerCase();
             overlay.style.display = 'none';
             document.getElementById('app').style.display = 'block';
             initApp();
-            logView('load');
-            if (isAdmin(USER_EMAIL)) {
-              document.getElementById('adminBadge').style.display = 'inline-block';
-              loadViewCounts();
-              setTimeout(loadViewCounts, 1200);
-              setInterval(loadViewCounts, 60000);
-            }
           }
         },
         auto_select: false,
         cancel_on_tap_outside: false,
       });
-      google.accounts.id.renderButton(
-        document.getElementById("gSignIn"),
-        { theme: "outline", size: "large", text: "signin_with", shape: "pill" }
-      );
-    }
-
-    async function loadViewCounts() {
-      try {
-        const res = await fetch(ENDPOINT + '?mode=view_counts&id_token=' + encodeURIComponent(ID_TOKEN || ''));
-        const data = await res.json();
-        if (data && data.ok) {
-          document.getElementById('vTotal').textContent = data.total ?? 0;
-          document.getElementById('vPeople').textContent = data.unique ?? 0;
-        }
-      } catch (e) { /* ignore */ }
+      google.accounts.id.renderButton(document.getElementById("gSignIn"), { theme: "outline", size: "large", text: "signin_with", shape: "pill" });
     }
 
     const teamCheckboxes = () => Array.from(document.querySelectorAll('input[name="teams"]'));
@@ -231,10 +269,7 @@
           cb.parentElement.style.opacity = cb.disabled ? 0.6 : 1;
         });
       } catch (e) {
-        teamCheckboxes().forEach(cb => {
-          cb.disabled = false;
-          cb.parentElement.style.opacity = 1;
-        });
+        teamCheckboxes().forEach(cb => { cb.disabled = false; cb.parentElement.style.opacity = 1; });
       }
     }
 
@@ -252,7 +287,7 @@
         const td1 = document.createElement('td');
         const td2 = document.createElement('td');
         td1.textContent = t;
-        td2.innerHTML = names.map(function(n){ return '<span class="chip">' + n + '</span>'; }).join(' ');
+        td2.innerHTML = names.map(n => '<span class="chip">' + n + '</span>').join(' ');
         tr.appendChild(td1); tr.appendChild(td2);
         tbody.appendChild(tr);
       });
@@ -271,22 +306,11 @@
       const errBox = document.getElementById('rosterError');
       try {
         const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
-        if (!res.ok) {
-          errBox.textContent = 'Could not load RSVP status (' + res.status + ').';
-          errBox.style.display = 'block';
-          return;
-        }
+        if (!res.ok) { errBox.textContent = 'Could not load RSVP status (' + res.status + ').'; errBox.style.display = 'block'; return; }
         const data = await res.json();
-        if (!(data && data.ok)) {
-          errBox.textContent = 'Could not load RSVP status (invalid response).';
-          errBox.style.display = 'block';
-          return;
-        }
+        if (!(data && data.ok)) { errBox.textContent = 'Could not load RSVP status (invalid response).'; errBox.style.display = 'block'; return; }
         renderRoster(data.roster || {});
-      } catch (e) {
-        errBox.textContent = 'Could not load RSVP status (network error).';
-        errBox.style.display = 'block';
-      }
+      } catch (e) { errBox.textContent = 'Could not load RSVP status (network error).'; errBox.style.display = 'block'; }
     }
 
     async function logView(kind='load') {
@@ -297,23 +321,36 @@
         params.append('path', location.pathname + location.search);
         params.append('ua', navigator.userAgent || '');
         params.append('kind', kind);
-        await fetch(ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
-          body: params.toString()
-        });
-      } catch (e) { /* ignore */ }
+        await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' }, body: params.toString() });
+      } catch (e) { }
     }
 
-    function validateNames(first, last) {
-      const re = /^[A-Za-z][A-Za-z\s\-']{2,}$/;
-      return re.test(first) && first.trim().length >= 3 && re.test(last) && last.trim().length >= 3;
+    async function loadMetrics() {
+      try {
+        const res = await fetch(ENDPOINT + '?mode=view_breakdown&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        const data = await res.json();
+        const wrap = document.getElementById('adminMetrics');
+        const body = document.getElementById('metricsBody');
+        const totals = document.getElementById('metricsTotals');
+        if (!(data && data.ok)) { wrap.style.display='none'; return; }
+        wrap.style.display = 'block';
+        totals.textContent = 'Totals — Views: ' + (data.totalViews||0) + ' • Unique People: ' + (data.unique||0) + ' • Submits: ' + (data.totalSubmits||0);
+        body.innerHTML = '';
+        (data.rows || []).forEach(row => { body.insertAdjacentHTML('beforeend', '<tr><td>'+(row.email||'')+'</td><td>'+(row.submits||0)+'</td><td>'+(row.views||0)+'</td></tr>'); });
+      } catch (e) { document.getElementById('adminMetrics').style.display = 'none'; }
     }
+
+    function validateNames(first, last) { const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/; return re.test(first) && first.trim().length >= 4 && re.test(last) && last.trim().length >= 4; }
 
     function initApp() {
+      showClosedBannerIfNeeded();
       refreshAvailability();
       refreshRoster();
+      logView('load');
 
+      if (isAdmin(USER_EMAIL)) { loadMetrics(); setInterval(loadMetrics, 60000); }
+
+      // Phone input formatting
       const phoneEl = document.getElementById('phone');
       phoneEl.addEventListener('input', () => {
         let v = phoneEl.value.replace(/\D/g, '').slice(0, 10);
@@ -340,8 +377,14 @@
         const comments = form.comments.value.trim();
         const teams = Array.from(document.querySelectorAll('input[name="teams"]:checked')).map(cb => cb.value);
 
-        if (!validateNames(firstName, lastName) || !email || teams.length === 0) {
-          error.textContent = 'Please enter a valid first and last name (min 3 letters), your email, and select at least one team.';
+        if (new Date() > new Date(EVENT_DATE_ISO)) {
+          error.textContent = 'RSVP is closed — the event has concluded. Thank you for serving!';
+          error.style.display = 'block';
+          return;
+        }
+
+        if (!validateNames(firstName, lastName) || !email || !phone || teams.length === 0) {
+          error.textContent = 'Please enter a valid First and Last Name (at least 4 letters each), email, phone, and pick at least one team.';
           error.style.display = 'block';
           return;
         }
@@ -359,18 +402,14 @@
           params.append('id_token', ID_TOKEN || '');
           teams.forEach(t => params.append('teams', t));
 
-          const res = await fetch(ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body: params.toString(),
-          });
+          const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: params.toString() });
           const data = await res.json().catch(() => ({}));
           if (res.ok && data.ok) {
             success.style.display = 'block';
             form.reset();
             await refreshAvailability();
             await refreshRoster();
-            if (isAdmin(USER_EMAIL)) setTimeout(loadViewCounts, 1000);
+            if (isAdmin(USER_EMAIL)) setTimeout(loadMetrics, 800);
           } else {
             error.textContent = (data && data.error) ? data.error : 'Submission failed. Please try again.';
             error.style.display = 'block';
