@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC 13th Anniversary, Sept 21, 2025 — RSVP</title>
+  <title>ATC 13th Anniv., Sept 21, 2025 — RSVP</title>
   <style>
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
@@ -79,10 +79,7 @@
     </header>
 
     <main>
-      <section class="card" id="postEventBanner" style="display:none">
-        <h2 style="margin-top:0">Thank you for serving!</h2>
-        <p>Thank you for your prayers, time, and hearts to serve. God bless you!</p>
-      </section>
+      <!-- Top banner removed -->
 
       <section class="card">
         <form id="signupForm" autocomplete="on">
@@ -91,11 +88,11 @@
             <div class="grid-2">
               <div>
                 <label for="firstName">First Name<span class="req">*</span></label>
-                <input id="firstName" name="firstName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\\s\\-']{2,}" placeholder="e.g., John" />
+                <input id="firstName" name="firstName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\s\-']{2,}" placeholder="e.g., John" />
               </div>
               <div>
                 <label for="lastName">Last Name<span class="req">*</span></label>
-                <input id="lastName" name="lastName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\\s\\-']{2,}" placeholder="e.g., Doe" />
+                <input id="lastName" name="lastName" type="text" required minlength="3" pattern="[A-Za-z][A-Za-z\s\-']{2,}" placeholder="e.g., Doe" />
               </div>
             </div>
             <div class="grid-2">
@@ -149,6 +146,7 @@
             <tbody id="rosterBody"><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
           </table>
         </div>
+        <div id="rosterError" class="msg error" style="display:none;"></div>
       </section>
     </main>
 
@@ -161,11 +159,8 @@
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFiksRBfhbHD5bvRAyv5Stec7WO6zC9PLjgU1zcLXfzHW_RDms1CLbyawR5F3ATbG4/exec";
     const TEAM_ORDER = ["Setup Team", "Decoration team", "Program leads", "Slides", "Live stream", "Photography", "Dinner coordinator", "Dinner Serving team", "Cleanup Team"];
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
-    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
-    const EVENT_DATE_ISO = '2025-09-21T09:00:00-04:00';
-    const POST_EVENT_MESSAGE_START_ISO = null;
+    const ADMIN_EMAILS = ["atc.noting@gmail.com", "chakdom@gmail.com"];
 
-    let signedIn = false;
     let ID_TOKEN = null;
     let USER_EMAIL = '';
 
@@ -191,7 +186,6 @@
           const info = decodeJwtResponse(ID_TOKEN || '');
           if (info && (info.email || info.sub)) {
             USER_EMAIL = (info.email || '').toLowerCase();
-            signedIn = true;
             overlay.style.display = 'none';
             document.getElementById('app').style.display = 'block';
             initApp();
@@ -199,6 +193,8 @@
             if (isAdmin(USER_EMAIL)) {
               document.getElementById('adminBadge').style.display = 'inline-block';
               loadViewCounts();
+              setTimeout(loadViewCounts, 1200);
+              setInterval(loadViewCounts, 60000);
             }
           }
         },
@@ -216,27 +212,10 @@
         const res = await fetch(ENDPOINT + '?mode=view_counts&id_token=' + encodeURIComponent(ID_TOKEN || ''));
         const data = await res.json();
         if (data && data.ok) {
-          document.getElementById('vTotal').textContent = data.total || 0;
-          document.getElementById('vPeople').textContent = data.unique || 0;
+          document.getElementById('vTotal').textContent = data.total ?? 0;
+          document.getElementById('vPeople').textContent = data.unique ?? 0;
         }
-      } catch (e) {}
-    }
-
-    function secondMondayAfter(date) {
-      const d = new Date(date.getTime());
-      d.setDate(d.getDate() + 1);
-      const day = d.getDay();
-      const daysUntilNextMon = (8 - day) % 7;
-      d.setDate(d.getDate() + daysUntilNextMon);
-      d.setDate(d.getDate() + 7);
-      return d;
-    }
-
-    function maybeShowPostEventBanner() {
-      const banner = document.getElementById('postEventBanner');
-      const start = POST_EVENT_MESSAGE_START_ISO ? new Date(POST_EVENT_MESSAGE_START_ISO) : secondMondayAfter(new Date(EVENT_DATE_ISO));
-      const now = new Date();
-      if (now >= start) banner.style.display = 'block';
+      } catch (e) { /* ignore */ }
     }
 
     const teamCheckboxes = () => Array.from(document.querySelectorAll('input[name="teams"]'));
@@ -261,6 +240,8 @@
 
     function renderRoster(roster) {
       const tbody = document.getElementById('rosterBody');
+      const errBox = document.getElementById('rosterError');
+      errBox.style.display = 'none';
       tbody.innerHTML = '';
       let any = false;
       TEAM_ORDER.forEach(t => {
@@ -287,17 +268,25 @@
     }
 
     async function refreshRoster() {
+      const errBox = document.getElementById('rosterError');
       try {
         const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (!res.ok) {
+          errBox.textContent = 'Could not load RSVP status (' + res.status + ').';
+          errBox.style.display = 'block';
+          return;
+        }
         const data = await res.json();
-        if (!(data && data.ok)) return;
+        if (!(data && data.ok)) {
+          errBox.textContent = 'Could not load RSVP status (invalid response).';
+          errBox.style.display = 'block';
+          return;
+        }
         renderRoster(data.roster || {});
-      } catch (e) { }
-    }
-
-    function validateNames(first, last) {
-      const re = /^[A-Za-z][A-Za-z\s\-']{2,}$/;
-      return re.test(first) && first.trim().length >= 3 && re.test(last) && last.trim().length >= 3;
+      } catch (e) {
+        errBox.textContent = 'Could not load RSVP status (network error).';
+        errBox.style.display = 'block';
+      }
     }
 
     async function logView(kind='load') {
@@ -316,10 +305,14 @@
       } catch (e) { /* ignore */ }
     }
 
+    function validateNames(first, last) {
+      const re = /^[A-Za-z][A-Za-z\s\-']{2,}$/;
+      return re.test(first) && first.trim().length >= 3 && re.test(last) && last.trim().length >= 3;
+    }
+
     function initApp() {
       refreshAvailability();
       refreshRoster();
-      maybeShowPostEventBanner();
 
       const phoneEl = document.getElementById('phone');
       phoneEl.addEventListener('input', () => {
@@ -377,6 +370,7 @@
             form.reset();
             await refreshAvailability();
             await refreshRoster();
+            if (isAdmin(USER_EMAIL)) setTimeout(loadViewCounts, 1000);
           } else {
             error.textContent = (data && data.error) ? data.error : 'Submission failed. Please try again.';
             error.style.display = 'block';
