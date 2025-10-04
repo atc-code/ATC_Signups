@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATC 13th Anniversary, Sept 21, 2025 — Signup</title>
+  <style>
+    :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
+    header { background: #222; color: #fff; padding: 24px var(--pad); }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3.2vw, 2.2rem); line-height: 1.25; }
+    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; }
+    main { max-width: var(--max); margin: 20px auto; padding: 0 var(--pad); display:grid; gap:16px; }
+    .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 860px){ .grid-2{ grid-template-columns:1fr; } }
+    fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+    legend { font-weight:800; margin-bottom: 10px; padding: 0; }
+    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; background:#fff; }
+    input[type="checkbox"] { width: 18px; height: 18px; }
+    textarea { min-height: 90px; resize: vertical; }
+    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 4px; }
+    @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
+    .team { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border:1px solid #e2e8f0; border-radius: 12px; }
+    .req { color: #c00; margin-left: 4px; }
+    .actions { display:flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap:wrap; }
+    button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size:1rem; }
+    .primary { background: var(--accent); color: #fff; }
+    .secondary { background: #edf2f7; }
+    .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
+    .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
+    .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
+    h2 { margin:0 0 10px; font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+    .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
+    .muted { color:#666; }
+    .tableWrap { overflow-x:auto; }
+    table.roster, table.metrics { width:100%; border-collapse: collapse; }
+    table.roster th, table.roster td, table.metrics th, table.metrics td { text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align: top; }
+    table.roster th, table.metrics th { font-size:.95rem; color:#334155; }
+    .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
+    .overlay .inner { max-width:600px; text-align:center; }
+    .overlay p{ opacity:.9; }
+    .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
+    .brandRow { position: relative; min-height: 104px; }
+    .brandRow .logo{ position: absolute; left: 18px; top: 50%; transform: translateY(-50%); }
+    .brandRow > :nth-child(2){ text-align: center; max-width: 900px; margin: 0 auto; text-wrap: balance; padding-left: 0; }
+    footer { text-align:center; color:#374151; padding: 16px; }
+    .hero { background:#0f172a; color:#e5e7eb; border:0; text-align:center; }
+    .hero h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin:0 0 8px; color:#fff; }
+    .hero p { margin:0; font-size: clamp(1rem, 2.2vw, 1.15rem); }
+    @media (max-width: 560px){
+      header .brandRow{ min-height: 120px; padding-top: 12px; }
+      header .brandRow .logo{ top: 12px; transform: none; height: 64px; width: 64px; }
+      header .brandRow > :nth-child(2){ max-width: 92%; margin: 0 auto; padding-left: 72px; }
+      header h1{ font-size: clamp(1.2rem, 6vw, 1.8rem); }
+    }
+  </style>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <!-- Sign-in overlay -->
+  <div id="signinOverlay" class="overlay" style="display:none">
+    <div class="inner">
+      <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
+        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
+        <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
+      </div>
+      <p>Please sign in with your Google account to access this ATC Signup page.</p>
+      <div id="gSignIn" style="display:inline-block;"></div>
+      <div class="subtle" style="margin-top:10px;">Your email is used to confirm your ATC Signup.</div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="app" style="display:none">
+    <header>
+      <div class="brandRow">
+        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
+        <div>
+          <h1>ATC 13th Anniversary, Sept 21, 2025 — Signup</h1>
+          <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Big banner after Signups close -->
+      <section class="card hero" id="closedBanner" style="display:none">
+        <h2>Thanks for your Signup and hearts to serve. God bless you!</h2>
+        <p>see you next time!</p>
+      </section>
+
+      <!-- Submit form (visible only while Signups are open) -->
+      <section class="card" id="formCard">
+        <form id="signupForm" autocomplete="on">
+          <fieldset>
+            <legend>Contact information</legend>
+            <div class="grid-2">
+              <div>
+                <label for="firstName">First Name<span class="req">*</span></label>
+                <input id="firstName" name="firstName" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John" />
+              </div>
+              <div>
+                <label for="lastName">Last Name<span class="req">*</span></label>
+                <input id="lastName" name="lastName" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe" />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <label for="email">Email<span class="req">*</span></label>
+                <input id="email" name="email" type="email" required placeholder="name@example.com" />
+              </div>
+              <div>
+                <label for="phone">Phone<span class="req">*</span></label>
+                <input id="phone" name="phone" type="text" inputmode="tel" required placeholder="(###) ###-####" />
+              </div>
+            </div>
+            <div>
+              <label for="comments">Comments / Notes</label>
+              <textarea id="comments" name="comments" placeholder="Any preferences or availability details…"></textarea>
+            </div>
+          </fieldset>
+
+          <div class="divider"></div>
+
+          <fieldset>
+            <legend>Choose your team(s)<span class="req">*</span></legend>
+            <div class="teams">
+              <label class="team"><input type="checkbox" name="teams" value="Setup Team" /> <span class="teamName">Setup Team</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Decoration team" /> <span class="teamName">Decoration team</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Program leads" /> <span class="teamName">Program leads</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Slides" /> <span class="teamName">Slides</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Live stream" /> <span class="teamName">Live stream</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Photography" /> <span class="teamName">Photography</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner coordinator" /> <span class="teamName">Dinner coordinator</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Dinner Serving team" /> <span class="teamName">Dinner Serving team</span></label>
+              <label class="team"><input type="checkbox" name="teams" value="Cleanup Team" /> <span class="teamName">Cleanup Team</span></label>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="primary" type="submit" id="submitBtn">Submit</button>
+            <button class="secondary" type="reset">Clear</button>
+          </div>
+          <div id="success" class="msg success">Thank you! Your Signup was recorded. You may select more teams by submitting again.</div>
+          <div id="error" class="msg error">Sorry, something went wrong. Please try again or contact the coordinator.</div>
+        </form>
+      </section>
+
+      <!-- Live Signup always visible -->
+      <section class="card" id="rosterCard">
+        <h2 style="margin-top:0;">LIVE Signup STATUS</h2>
+        <div class="tableWrap">
+          <table class="roster" id="rosterTable">
+            <thead><tr><th>Team</th><th>Volunteers</th></tr></thead>
+            <tbody id="rosterBody"><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="rosterError" class="msg error" style="display:none;"></div>
+      </section>
+
+      <!-- Admin metrics always visible to admins -->
+      <section class="card" id="adminMetrics" style="display:none">
+        <h2 style="margin-top:0">Admin — Activity Metrics</h2>
+        <div class="muted" id="metricsTotals" style="margin-bottom:8px"></div>
+        <div class="tableWrap">
+          <table class="metrics" id="metricsTable">
+            <thead><tr><th>Email</th><th>Submits</th><th>Views</th></tr></thead>
+            <tbody id="metricsBody"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer></footer>
+  </div>
+
+  <script>
+    // --- Config (edit per event) ---
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFiksRBfhbHD5bvRAyv5Stec7WO6zC9PLjgU1zcLXfzHW_RDms1CLbyawR5F3ATbG4/exec";
+    const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
+    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
+    const EVENT_DATE_ISO = "2025-09-21T23:59:59-04:00";
+    const TEAM_ORDER = ["Setup Team","Decoration team","Program leads","Slides","Live stream","Photography","Dinner coordinator","Dinner Serving team","Cleanup Team"];
+
+    let ID_TOKEN = null;
+    let USER_EMAIL = '';
+
+    function decodeJwtResponse(token) {
+      try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); } catch(e){ return {}; }
+    }
+    function isAdmin(email) { email = (email||'').toLowerCase(); return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email); }
+
+    function tokenFromSession() {
+      try {
+        const t = sessionStorage.getItem('ID_TOKEN');
+        const exp = Number(sessionStorage.getItem('ID_TOKEN_EXP') || '0');
+        if (!t || !exp) return null;
+        const now = Math.floor(Date.now()/1000);
+        if (now >= exp - 30) { sessionStorage.removeItem('ID_TOKEN'); sessionStorage.removeItem('ID_TOKEN_EXP'); return null; }
+        return t;
+      } catch(e){ return null; }
+    }
+    function saveTokenToSession(t) {
+      try {
+        const info = decodeJwtResponse(t || '');
+        const exp = info && info.exp ? Number(info.exp) : 0;
+        sessionStorage.setItem('ID_TOKEN', t || '');
+        if (exp) sessionStorage.setItem('ID_TOKEN_EXP', String(exp));
+      } catch(e){ /* ignore */ }
+    }
+
+    function toggleUIForClosed() {
+      const closed = (new Date() > new Date(EVENT_DATE_ISO));
+      document.getElementById('closedBanner').style.display = closed ? 'block' : 'none';
+      document.getElementById('formCard').style.display    = closed ? 'none'  : 'block';
+      return closed;
+    }
+
+    function initGoogleSignIn() {
+      const overlay = document.getElementById('signinOverlay');
+
+      const cached = tokenFromSession();
+      if (cached) {
+        ID_TOKEN = cached;
+        const info = decodeJwtResponse(ID_TOKEN || '');
+        USER_EMAIL = (info.email || '').toLowerCase();
+        document.getElementById('app').style.display = 'block';
+        initApp();
+        return;
+      }
+
+      overlay.style.display = 'flex';
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          ID_TOKEN = response.credential || null;
+          if (!ID_TOKEN) return;
+          saveTokenToSession(ID_TOKEN);
+          const info = decodeJwtResponse(ID_TOKEN || '');
+          if (info && (info.email || info.sub)) {
+            USER_EMAIL = (info.email || '').toLowerCase();
+            overlay.style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            initApp();
+          }
+        },
+        auto_select: false,
+        cancel_on_tap_outside: false,
+      });
+      google.accounts.id.renderButton(document.getElementById("gSignIn"), { theme: "outline", size: "large", text: "signin_with", shape: "pill" });
+    }
+
+    const teamCheckboxes = () => Array.from(document.querySelectorAll('input[name="teams"]'));
+
+    async function refreshAvailability() {
+      try {
+        const res = await fetch(ENDPOINT + '?id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          const data = await res.json().catch(()=>({}));
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This Signup is limited to ATC members.')+'</p></section>';
+          return;
+        }
+        const data = await res.json();
+        const remaining = data && data.ok ? (data.remaining || {}) : null;
+        teamCheckboxes().forEach(cb => {
+          const raw = remaining && Object.prototype.hasOwnProperty.call(remaining, cb.value) ? remaining[cb.value] : undefined;
+          const left = Number.isFinite(raw) ? raw : 99;
+          cb.disabled = Number.isFinite(raw) ? (left <= 0) : false;
+          cb.parentElement.style.opacity = cb.disabled ? 0.6 : 1;
+        });
+      } catch (e) {
+        teamCheckboxes().forEach(cb => { cb.disabled = false; cb.parentElement.style.opacity = 1; });
+      }
+    }
+
+    function renderRoster(roster) {
+      const tbody = document.getElementById('rosterBody');
+      const errBox = document.getElementById('rosterError');
+      errBox.style.display = 'none';
+      tbody.innerHTML = '';
+      let any = false;
+      TEAM_ORDER.forEach(t => {
+        const names = roster[t] || [];
+        if (names.length === 0) return;
+        any = true;
+        const tr = document.createElement('tr');
+        const td1 = document.createElement('td');
+        const td2 = document.createElement('td');
+        td1.textContent = t;
+        td2.innerHTML = names.map(n => '<span class="chip">' + n + '</span>').join(' ');
+        tr.appendChild(td1); tr.appendChild(td2);
+        tbody.appendChild(tr);
+      });
+      if (!any) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 2;
+        td.className = 'muted';
+        td.textContent = 'No Signups yet.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function refreshRoster() {
+      const errBox = document.getElementById('rosterError');
+      try {
+        const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          const data = await res.json().catch(()=>({}));
+          document.getElementById('app').innerHTML = '<section class="card"><h2>Access restricted</h2><p>'+(data.error || 'This Signup is limited to ATC members.')+'</p></section>';
+          return;
+        }
+        if (!res.ok) { errBox.textContent = 'Could not load Signup status (' + res.status + ').'; errBox.style.display = 'block'; return; }
+        const data = await res.json();
+        if (!(data && data.ok)) { errBox.textContent = 'Could not load Signup status (invalid response).'; errBox.style.display = 'block'; return; }
+        renderRoster(data.roster || {});
+      } catch (e) { errBox.textContent = 'Could not load Signup status (network error).'; errBox.style.display = 'block'; }
+    }
+
+    async function logView(kind='load') {
+      try {
+        const params = new URLSearchParams();
+        params.append('mode','log_view');
+        params.append('id_token', ID_TOKEN || '');
+        params.append('path', location.pathname + location.search);
+        params.append('ua', navigator.userAgent || '');
+        params.append('kind', kind);
+        await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' }, body: params.toString() });
+      } catch (e) { }
+    }
+
+    async function loadMetrics() {
+      try {
+        const res = await fetch(ENDPOINT + '?mode=view_breakdown&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        if (res.status === 403) {
+          document.getElementById('adminMetrics').style.display = 'none';
+          return;
+        }
+        const data = await res.json();
+        const wrap = document.getElementById('adminMetrics');
+        const body = document.getElementById('metricsBody');
+        const totals = document.getElementById('metricsTotals');
+        if (!(data && data.ok)) { wrap.style.display='none'; return; }
+        wrap.style.display = 'block';
+        totals.textContent = 'Totals — Views: ' + (data.totalViews||0) + ' • Unique People: ' + (data.unique||0) + ' • Submits: ' + (data.totalSubmits||0);
+        body.innerHTML = '';
+        (data.rows || []).forEach(row => { body.insertAdjacentHTML('beforeend', '<tr><td>'+(row.email||'')+'</td><td>'+(row.submits||0)+'</td><td>'+(row.views||0)+'</td></tr>'); });
+      } catch (e) { document.getElementById('adminMetrics').style.display = 'none'; }
+    }
+
+    function validateNames(first, last) { const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/; return re.test(first) && first.trim().length >= 4 && re.test(last) && last.trim().length >= 4; }
+
+    async function initApp() {
+      const closed = toggleUIForClosed();
+      refreshAvailability();
+      refreshRoster();
+
+      await logView('load');
+
+      if (isAdmin(USER_EMAIL)) {
+        await loadMetrics();
+        setTimeout(loadMetrics, 600);
+        setInterval(loadMetrics, 60000);
+      }
+
+      if (!closed) {
+        const phoneEl = document.getElementById('phone');
+        phoneEl.addEventListener('input', () => {
+          let v = phoneEl.value.replace(/\D/g, '').slice(0, 10);
+          const parts = [];
+          if (v.length > 0) parts.push('(' + v.substring(0, Math.min(3, v.length)));
+          if (v.length >= 4) parts[0] += ') ' + v.substring(3, Math.min(6, v.length));
+          if (v.length >= 7) parts[0] += '-' + v.substring(6, 10);
+          phoneEl.value = parts[0] || v;
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitBtn = document.getElementById('submitBtn');
+          const success = document.getElementById('success');
+          const error = document.getElementById('error');
+          success.style.display = 'none';
+          error.style.display = 'none';
+
+          const form = e.currentTarget;
+          const firstName = form.firstName.value.trim();
+          const lastName = form.lastName.value.trim();
+          const email = form.email.value.trim();
+          const phone = form.phone.value.trim();
+          const comments = form.comments.value.trim();
+          const teams = Array.from(document.querySelectorAll('input[name="teams"]:checked')).map(cb => cb.value);
+
+          if (new Date() > new Date(EVENT_DATE_ISO)) {
+            error.textContent = 'Signup is closed — the event has concluded. Thank you for serving!';
+            error.style.display = 'block';
+            return;
+          }
+
+          if (!validateNames(firstName, lastName) || !email || !phone || teams.length === 0) {
+            error.textContent = 'Please enter a valid First and Last Name (at least 4 letters each), email, phone, and pick at least one team.';
+            error.style.display = 'block';
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Submitting…';
+          try {
+            const params = new URLSearchParams();
+            params.append('firstName', firstName);
+            params.append('lastName', lastName);
+            params.append('name', firstName + ' ' + lastName);
+            params.append('email', email);
+            params.append('phone', phone);
+            params.append('comments', comments);
+            params.append('id_token', ID_TOKEN || '');
+            teams.forEach(t => params.append('teams', t));
+
+            const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: params.toString() });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data.ok) {
+              success.style.display = 'block';
+              form.reset();
+              await refreshAvailability();
+              await refreshRoster();
+              if (isAdmin(USER_EMAIL)) setTimeout(loadMetrics, 800);
+            } else {
+              error.textContent = (data && data.error) ? data.error : 'Submission failed. Please try again.';
+              error.style.display = 'block';
+              await refreshAvailability();
+              await refreshRoster();
+            }
+          } catch (err) {
+            error.textContent = 'Network error. Please check your connection and try again.';
+            error.style.display = 'block';
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit';
+          }
+        });
+      }
+    }
+
+    window.addEventListener('load', () => {
+      if (!GOOGLE_CLIENT_ID) {
+        const overlay = document.getElementById('signinOverlay');
+        overlay.style.display = 'flex';
+        document.getElementById('gSignIn').innerHTML = '<div style="background:#111827;padding:12px 16px;border-radius:10px;display:inline-block">Admin setup required: set GOOGLE_CLIENT_ID in the HTML.</div>';
+      } else {
+        initGoogleSignIn();
+      }
+    });
+  </script>
+</body>
+</html>
