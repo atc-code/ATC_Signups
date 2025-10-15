@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATC Christmas Carols 2025 — Signup</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <meta name="color-scheme" content="light only"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>ATC Christmas Carols — Signup</h1>
+      <p class="lead">Select your preferred date and tell us who’s coming. Dates: <span class="badge">Dec 6</span> <span class="badge">Dec 13</span> <span class="badge">Dec 20</span></p>
+
+      <form id="signupForm" class="grid grid-2">
+        <div>
+          <label for="name">Full Name *</label>
+          <input id="name" required placeholder="Your name"/>
+        </div>
+
+        <div>
+          <label for="email">Email *</label>
+          <input id="email" type="email" required placeholder="name@domain.com"/>
+        </div>
+
+        <div>
+          <label for="phone">Phone *</label>
+          <input id="phone" inputmode="numeric" required placeholder="Digits only"/>
+        </div>
+
+        <div>
+          <label for="area">Area / Neighborhood *</label>
+          <input id="area" required placeholder="e.g., Cumming, GA"/>
+        </div>
+
+        <div>
+          <label for="party_size">How many attending? *</label>
+          <input id="party_size" type="number" min="1" value="1" required />
+        </div>
+
+        <div>
+          <label for="preferred_date">Preferred Date *</label>
+          <select id="preferred_date" required></select>
+        </div>
+
+        <div class="grid" style="grid-column: 1 / -1;">
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" rows="3" placeholder="Any special notes or address details…"></textarea>
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <button id="submitBtn" class="primary" type="submit">Submit Signup</button>
+          <div id="message" class="message"></div>
+          <p class="note">We’ll reach out with route and timing. If your email domain is not permitted by ATC, you’ll see an error.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

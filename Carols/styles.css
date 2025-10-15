@@ -1,0 +1,42 @@
+/* ATC Christmas Carols — Styles (minimal, mobile-first) */
+:root {
+  --brand: #0b6cff;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --ring: rgba(11,108,255,0.2);
+}
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  margin: 0; padding: 2rem; background: var(--bg); color: var(--text);
+}
+.container { max-width: 720px; margin: 0 auto; }
+.card {
+  background: var(--card); border-radius: 16px; padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 10px 15px rgba(0,0,0,0.04);
+}
+h1 { font-size: 1.6rem; margin: 0 0 0.75rem; }
+p.lead { color: var(--muted); margin-top: 0; }
+
+label { display:block; margin: 0.75rem 0 0.25rem; font-weight: 600; }
+input, select, textarea, button {
+  width: 100%; padding: 0.8rem 0.9rem; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 1rem;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; box-shadow: 0 0 0 4px var(--ring);
+}
+.grid { display: grid; gap: 0.8rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+button.primary {
+  background: var(--brand); color: white; border: none; cursor: pointer; font-weight: 700;
+}
+button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.note { font-size: 0.9rem; color: var(--muted); }
+.message { margin-top: 0.75rem; font-weight: 600; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 0.6rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+.badge { display:inline-block; background:#eef2ff; color:#3730a3; padding:0.2rem 0.5rem; border-radius:999px; font-size:0.85rem; }

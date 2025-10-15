@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATC Christmas Carols — Admin</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Admin — ATC Christmas Carols</h1>
+      <div class="grid grid-2">
+        <div>
+          <label for="passcode">Admin Passcode</label>
+          <input id="passcode" placeholder="from Config sheet"/>
+        </div>
+        <div>
+          <label for="filter_date">Filter by Date</label>
+          <select id="filter_date"></select>
+        </div>
+      </div>
+
+      <div style="margin-top: .75rem; display:flex; gap:.5rem; flex-wrap:wrap;">
+        <button id="pingBtn">Test Ping</button>
+        <button id="loadBtn" class="primary">Load Roster</button>
+        <button id="exportBtn">Export CSV</button>
+        <span id="status" class="note" style="align-self:center;">Status: …</span>
+        <span id="count" class="note" style="align-self:center;"></span>
+      </div>
+
+      <div style="overflow:auto; margin-top:1rem;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Area</th>
+              <th>Party</th>
+              <th>Notes</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
