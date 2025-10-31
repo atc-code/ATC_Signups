@@ -3,39 +3,63 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ATC Monthly Signups</title>
+<title>ATC Monthly Signups — RSVP</title>
 <style>
-  :root{--max:980px;--pad:18px;--radius:16px;--accent:#2b6cb0}
+  :root{--max:1000px;--pad:18px;--radius:16px;--accent:#2b6cb0}
   *{box-sizing:border-box}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7fb;color:#111827}
-  header{background:#1f2937;color:#fff;padding:28px var(--pad)}
-  .hdr{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center}
-  .logo{width:64px;height:64px;border-radius:12px;background:#fff;padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+
+  /* Header */
+  header{background:#1f2937;color:#fff;padding:32px var(--pad)}
+  .hdr{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center}
+  .logo{width:96px;height:96px;border-radius:14px;background:#fff;padding:10px;box-shadow:0 10px 26px rgba(0,0,0,.22);justify-self:start}
   .title{text-align:center}
-  .title h1{margin:0;font-weight:800;font-size:clamp(1.4rem,3.4vw,2rem)}
-  .title p{margin:6px 0 0;opacity:.95;font-style:italic}
+  .title h1{margin:0;font-weight:800;font-size:clamp(1.6rem,3.6vw,2.2rem)}
+  .title p{margin:8px 0 0;opacity:.98;font-style:italic;font-size:clamp(1rem,2.4vw,1.15rem)}
+
+  /* Layout */
   main{max-width:var(--max);margin:18px auto;padding:0 var(--pad);display:grid;gap:16px}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:0 6px 22px rgba(0,0,0,.08);padding:18px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:0 8px 28px rgba(0,0,0,.08);padding:18px}
+
   fieldset{border:0;margin:0 0 12px;padding:0}
-  legend{font-weight:800;margin-bottom:8px}
+  legend{font-weight:900;margin-bottom:10px;font-size:1.2rem} /* bigger sub-headers */
   label{font-weight:600;display:block;margin:6px 0}
-  input[type="text"],input[type="email"],input[type="month"],textarea{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+
+  input[type="text"],input[type="email"],input[type="month"],textarea{
+    width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff
+  }
   textarea{min-height:90px;resize:vertical}
+
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media (max-width:820px){.grid2{grid-template-columns:1fr}.hdr{grid-template-columns:48px 1fr}.logo{width:48px;height:48px}}
-  .teams{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
-  @media (max-width:720px){.teams{grid-template-columns:1fr}}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr}.hdr{grid-template-columns:80px 1fr}.logo{width:80px;height:80px}}
+
+  /* Teams: one column */
+  .teams{display:grid;grid-template-columns:1fr;gap:10px}
   .team{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px}
-  .muted{color:#6b7280}
+
+  /* Sundays chips as single column stack */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px}
+
+  /* Two-column form layout: Teams (left) + Contact (right) */
+  .formGrid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  @media (max-width:1000px){.formGrid{grid-template-columns:1fr}}
+
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
   button{border:0;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
   .primary{background:var(--accent);color:#fff}
   .secondary{background:#eef2f7}
+
   .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:12px}
   .ok{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
   .err{background:#fff5f5;border:1px solid #fecaca;color:#7f1d1d}
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px}
+
+  /* Roster table */
+  .tableWrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+  th{color:#374151;font-size:.95rem}
+
   footer{padding:10px 0 24px;text-align:center;color:#6b7280}
 </style>
 </head>
@@ -54,10 +78,10 @@
   <!-- Month + Sundays info -->
   <section class="card">
     <fieldset>
-      <legend style="font-size:1.05rem">Service Month<span style="color:#b91c1c;margin-left:6px">*</span></legend>
+      <legend>Service Month<span style="color:#b91c1c;margin-left:6px">*</span></legend>
       <div class="grid2">
         <div>
-          <label for="month" style="font-size:1.05rem">Select Month</label>
+          <label for="month">Select Month</label>
           <input type="month" id="month">
         </div>
         <div>
@@ -71,39 +95,46 @@
   <!-- Signup form -->
   <section class="card">
     <form id="f" autocomplete="on">
-      <fieldset>
-        <legend>Choose your team(s)<span style="color:#b91c1c;margin-left:6px">*</span></legend>
-        <div id="roles" class="teams"><div class="muted">Pick a month to load roles…</div></div>
-        <div class="muted" style="margin-top:6px">Full roles are hidden automatically.</div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Contact information</legend>
-        <div class="grid2">
-          <div>
-            <label for="first">First Name<span style="color:#b91c1c">*</span></label>
-            <input id="first" type="text" required minlength="4" placeholder="e.g., John">
-          </div>
-          <div>
-            <label for="last">Last Name<span style="color:#b91c1c">*</span></label>
-            <input id="last" type="text" required minlength="4" placeholder="e.g., Doe">
-          </div>
-        </div>
-        <div class="grid2">
-          <div>
-            <label for="email">Email<span style="color:#b91c1c">*</span></label>
-            <input id="email" type="email" required placeholder="name@example.com">
-          </div>
-          <div>
-            <label for="phone">Phone<span style="color:#b91c1c">*</span></label>
-            <input id="phone" type="text" inputmode="tel" required placeholder="(###) ###-####">
-          </div>
-        </div>
+      <div class="formGrid">
+        <!-- Left: Teams -->
         <div>
-          <label for="notes">Comments / Notes</label>
-          <textarea id="notes" placeholder="Any preferences or dates you can’t make…"></textarea>
+          <fieldset>
+            <legend>Choose your team(s)<span style="color:#b91c1c;margin-left:6px">*</span></legend>
+            <div id="roles" class="teams"><div class="muted">Pick a month to load roles…</div></div>
+          </fieldset>
         </div>
-      </fieldset>
+
+        <!-- Right: Contact -->
+        <div>
+          <fieldset>
+            <legend>Contact information</legend>
+            <div class="grid2">
+              <div>
+                <label for="first">First Name<span style="color:#b91c1c">*</span></label>
+                <input id="first" type="text" required minlength="4" placeholder="e.g., John">
+              </div>
+              <div>
+                <label for="last">Last Name<span style="color:#b91c1c">*</span></label>
+                <input id="last" type="text" required minlength="4" placeholder="e.g., Doe">
+              </div>
+            </div>
+            <div class="grid2">
+              <div>
+                <label for="email">Email<span style="color:#b91c1c">*</span></label>
+                <input id="email" type="email" required placeholder="name@example.com">
+              </div>
+              <div>
+                <label for="phone">Phone<span style="color:#b91c1c">*</span></label>
+                <input id="phone" type="text" inputmode="tel" required placeholder="(###) ###-####">
+              </div>
+            </div>
+            <div>
+              <label for="notes">Comments / Notes</label>
+              <textarea id="notes" placeholder="Any preferences or dates you can’t make…"></textarea>
+            </div>
+          </fieldset>
+        </div>
+      </div>
 
       <div class="actions">
         <button type="submit" id="submit" class="primary">Submit</button>
@@ -114,14 +145,19 @@
     </form>
   </section>
 
-  <!-- Roster (bottom) -->
+  <!-- Roster (bottom, tabular) -->
   <section class="card">
     <h2 style="margin:0 0 10px">Current Signups</h2>
-    <div id="rosterWrap" class="chips"><span class="muted">No signups yet.</span></div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr><th style="width:32%">Role</th><th>Volunteers</th></tr></thead>
+        <tbody id="roster"><tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr></tbody>
+      </table>
+    </div>
   </section>
 </main>
 
-<footer>© ATC</footer>
+<footer>© Atlanta Telugu Church and/or https://atlantateluguchurch.org/</footer>
 
 <script>
   // === CONFIG ===
@@ -162,7 +198,6 @@
     const box = $('sundays'); box.innerHTML = '';
     if (!cal || !cal.length){ box.innerHTML = '<span class="muted">No Sundays found.</span>'; return; }
     cal.forEach(d=>{
-      // Pretty like “November 21, 2025”
       const pretty = new Date(d.ServiceDate + 'T00:00:00').toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
       const span = document.createElement('span');
       span.className = 'chip';
@@ -176,9 +211,8 @@
     if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles configured.</div>'; return; }
     roles.forEach(r=>{
       const role = r.role;
-      const left = (remaining && remaining.hasOwnProperty(role)) ? remaining[role] : null;
-      // hide if full
-      if (left !== null && left <= 0) return;
+      const left = (remaining && Object.prototype.hasOwnProperty.call(remaining, role)) ? remaining[role] : null;
+      if (left !== null && left <= 0) return; // hide full
       const label = document.createElement('label');
       label.className = 'team';
       label.innerHTML = `<input type="checkbox" name="role" value="${role.replace(/"/g,'&quot;')}"> <span>${role}</span>`;
@@ -190,29 +224,14 @@
   }
 
   function renderRoster(roster){
-    const wrap = $('rosterWrap'); wrap.innerHTML = '';
+    const tb = $('roster'); tb.innerHTML = '';
     const roles = Object.keys(roster||{});
-    if (!roles.length){ wrap.innerHTML = '<span class="muted">No signups yet.</span>'; return; }
+    if (!roles.length){ tb.innerHTML = '<tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr>'; return; }
     roles.forEach(role=>{
       const names = roster[role] || [];
       if (!names.length) return;
-      const row = document.createElement('div');
-      row.style.display='block';
-      row.style.margin='6px 0';
-      const title = document.createElement('div');
-      title.style.fontWeight='700';
-      title.textContent = role;
-      const chips = document.createElement('div');
-      chips.className = 'chips';
-      names.forEach(n=>{
-        const c = document.createElement('span');
-        c.className = 'chip';
-        c.textContent = n;
-        chips.appendChild(c);
-      });
-      row.appendChild(title);
-      row.appendChild(chips);
-      wrap.appendChild(row);
+      const listHtml = names.map(n => `<div class="chip" style="display:inline-block;margin:4px 6px 0 0">${n}</div>`).join('');
+      tb.insertAdjacentHTML('beforeend', `<tr><td><strong>${role}</strong></td><td>${listHtml}</td></tr>`);
     });
   }
 
@@ -221,20 +240,17 @@
     if (!month){
       $('sundays').innerHTML = '<span class="muted">Select a month…</span>';
       $('roles').innerHTML = '<div class="muted">Pick a month to load roles…</div>';
-      $('rosterWrap').innerHTML = '<span class="muted">No signups yet.</span>';
+      $('roster').innerHTML = '<tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr>';
       return;
     }
 
     try{
-      // Sundays info (display only)
       const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
       renderSundays((calResp && calResp.cal) || []);
 
-      // Roles & remaining (hide full)
       const rr = await jsonp(`${ENDPOINT}?mode=roles_remaining&month=${encodeURIComponent(month)}`);
       renderRoles((rr && rr.roles)||[], (rr && rr.remaining)||{});
 
-      // Roster
       const ro = await jsonp(`${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}`);
       renderRoster(ro && ro.roster);
     }catch(e){
@@ -281,8 +297,7 @@
         if (out && out.ok){
           $('ok').style.display='block';
           $('f').reset();
-          // Keep selected month; just refresh roles/roster
-          await refreshForMonth();
+          await refreshForMonth(); // keep month, refresh lists
         }else{
           throw new Error((out && out.error) || 'Submission failed.');
         }
