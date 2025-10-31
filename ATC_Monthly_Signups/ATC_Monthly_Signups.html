@@ -376,7 +376,25 @@
     }
 
     // Boot
-    window.addEventListener('load', () => { initGIS(); });
+    // Boot logic with localStorage sign-in persistence
+window.addEventListener('load', async () => {
+  const cachedToken = localStorage.getItem('atc_id_token');
+  const cachedTime  = parseInt(localStorage.getItem('atc_id_token_time') || '0', 10);
+  const now = Date.now();
+
+  // If cached token is < 1 hour old, reuse it
+  if (cachedToken && (now - cachedTime < 3600 * 1000)) {
+    ID_TOKEN = cachedToken;
+    document.getElementById('signinOverlay').style.display='none';
+    document.getElementById('app').style.display='block';
+    console.log('✅ Reusing existing sign-in token.');
+    initAfterSignIn();
+  } else {
+    console.log('🕓 Need to sign in again.');
+    initGIS();
+  }
+});
+
   </script>
 </body>
 </html>
