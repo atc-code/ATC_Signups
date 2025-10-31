@@ -13,18 +13,26 @@
   /* ===== Header with left logo, centered title/verse ===== */
   header{background:#172230;color:#fff}
   .headerInner{
-    max-width:var(--max);
-    margin:0 auto;
-    position:relative;
-    text-align:center;
-    padding:28px clamp(16px,3vw,24px);
-    padding-left:128px;              /* keeps text from overlapping the logo */
-  }
-  .headerLogo{
-    position:absolute; left:clamp(12px,3vw,24px); top:50%; transform:translateY(-50%);
-    height:84px;width:84px;border-radius:12px;background:#fff;padding:10px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-  }
+  max-width:var(--max);
+  margin:0 auto;
+  position:relative;
+  text-align:center;
+  padding:28px clamp(16px,3vw,24px);
+  padding-left:128px; /* reserve space so centered text won't overlap logo */
+}
+.headerLogo{
+  position:absolute;
+  left:16px;               /* hard top-left corner inside header */
+  top:16px;
+  transform:none;          /* no vertical centering */
+  height:88px; width:88px;
+  border-radius:12px; background:#fff; padding:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+@media (max-width:720px){
+  .headerInner{ padding-left:96px; }
+  .headerLogo{ height:64px; width:64px; left:12px; top:12px; }
+}
   header h1{margin:0 0 8px;font-size:clamp(1.6rem,4.2vw,2.4rem);line-height:1.25}
   header p{margin:0;opacity:.95;font-style:italic;font-size:clamp(1rem,2.4vw,1.15rem)}
   @media (max-width:720px){
@@ -228,21 +236,28 @@
 
   /* ====== Rendering ====== */
   function renderSundays(cal){
-    const box = $('sundays'); box.innerHTML = '';
-    const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
-    if (!upcoming.length){
-      box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
-      return;
-    }
-    upcoming.forEach(d=>{
-      const pretty = new Date(d.ServiceDate+'T00:00:00').toLocaleDateString(undefined,
-        {year:'numeric',month:'long',day:'numeric'});
-      const chip = document.createElement('span');
-      chip.className = 'chip';
-      chip.textContent = pretty;
-      box.appendChild(chip);
-    });
+  const box = $('sundays'); box.innerHTML = '';
+  const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
+  const submitBtn = $('submit');
+
+  if (!upcoming.length){
+    box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
+    if (submitBtn) submitBtn.disabled = true;
+    return;
   }
+
+  // We have Sundays: enable submit
+  if (submitBtn) submitBtn.disabled = false;
+
+  upcoming.forEach(d=>{
+    const pretty = new Date(d.ServiceDate+'T00:00:00').toLocaleDateString(undefined,
+      {year:'numeric',month:'long',day:'numeric'});
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = pretty;
+    box.appendChild(chip);
+  });
+}
 
   function renderRoles(roles, remaining){
     const wrap = $('roles'); wrap.innerHTML = '';
@@ -273,25 +288,42 @@
   }
 
   /* ====== Data flow ====== */
-  async function loadForMonth(){
-    const month = $('month').value;
-    if (!month){ $('sundays').innerHTML = '<span class="muted">Select a month…</span>'; return; }
-
-    try{
-      const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
-      renderSundays(calResp.cal || []);
-
-      const rolesResp = await jsonp(`${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}`);
-      renderRoles(rolesResp.roles || [], rolesResp.remaining || {});
-
-      const rosterResp = await jsonp(`${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}`);
-      renderRoster(rosterResp.rows || []);
-    }catch(e){
-      console.error(e);
-      $('sundays').innerHTML = '<span class="muted">Failed to load Sundays.</span>';
-    }
+async function loadForMonth(){
+  const month = $('month').value;
+  if (!month){
+    $('sundays').innerHTML = '<span class="muted">Select a month…</span>';
+    $('roles').innerHTML = '<div class="muted">Pick a month to load roles…</div>';
+    $('roster').innerHTML = '<tr><td colspan="3" class="muted">No signups yet.</td></tr>';
+    $('submit').disabled = true;
+    return;
   }
 
+  try{
+    // 1) Sundays (also handles enabling/disabling Submit)
+    const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
+    renderSundays(calResp.cal || []);
+
+    // 2) Roles (hide full roles entirely)
+    const rolesResp = await jsonp(`${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}`);
+    renderRoles(rolesResp.roles || [], rolesResp.remaining || {});
+
+    // 3) Roster (backend returns { ok, roster: { Role: [{name,comments,stamp}], ... } })
+    const rosterResp = await jsonp(`${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}`);
+    const rows = [];
+    const map = rosterResp && rosterResp.roster ? rosterResp.roster : {};
+    Object.keys(map).forEach(role=>{
+      (map[role]||[]).forEach(p=>{
+        rows.push({ role, name: p.name || '', notes: p.comments || '', ts: +p.stamp || 0 });
+      });
+    });
+    rows.sort((a,b)=> a.ts - b.ts);
+    renderRoster(rows);
+
+  }catch(e){
+    console.error(e);
+    $('sundays').innerHTML = '<span class="muted">Failed to load Sundays.</span>';
+  }
+}
   document.addEventListener('DOMContentLoaded', ()=>{
   const y = new Date().getFullYear();
   const el = document.getElementById('foot-year');
