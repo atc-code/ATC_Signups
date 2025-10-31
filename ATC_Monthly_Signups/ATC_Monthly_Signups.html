@@ -13,32 +13,27 @@
   /* ===== Header with left logo, centered title/verse ===== */
   header{background:#172230;color:#fff}
   .headerInner{
-  max-width:var(--max);
-  margin:0 auto;
-  position:relative;
-  text-align:center;
-  padding:28px clamp(16px,3vw,24px);
-  padding-left:128px; /* reserve space so centered text won't overlap logo */
-}
-.headerLogo{
-  position:absolute;
-  left:16px;               /* hard top-left corner inside header */
-  top:16px;
-  transform:none;          /* no vertical centering */
-  height:88px; width:88px;
-  border-radius:12px; background:#fff; padding:10px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-@media (max-width:720px){
-  .headerInner{ padding-left:96px; }
-  .headerLogo{ height:64px; width:64px; left:12px; top:12px; }
-}
+    max-width:var(--max);
+    margin:0 auto;
+    position:relative;
+    text-align:center;
+    padding:28px clamp(16px,3vw,24px);
+    padding-left:128px; /* reserve space so centered text won't overlap logo */
+  }
+  .headerLogo{
+    position:absolute;
+    left:16px; top:16px;
+    transform:none;
+    height:88px; width:88px;
+    border-radius:12px; background:#fff; padding:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  @media (max-width:720px){
+    .headerInner{ padding-left:96px; }
+    .headerLogo{ height:64px; width:64px; left:12px; top:12px; }
+  }
   header h1{margin:0 0 8px;font-size:clamp(1.6rem,4.2vw,2.4rem);line-height:1.25}
   header p{margin:0;opacity:.95;font-style:italic;font-size:clamp(1rem,2.4vw,1.15rem)}
-  @media (max-width:720px){
-    .headerInner{padding-left:96px}
-    .headerLogo{height:64px;width:64px}
-  }
 
   /* ===== Layout cards ===== */
   main{max-width:var(--max);margin:22px auto;padding:0 var(--pad);display:grid;gap:16px}
@@ -83,23 +78,14 @@
   th,td{padding:10px 8px;border-bottom:1px solid #e3e6ef;text-align:left}
   th{color:#334155;font-weight:800}
 
-  footer{max-width:var(--max);margin:6px auto 28px;padding:0 var(--pad);text-align:center;color:#475569}
-  footer a{color:inherit;text-decoration:underline}
-  .site-footer{
-  background:#0f172a;           /* subtle dark bar (harmonizes with header) */
-  color:#cbd5e1;
-  margin-top: 8px;
-}
-.site-footer .foot-inner{
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 14px var(--pad);
-  text-align:center;
-  font-size:.95rem;
-  letter-spacing:.2px;
-}
-.site-footer a{ color:#e2e8f0; text-decoration: underline; }
-.site-footer a:hover{ text-decoration: none; }
+  /* Footer */
+  .site-footer{ background:#0f172a; color:#cbd5e1; margin-top:8px; }
+  .site-footer .foot-inner{
+    max-width:var(--max); margin:0 auto; padding:14px var(--pad);
+    text-align:center; font-size:.95rem; letter-spacing:.2px;
+  }
+  .site-footer a{ color:#e2e8f0; text-decoration: underline; }
+  .site-footer a:hover{ text-decoration: none; }
 </style>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -189,12 +175,10 @@
 
 <footer class="site-footer">
   <div class="foot-inner">
-    <span id="foot-year"></span> <a href="https://atlantateluguchurch.org/" target="_blank" rel="noopener">
-      Atlanta Telugu Church
-    </a> • All rights reserved
+    <span id="foot-year"></span>
+    <a href="https://atlantateluguchurch.org/" target="_blank" rel="noopener">Atlanta Telugu Church</a> • All rights reserved
   </div>
 </footer>
-
 
 <script>
   /* ====== Config ====== */
@@ -204,12 +188,11 @@
   const $ = id => document.getElementById(id);
 
   function isTodayOrFutureISO(iso){
-  // iso = "YYYY-MM-DD"
-  if(!iso) return false;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(iso + 'T00:00:00');
-  return d >= today;
-}
+    if(!iso) return false;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const d = new Date(iso + 'T00:00:00');
+    return d >= today;
+  }
 
   function phoneMask(el){
     let v = el.value.replace(/\D/g,'').slice(0,10);
@@ -236,45 +219,38 @@
 
   /* ====== Rendering ====== */
   function renderSundays(cal){
-  // cal is an array of { ServiceDate: "YYYY-MM-DD", Title: "..." }
-  const box = document.getElementById('sundays');
-  const submitBtn = document.getElementById('submitBtn');
+    // cal = [{ ServiceDate:"YYYY-MM-DD", Title:"..." }, ...]
+    const box = $('sundays');
+    const submitBtn = $('submit');
+    if (!box) return;
 
-  // Safety: if container or button aren't found, do nothing
-  if (!box || !submitBtn) return;
+    box.innerHTML = '';
+    const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
 
-  // Clear current UI
-  box.innerHTML = '';
+    if (!upcoming.length){
+      box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
+      if (submitBtn) submitBtn.disabled = true;
+      return;
+    }
 
-  // Keep only today-or-future Sundays
-  const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
+    if (submitBtn) submitBtn.disabled = false;
 
-  // If no Sundays left, show message and disable submit
-  if (!upcoming.length){
-    box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
-    submitBtn.disabled = true;
-    return;
+    upcoming.forEach(d=>{
+      const pretty = new Date(d.ServiceDate + 'T00:00:00').toLocaleDateString(
+        undefined, { year:'numeric', month:'long', day:'numeric' }
+      );
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = pretty;
+      box.appendChild(chip);
+    });
   }
 
-  // We have Sundays -> enable submit
-  submitBtn.disabled = false;
-
-  // Render pretty chips like "November 24, 2025"
-  upcoming.forEach(d=>{
-    const pretty = new Date(d.ServiceDate + 'T00:00:00').toLocaleDateString(
-      undefined, { year:'numeric', month:'long', day:'numeric' }
-    );
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.textContent = pretty;
-    box.appendChild(chip);
-  });
-}
   function renderRoles(roles, remaining){
     const wrap = $('roles'); wrap.innerHTML = '';
     if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles for this month.</div>'; return; }
     roles.forEach(r=>{
-      const left = Number.isFinite(remaining?.[r.role]) ? remaining[r.role] : null;
+      const left = (remaining && Object.prototype.hasOwnProperty.call(remaining, r.role)) ? remaining[r.role] : null;
       const full = (left !== null) && (left <= 0);
       if (full) return; // hide full roles entirely
       wrap.insertAdjacentHTML('beforeend',
@@ -289,7 +265,6 @@
       tb.innerHTML = '<tr><td colspan="3" class="muted">No signups yet.</td></tr>';
       return;
     }
-    // Expecting rows of { role, name, notes, ts } already sorted by time in backend
     rows.forEach(r=>{
       const role  = r.role || '';
       const name  = r.name || '';
@@ -299,48 +274,42 @@
   }
 
   /* ====== Data flow ====== */
-async function loadForMonth(){
-  const month = $('month').value;
-  if (!month){
-    $('sundays').innerHTML = '<span class="muted">Select a month…</span>';
-    $('roles').innerHTML = '<div class="muted">Pick a month to load roles…</div>';
-    $('roster').innerHTML = '<tr><td colspan="3" class="muted">No signups yet.</td></tr>';
-    $('submit').disabled = true;
-    return;
-  }
+  async function loadForMonth(){
+    const month = $('month').value;
+    if (!month){
+      $('sundays').innerHTML = '<span class="muted">Select a month…</span>';
+      $('roles').innerHTML = '<div class="muted">Pick a month to load roles…</div>';
+      $('roster').innerHTML = '<tr><td colspan="3" class="muted">No signups yet.</td></tr>';
+      $('submit').disabled = true;
+      return;
+    }
 
-  try{
-    // 1) Sundays (also handles enabling/disabling Submit)
-    const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
-    renderSundays(calResp.cal || []);
+    try{
+      // Sundays (also handles enabling/disabling Submit)
+      const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
+      renderSundays(calResp.cal || []);
 
-    // 2) Roles (hide full roles entirely)
-    const rolesResp = await jsonp(`${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}`);
-    renderRoles(rolesResp.roles || [], rolesResp.remaining || {});
+      // Roles
+      const rolesResp = await jsonp(`${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}`);
+      renderRoles(rolesResp.roles || [], rolesResp.remaining || {});
 
-    // 3) Roster (backend returns { ok, roster: { Role: [{name,comments,stamp}], ... } })
-    const rosterResp = await jsonp(`${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}`);
-    const rows = [];
-    const map = rosterResp && rosterResp.roster ? rosterResp.roster : {};
-    Object.keys(map).forEach(role=>{
-      (map[role]||[]).forEach(p=>{
-        rows.push({ role, name: p.name || '', notes: p.comments || '', ts: +p.stamp || 0 });
+      // Roster map -> flat array -> sort by ts
+      const rosterResp = await jsonp(`${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}`);
+      const rows = [];
+      const map = rosterResp && rosterResp.roster ? rosterResp.roster : {};
+      Object.keys(map).forEach(role=>{
+        (map[role]||[]).forEach(p=>{
+          rows.push({ role, name: p.name || '', notes: p.comments || '', ts: +p.stamp || 0 });
+        });
       });
-    });
-    rows.sort((a,b)=> a.ts - b.ts);
-    renderRoster(rows);
+      rows.sort((a,b)=> a.ts - b.ts);
+      renderRoster(rows);
 
-  }catch(e){
-    console.error(e);
-    $('sundays').innerHTML = '<span class="muted">Failed to load Sundays.</span>';
+    }catch(e){
+      console.error(e);
+      $('sundays').innerHTML = '<span class="muted">Failed to load Sundays.</span>';
+    }
   }
-}
-  document.addEventListener('DOMContentLoaded', ()=>{
-  const y = new Date().getFullYear();
-  const el = document.getElementById('foot-year');
-  if (el) el.textContent = `© ${y} `;
-});
-
 
   async function submitForm(){
     const month = $('month').value;
@@ -371,12 +340,14 @@ async function loadForMonth(){
         + `&roles=${encodeURIComponent(roles.join(','))}`;
       const out = await jsonp(url);
       if (!out || !out.ok) throw new Error(out && out.error || 'Submission failed');
+
       $('ok').style.display='block';
       // clear roles only; keep month & contact in place
       document.querySelectorAll('input[name="role"]:checked').forEach(x=>x.checked=false);
       $('notes').value='';
-      // refresh roster & roles
+      // refresh UI
       await loadForMonth();
+
     }catch(err){
       $('err').textContent = err.message || 'Submission failed.';
       $('err').style.display = 'block';
@@ -386,8 +357,11 @@ async function loadForMonth(){
   }
 
   /* ====== Boot ====== */
-  window.addEventListener('load', ()=>{
-    // Don’t auto-select a month; keep current value if user already picked one
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const y = new Date().getFullYear();
+    const el = document.getElementById('foot-year');
+    if (el) el.textContent = `© ${y} `;
+
     $('phone').addEventListener('input', ()=> phoneMask($('phone')));
     $('month').addEventListener('change', loadForMonth);
     $('submit').addEventListener('click', submitForm);
