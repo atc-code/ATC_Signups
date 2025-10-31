@@ -239,26 +239,48 @@
     // === Helpers ===
     const $ = (id)=>document.getElementById(id);
 
+    function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const s = document.createElement('script');
+    const to = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 12000);
+    function cleanup(){ clearTimeout(to); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } s.remove(); }
+    window[cb] = (data) => { cleanup(); resolve(data); };
+    s.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
+    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    document.head.appendChild(s);
+  });
+}
     async function loadDates(){
-  const month = $('month').value;
-  $('date').innerHTML = '';
+    const month = $('month').value;
+    const $date = $('date');
+    $date.innerHTML = '';
 
   try{
-    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
-    const {cal, profile, isAdmin} = await jsonp(url);
-    PROFILE = profile || null;
-    if(isAdmin){ $('adminCard').style.display='block'; loadMetrics(); }
-    if(!cal || cal.length===0){
-      $('date').insertAdjacentHTML('beforeend','<option value="">No dates</option>');
+    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+    const { cal, profile, isAdmin } = await jsonp(url);
+
+    if (isAdmin) { $('adminCard').style.display = 'block'; loadMetrics(); }
+
+    if (!cal || !cal.length) {
+      $date.insertAdjacentHTML('beforeend','<option value="">No dates</option>');
       return;
     }
-    cal.forEach(d => $('date').insertAdjacentHTML('beforeend','<option value="'+d.ServiceDate+'">'+d.ServiceDate+' — '+(d.Title||'Service')+'</option>'));
+    cal.forEach(d => {
+      $date.insertAdjacentHTML('beforeend',
+        `<option value="${d.ServiceDate}">${d.ServiceDate} — ${d.Title || 'Service'}</option>`);
+    });
+
+    // Immediately refresh roles/roster for the first date
     refreshRolesAndRoster();
-  }catch(e){
-    const el = $('signinError'); el.textContent = (e && e.message) ? e.message : 'Failed to load dates.'; el.style.display='block';
+
+  } catch(e){
+    console.error('loadDates error:', e);
+    const el = $('signinError');
+    el.textContent = (e && e.message) ? e.message : 'Failed to load dates.';
+    el.style.display = 'block';
   }
 }
-
     function setDefaultMonth(){
       const now = new Date();
       const y = now.getFullYear();
@@ -275,22 +297,25 @@
     }
 
     async function refreshRolesAndRoster(){
-  const month = $('month').value, date = $('date').value;
-  if(!month || !date) return;
+  const month = $('month').value;
+  const date  = $('date').value;
+  if (!month || !date) return;
 
   try{
-    const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
-    const {roles, remaining} = await jsonp(rolesUrl);
+    const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+    const { roles, remaining } = await jsonp(rolesUrl);
     renderRoles(roles, remaining);
   }catch(e){
+    console.error('roles error:', e);
     alert(e.message || 'Failed to load roles');
   }
 
   try{
-    const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
     const roster = await jsonp(rosterUrl);
     renderRoster(roster);
   }catch(e){
+    console.error('roster error:', e);
     alert(e.message || 'Failed to load roster');
   }
 }
@@ -348,10 +373,10 @@
     }
 
     async function initAfterSignIn(){
-  try{
-    const url = `${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN)}`;
-    jsonp(url).catch(()=>{});
-  }catch(_){}
+
+  try {
+  jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{});
+} catch(_) {}
 
   $('app').style.display='block';
   setDefaultMonth();
