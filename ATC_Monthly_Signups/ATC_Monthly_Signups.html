@@ -196,6 +196,8 @@
           try{
             if(!resp || !resp.credential) throw new Error('No credential returned.');
             ID_TOKEN = resp.credential;
+            localStorage.setItem('atc_id_token', ID_TOKEN);
+            localStorage.setItem('atc_id_token_time', Date.now().toString());
             overlay.style.display='none';
             document.getElementById('app').style.display='block';
             initAfterSignIn();
