@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATC Monthly Signups</title>
   <style>
+    #monthGrid .muted { text-align:center; }
+    .sundayCard { background:#fff; }
     .monthGrid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
 @media (max-width: 860px){ .monthGrid { grid-template-columns:1fr; } }
 .sundayCard { border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
@@ -28,8 +30,10 @@
     .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 860px){
+       header .brandRow { grid-template-columns: 64px 1fr; }
       .grid-2{ grid-template-columns:1fr; }
       .brandRow{ grid-template-columns: 72px 1fr; min-height: 96px; }
+      header .brandRow > div { text-align: center; }
       .logo{ height:64px; width:64px; }
       header h1{ font-size: clamp(1.3rem, 5vw, 1.9rem); }
     }
@@ -101,13 +105,15 @@
 
     <main>
       <!-- Submit form -->
-      <section class="card" id="formCard">
+      <section class="card" id="formCard" style="display:none">
         <form id="f" autocomplete="on">
           <!-- Service -->
 <fieldset>
   <legend>Service</legend>
   <div class="grid-2">
     <div>
+      label[for="month"] { font-size: 1.15rem; font-weight: 800; }
+      #month { font-size: 1.05rem; padding: 12px 14px; }
       <label for="month">Month<span class="req">*</span></label>
       <input type="month" id="month">
       <div class="muted" style="margin-top:6px">Pick a month; Sundays will appear below with roles.</div>
@@ -163,17 +169,6 @@
           <div id="ok" class="msg success">Thank you! Your signup was recorded.</div>
           <div id="err" class="msg error">Sorry, something went wrong.</div>
         </form>
-      </section>
-
-      <!-- Live SIGNUP Status  -->
-      <section class="card" id="rosterCard">
-        <h2 style="margin-top:0;">LIVE SIGNUP STATUS</h2>
-        <div class="tableWrap">
-          <table class="roster">
-            <thead><tr><th>Team</th><th>Volunteers</th></tr></thead>
-            <tbody id="roster"><tr><td colspan="2" class="muted">Select a date.</td></tr></tbody>
-          </table>
-        </div>
       </section>
 
       <!-- Admin metrics (only if admin) -->
@@ -282,21 +277,21 @@ function renderMonthGrid(cal){
     return;
   }
 
-  MonthState.dates = cal.map(d => d.ServiceDate);
+  MonthState.dates = cal.map(d => fmtLongDate(d.ServiceDate));
   MonthState.byDate = {}; // reset
 
   for (const d of cal){
-    const id = `day_${d.ServiceDate}`;
+    const id = `day_${fmtLongDate(d.ServiceDate)}`;
     grid.insertAdjacentHTML('beforeend', `
       <div class="sundayCard" id="${id}">
         <div class="sundayHead">
-          <div><strong>${d.ServiceDate}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
+          <div><strong>${fmtLongDate(d.ServiceDate)}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
         </div>
-        <div class="roleList" data-date="${d.ServiceDate}">
+        <div class="roleList" data-date="${fmtLongDate(d.ServiceDate)}">
           <div class="muted">Loading roles…</div>
         </div>
         <div class="muted" style="margin-top:8px">Current Signups:</div>
-        <div class="roleList rosterList" data-roster="${d.ServiceDate}">
+        <div class="roleList rosterList" data-roster="${fmtLongDate(d.ServiceDate)}">
           <div class="muted">Loading roster…</div>
         </div>
       </div>
@@ -305,8 +300,8 @@ function renderMonthGrid(cal){
 
   // Load roles & roster for each date
   for (const d of cal){
-    loadRolesForDate(d.ServiceDate);
-    loadRosterForDate(d.ServiceDate);
+    loadRolesForDate(fmtLongDate(d.ServiceDate));
+    loadRosterForDate(fmtLongDate(d.ServiceDate));
   }
 }
 
@@ -316,7 +311,6 @@ async function loadRolesForDate(dateISO){
     const month = $('month').value;
     const url = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
     const { roles } = await jsonp(url);
-    MonthState.byDate[dateISO] = { roles };
 
     const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
     if (!list) return;
@@ -326,7 +320,6 @@ async function loadRolesForDate(dateISO){
       return;
     }
 
-    // Build checkboxes; no counts displayed
     list.innerHTML = '';
     roles.forEach(r=>{
       list.insertAdjacentHTML('beforeend', `
@@ -342,6 +335,7 @@ async function loadRolesForDate(dateISO){
     console.error('loadRolesForDate error:', e);
   }
 }
+
 async function loadRosterForDate(dateISO){
   try{
     const month = $('month').value;
@@ -382,35 +376,61 @@ function collectMonthSelections(){
 
 
     async function loadDates(){
-    const month = $('month').value;
-    const $date = $('date');
-    $date.innerHTML = '';
+  const month = $('month').value;
+  const grid  = $('monthGrid');
+  grid.innerHTML = '';
+  if (!month) {
+    grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
+    // hide form pieces until month chosen
+    document.getElementById('formCard').style.display = 'none';
+    return;
+  }
 
   try{
     const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const { cal, profile, isAdmin } = await jsonp(url);
+    const res = await jsonp(url);
+    const cal = Array.isArray(res?.cal) ? res.cal : [];
 
-    if (isAdmin) { $('adminCard').style.display = 'block'; loadMetrics(); }
+    // Split Sundays vs Men’s Fellowship (by Title)
+    const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
+    const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
 
-    if (!cal || !cal.length) {
-      $date.insertAdjacentHTML('beforeend','<option value="">No dates</option>');
-      return;
+    // Render Sundays (multi-cards)
+    renderMonthGrid(sundays);
+
+    // Render Men’s Fellowship (single card), if present
+    if (mensF){
+      const id = `mf_${mensF.ServiceDate}`;
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="sundayCard" id="${id}">
+          <div class="sundayHead">
+            <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
+          </div>
+          <div class="roleList" data-date="${mensF.ServiceDate}">
+            <div class="muted">Loading roles…</div>
+          </div>
+          <div class="muted" style="margin-top:8px">Current Signups:</div>
+          <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
+            <div class="muted">Loading roster…</div>
+          </div>
+        </div>
+      `);
+      // Load roles/roster for MF date
+      await loadRolesForDate(mensF.ServiceDate);
+      await loadRosterForDate(mensF.ServiceDate);
     }
-    cal.forEach(d => {
-      $date.insertAdjacentHTML('beforeend',
-        `<option value="${d.ServiceDate}">${d.ServiceDate} — ${d.Title || 'Service'}</option>`);
-    });
 
-    // Immediately refresh roles/roster for the first date
-    refreshRolesAndRoster();
+    // Show the contact form only after month is selected (per your #7)
+    document.getElementById('formCard').style.display = 'block';
 
-  } catch(e){
+  }catch(e){
     console.error('loadDates error:', e);
     const el = $('signinError');
-    el.textContent = (e && e.message) ? e.message : 'Failed to load dates.';
+    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
     el.style.display = 'block';
   }
 }
+
     function setDefaultMonth(){
       const now = new Date();
       const y = now.getFullYear();
@@ -471,11 +491,10 @@ function collectMonthSelections(){
 } catch(_) {}
 
   $('app').style.display='block';
-  setDefaultMonth();
   $('phone').addEventListener('input', ()=> phoneMask($('phone')));
   $('month').addEventListener('change', loadDates);
-  $('date').addEventListener('change', refreshRolesAndRoster);
-  await loadDates();
+  // no default month, no initial load
+
 
   $('f').addEventListener('submit', async (e)=>{
   e.preventDefault();
