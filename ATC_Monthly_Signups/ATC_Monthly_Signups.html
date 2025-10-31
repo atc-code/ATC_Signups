@@ -91,7 +91,7 @@
 
     <main>
       <!-- Form -->
-      <section class="card" id="formCard" style="display:none">
+      <section class="card" id="formCard">
         <form id="f" autocomplete="on">
           <fieldset>
             <legend>Service</legend>
@@ -110,7 +110,7 @@
             </div>
           </section>
 
-          <fieldset style="margin-top:14px">
+          <fieldset id="contactFS" style="margin-top:14px">
             <legend>Contact information</legend>
             <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
@@ -138,14 +138,14 @@
             </div>
           </fieldset>
 
-          <div class="actions">
-            <button class="primary" type="submit" id="submit">Submit</button>
-            <button class="secondary" type="reset">Clear</button>
-          </div>
-          <div id="ok" class="msg success">Thank you! Your signup was recorded.</div>
-          <div id="err" class="msg error">Sorry, something went wrong.</div>
-        </form>
-      </section>
+          <div class="actions" id="actionsRow">
+      <button class="primary" type="submit" id="submit">Submit</button>
+      <button class="secondary" type="reset">Clear</button>
+    </div>
+    <div id="ok" class="msg success">Thank you! Your signup was recorded.</div>
+    <div id="err" class="msg error">Sorry, something went wrong.</div>
+  </form>
+</section>
 
       <!-- Admin metrics -->
       <section class="card" id="adminCard" style="display:none">
@@ -229,54 +229,70 @@
 
     // Month loader
     async function loadDates(){
-      const month = $('month').value;
-      const grid  = $('monthGrid');
-      grid.innerHTML = '';
-      if (!month) {
-        grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
-        document.getElementById('formCard').style.display = 'none';
-        return;
-      }
+  const month = $('month').value;
+  const grid  = $('monthGrid');
 
-      try{
-        const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const res = await jsonp(url);
-        const cal = Array.isArray(res?.cal) ? res.cal : [];
+  // Always show the form card (so month picker is visible)
+  $('formCard').style.display = 'block';
 
-        // Split Sundays vs Men’s Fellowship
-        const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
-        const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
+  // Hide everything else until a month is chosen
+  if (!month) {
+    $('monthGridCard').style.display = 'none';
+    $('contactFS').style.display     = 'none';
+    $('actionsRow').style.display    = 'none';
+    grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
+    return;
+  }
 
-        renderMonthGrid(sundays);
+  // Month chosen → show grid; we'll show contact+buttons after data loads
+  $('monthGridCard').style.display = 'block';
+  $('contactFS').style.display     = 'none';
+  $('actionsRow').style.display    = 'none';
 
-        if (mensF){
-          const id = `mf_${mensF.ServiceDate}`;
-          grid.insertAdjacentHTML('beforeend', `
-            <div class="sundayCard" id="${id}">
-              <div class="sundayHead">
-                <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
-              </div>
-              <div class="roleList" data-date="${mensF.ServiceDate}">
-                <div class="muted">Loading roles…</div>
-              </div>
-              <div class="muted" style="margin-top:8px">Current Signups:</div>
-              <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
-                <div class="muted">Loading roster…</div>
-              </div>
-            </div>
-          `);
-          await loadRolesForDate(mensF.ServiceDate);
-          await loadRosterForDate(mensF.ServiceDate);
-        }
+  grid.innerHTML = '<div class="muted">Loading…</div>';
 
-        document.getElementById('formCard').style.display = 'block';
-      }catch(e){
-        console.error('loadDates error:', e);
-        const el = $('signinError');
-        el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
-        el.style.display = 'block';
-      }
+  try {
+    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+    const res = await jsonp(url);
+    const cal = Array.isArray(res?.cal) ? res.cal : [];
+
+    // Split Sundays vs Men’s Fellowship
+    const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
+    const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
+
+    renderMonthGrid(sundays);
+
+    if (mensF){
+      const id = `mf_${mensF.ServiceDate}`;
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="sundayCard" id="${id}">
+          <div class="sundayHead">
+            <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
+          </div>
+          <div class="roleList" data-date="${mensF.ServiceDate}">
+            <div class="muted">Loading roles…</div>
+          </div>
+          <div class="muted" style="margin-top:8px">Current Signups:</div>
+          <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
+            <div class="muted">Loading roster…</div>
+          </div>
+        </div>
+      `);
+      await loadRolesForDate(mensF.ServiceDate);
+      await loadRosterForDate(mensF.ServiceDate);
     }
+
+    // After we’ve rendered dates/roles successfully, show contact + buttons
+    $('contactFS').style.display  = 'block';
+    $('actionsRow').style.display = 'flex';
+
+  } catch(e){
+    console.error('loadDates error:', e);
+    const el = $('signinError');
+    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
+    el.style.display = 'block';
+  }
+}
 
     function renderMonthGrid(cal){
       const grid = $('monthGrid');
@@ -394,68 +410,19 @@
     }
 
     async function initAfterSignIn(){
-      try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
+  try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
 
-      $('app').style.display='block';
-      $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-      $('month').addEventListener('change', loadDates);
-      // No default month, no initial load (landing shows only month picker)
+  $('app').style.display='block';
+  $('phone').addEventListener('input', ()=> phoneMask($('phone')));
+  $('month').addEventListener('change', loadDates);
 
-      // Submit handler
-      $('f').addEventListener('submit', async (e)=>{
-        e.preventDefault();
+  // Show the form card with only the month picker visible on first load
+  $('formCard').style.display   = 'block';
+  $('monthGridCard').style.display = 'none';
+  $('contactFS').style.display  = 'none';
+  $('actionsRow').style.display = 'none';
+}
 
-        const month = $('month').value;
-        const first = $('first').value.trim(), last = $('last').value.trim();
-        const email = $('email').value.trim(), phone = $('phone').value.trim();
-        const comments = $('notes').value.trim();
-        const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
-
-        const selections = collectMonthSelections();
-        if(!month || !re.test(first) || !re.test(last) || !email || !phone || !selections.length){
-          $('err').style.display='block';
-          $('err').textContent='Please fill all fields and pick at least one date & role.';
-          return;
-        }
-
-        $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
-
-        try{
-          const url = `${ENDPOINT}?mode=submit_month_get`
-            + `&id_token=${encodeURIComponent(ID_TOKEN)}`
-            + `&month=${encodeURIComponent(month)}`
-            + `&firstName=${encodeURIComponent(first)}`
-            + `&lastName=${encodeURIComponent(last)}`
-            + `&email=${encodeURIComponent(email)}`
-            + `&phone=${encodeURIComponent(phone)}`
-            + `&comments=${encodeURIComponent(comments)}`
-            + `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
-
-          const out = await jsonp(url);
-
-          if (out && out.ok) {
-            const ok = $('ok');
-            ok.textContent = 'Thank you! Your signup was recorded. A confirmation email has been sent.';
-            ok.style.display = 'block';
-
-            $('f').reset();
-            // Keep the selected month as-is; just reload the dates to refresh roles/rosters
-            await loadDates();
-
-            if ($('adminCard') && $('adminCard').style.display !== 'none') loadMetrics();
-            try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
-          } else {
-            throw new Error((out && out.error) || 'Submission failed.');
-          }
-
-        } catch(err){
-          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-          $('err').style.display='block';
-        } finally{
-          $('submit').disabled = false;
-        }
-      });
-    }
 
     // Boot: reuse sign-in for 1 hour if available
     window.addEventListener('load', () => {
