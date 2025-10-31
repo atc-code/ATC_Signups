@@ -8,7 +8,7 @@
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
-    /* ==== Thanksgiving-style header & layout ==== */
+    /* Header (Thanksgiving style) */
     header { background: #222; color: #fff; padding: 24px var(--pad); }
     .brandRow { position: relative; min-height: 104px; display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
     .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
@@ -54,7 +54,7 @@
 
     footer { text-align:center; color:#374151; padding: 16px; }
 
-    /* Sign-in overlay (Thanksgiving style) */
+    /* Sign-in overlay */
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
@@ -70,7 +70,7 @@
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
         <div>
           <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
-          <p>Your Google sign-in confirms your RSVP and prevents duplicates.</p>
+          <p>Your Google sign-in confirms your Signup and prevents duplicates.</p>
         </div>
       </div>
       <div id="gSignIn" style="display:inline-block;"></div>
@@ -177,16 +177,16 @@
   </div>
 
   <script>
-    // === Config ===
+    // === Config (use your deployed Web App URL) ===
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzi1Llbc9YlklEvbXvssjD_qTMFBA-xDWOMEMFWYge65fjSxwF1VtCbanTUVZ2g5CR4/exec";   
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzi1Llbc9YlklEvbXvssjD_qTMFBA-xDWOMEMFWYge65fjSxwF1VtCbanTUVZ2g5CR4/exec";
 
     // === State ===
     let ID_TOKEN = '';
     let PROFILE  = null;
 
-    // === GIS init  ===
+    // === GIS init ===
     function initGIS(){
       const overlay = document.getElementById('signinOverlay');
       overlay.style.display = 'flex';
@@ -216,6 +216,28 @@
 
     // === Helpers ===
     const $ = (id)=>document.getElementById(id);
+
+    async function getJSON(url){
+      const r = await fetch(url, { credentials: 'omit' });
+      const text = await r.text();
+      let j;
+      try { j = JSON.parse(text); } catch (_) { throw new Error(text || 'Bad JSON'); }
+      if (j && j.ok === false && j.error) throw new Error(j.error);
+      return j;
+    }
+    async function postJSON(url, body){
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(body),
+        credentials: 'omit'
+      });
+      const text = await r.text();
+      let j;
+      try { j = JSON.parse(text); } catch (_) { throw new Error(text || 'Bad JSON'); }
+      if (j && j.ok === false && j.error) throw new Error(j.error);
+      return j;
+    }
 
     function setDefaultMonth(){
       const now = new Date();
@@ -255,54 +277,64 @@
       });
     }
 
-    function loadMetrics(){
-      google.script.run
-        .withSuccessHandler(rows=>{
-          const tb = $('metrics'); tb.innerHTML='';
-          if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
-          rows.forEach(r=>{
-            tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
-          });
-        })
-        .withFailureHandler(_=>{})
-        .api_adminMetrics(ID_TOKEN);
+    async function loadMetrics(){
+      try{
+        const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        const rows = await getJSON(url);
+        const tb = $('metrics'); tb.innerHTML='';
+        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
+        rows.forEach(r=>{
+          tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
+        });
+      }catch(_){}
     }
 
-    function refreshRolesAndRoster(){
+    async function refreshRolesAndRoster(){
       const month = $('month').value, date = $('date').value;
       if(!month || !date) return;
 
-      google.script.run
-        .withSuccessHandler(({roles,remaining})=> renderRoles(roles, remaining))
-        .withFailureHandler(e=> alert(e.message||'Failed to load roles'))
-        .api_getRolesRemainingSecure(month, date, ID_TOKEN);
+      try{
+        const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        const {roles, remaining} = await getJSON(rolesUrl);
+        renderRoles(roles, remaining);
+      }catch(e){
+        alert(e.message || 'Failed to load roles');
+      }
 
-      google.script.run
-        .withSuccessHandler(renderRoster)
-        .withFailureHandler(e=> alert(e.message||'Failed to load roster'))
-        .api_getRosterSecure(month, date, ID_TOKEN);
+      try{
+        const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        const roster = await getJSON(rosterUrl);
+        renderRoster(roster);
+      }catch(e){
+        alert(e.message || 'Failed to load roster');
+      }
     }
 
-    function loadDates(){
+    async function loadDates(){
       const month = $('month').value;
       $('date').innerHTML = '';
-      google.script.run
-        .withSuccessHandler(({cal, profile, isAdmin})=>{
-          PROFILE = profile || null;
-          if(isAdmin){ $('adminCard').style.display='block'; loadMetrics(); }
-          if(!cal || cal.length===0){ $('date').insertAdjacentHTML('beforeend','<option value="">No dates</option>'); return; }
-          cal.forEach(d => $('date').insertAdjacentHTML('beforeend','<option value="'+d.ServiceDate+'">'+d.ServiceDate+' — '+(d.Title||'Service')+'</option>'));
-          refreshRolesAndRoster();
-        })
-        .withFailureHandler(e=> {
-          const el = $('signinError'); el.textContent = (e && e.message) ? e.message : 'Failed to load dates.'; el.style.display='block';
-        })
-        .api_getCalendarSecure(month, ID_TOKEN);
+      try{
+        const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        const {cal, profile, isAdmin} = await getJSON(url);
+        PROFILE = profile || null;
+        if(isAdmin){ $('adminCard').style.display='block'; loadMetrics(); }
+        if(!cal || cal.length===0){
+          $('date').insertAdjacentHTML('beforeend','<option value="">No dates</option>');
+          return;
+        }
+        cal.forEach(d => $('date').insertAdjacentHTML('beforeend','<option value="'+d.ServiceDate+'">'+d.ServiceDate+' — '+(d.Title||'Service')+'</option>'));
+        refreshRolesAndRoster();
+      }catch(e){
+        const el = $('signinError'); el.textContent = (e && e.message) ? e.message : 'Failed to load dates.'; el.style.display='block';
+      }
     }
 
-    function initAfterSignIn(){
-      // Optional lightweight view ping (no-op if you don’t log it server-side)
-      google.script.run.withSuccessHandler(_=>{}).withFailureHandler(_=>{}).api_viewPing(ID_TOKEN);
+    async function initAfterSignIn(){
+      // View ping (optional)
+      try{
+        const url = `${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        getJSON(url).catch(()=>{});
+      }catch(_){}
 
       // Show app & wire up
       $('app').style.display='block';
@@ -312,7 +344,7 @@
       $('date').addEventListener('change', refreshRolesAndRoster);
       loadDates();
 
-      $('f').addEventListener('submit', (e)=>{
+      $('f').addEventListener('submit', async (e)=>{
         e.preventDefault();
         const month = $('month').value, date = $('date').value;
         const first = $('first').value.trim(), last = $('last').value.trim();
@@ -326,28 +358,25 @@
         }
         $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
 
-        google.script.run
-          .withSuccessHandler(_=>{
-            $('ok').style.display='block';
-            $('f').reset();
-            refreshRolesAndRoster();
-            loadMetrics();
-            $('submit').disabled = false;
-          })
-          .withFailureHandler(err=>{
-            $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-            $('err').style.display='block';
-            $('submit').disabled = false;
-            refreshRolesAndRoster();
-          })
-          .api_submitSecure({month,date,firstName:first,lastName:last,email,phone,comments,roles}, ID_TOKEN);
+        try{
+          const body = { mode:'submit', month, date, firstName:first, lastName:last, email, phone, comments, roles, id_token: ID_TOKEN };
+          const out = await postJSON(`${ENDPOINT}?mode=submit`, body);
+          $('ok').style.display='block';
+          $('f').reset();
+          refreshRolesAndRoster();
+          loadMetrics();
+        }catch(err){
+          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
+          $('err').style.display='block';
+          refreshRolesAndRoster();
+        }finally{
+          $('submit').disabled = false;
+        }
       });
     }
 
     // Boot
-    window.addEventListener('load', () => {
-      initGIS();
-    });
+    window.addEventListener('load', () => { initGIS(); });
   </script>
 </body>
 </html>
