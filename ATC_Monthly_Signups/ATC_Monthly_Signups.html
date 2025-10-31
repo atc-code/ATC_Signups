@@ -186,6 +186,26 @@
     let ID_TOKEN = '';
     let PROFILE  = null;
 
+    function jsonp(url) {
+    return new Promise((resolve, reject) => {
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      const s = document.createElement('script');
+      const timedOut = setTimeout(() => {
+        cleanup();
+        reject(new Error('JSONP timeout'));
+      }, 12000);
+      function cleanup() {
+        clearTimeout(timedOut);
+        try { delete window[cb]; } catch(_) { window[cb] = undefined; }
+        s.remove();
+      }
+      window[cb] = (data) => { cleanup(); resolve(data); };
+      s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+      s.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
+      document.head.appendChild(s);
+    });
+  }
+
     // === GIS init ===
     function initGIS(){
       const overlay = document.getElementById('signinOverlay');
@@ -219,27 +239,25 @@
     // === Helpers ===
     const $ = (id)=>document.getElementById(id);
 
-    async function getJSON(url){
-      const r = await fetch(url, { credentials: 'omit' });
-      const text = await r.text();
-      let j;
-      try { j = JSON.parse(text); } catch (_) { throw new Error(text || 'Bad JSON'); }
-      if (j && j.ok === false && j.error) throw new Error(j.error);
-      return j;
+    async function loadDates(){
+  const month = $('month').value;
+  $('date').innerHTML = '';
+
+  try{
+    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    const {cal, profile, isAdmin} = await jsonp(url);
+    PROFILE = profile || null;
+    if(isAdmin){ $('adminCard').style.display='block'; loadMetrics(); }
+    if(!cal || cal.length===0){
+      $('date').insertAdjacentHTML('beforeend','<option value="">No dates</option>');
+      return;
     }
-    async function postJSON(url, body){
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(body),
-        credentials: 'omit'
-      });
-      const text = await r.text();
-      let j;
-      try { j = JSON.parse(text); } catch (_) { throw new Error(text || 'Bad JSON'); }
-      if (j && j.ok === false && j.error) throw new Error(j.error);
-      return j;
-    }
+    cal.forEach(d => $('date').insertAdjacentHTML('beforeend','<option value="'+d.ServiceDate+'">'+d.ServiceDate+' — '+(d.Title||'Service')+'</option>'));
+    refreshRolesAndRoster();
+  }catch(e){
+    const el = $('signinError'); el.textContent = (e && e.message) ? e.message : 'Failed to load dates.'; el.style.display='block';
+  }
+}
 
     function setDefaultMonth(){
       const now = new Date();
@@ -256,40 +274,38 @@
       el.value = p[0] || v;
     }
 
-    function renderRoles(roles, remaining){
-      const wrap = $('roles'); wrap.innerHTML = '';
-      if(!roles || roles.length===0){ wrap.innerHTML = '<div class="muted">No roles for this date.</div>'; return; }
-      roles.forEach(r=>{
-        const left = Number.isFinite(remaining?.[r.role]) ? remaining[r.role] : null;
-        const disabled = (left!==null) ? (left<=0) : false;
-        wrap.insertAdjacentHTML('beforeend',
-          '<label class="team"><input type="checkbox" name="role" value="'+r.role.replace(/"/g,'&quot;')+'" '+(disabled?'disabled':'')+' /> '+
-          '<span>'+r.role+(left!==null? ' <span class="muted">(left: '+left+')</span>':'')+'</span></label>'
-        );
-      });
-    }
+    async function refreshRolesAndRoster(){
+  const month = $('month').value, date = $('date').value;
+  if(!month || !date) return;
 
-    function renderRoster(roster){
-      const tb = $('roster'); tb.innerHTML = '';
-      const roles = Object.keys(roster||{});
-      if(roles.length===0){ tb.innerHTML = '<tr><td colspan="2" class="muted">No signups yet.</td></tr>'; return; }
-      roles.forEach(role=>{
-        const names = roster[role]||[]; if(names.length===0) return;
-        tb.insertAdjacentHTML('beforeend','<tr><td>'+role+'</td><td>'+names.map(n=>'<span class="chip">'+n+'</span>').join(' ')+'</td></tr>');
-      });
-    }
+  try{
+    const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    const {roles, remaining} = await jsonp(rolesUrl);
+    renderRoles(roles, remaining);
+  }catch(e){
+    alert(e.message || 'Failed to load roles');
+  }
+
+  try{
+    const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    const roster = await jsonp(rosterUrl);
+    renderRoster(roster);
+  }catch(e){
+    alert(e.message || 'Failed to load roster');
+  }
+}
 
     async function loadMetrics(){
-      try{
-        const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        const rows = await getJSON(url);
-        const tb = $('metrics'); tb.innerHTML='';
-        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
-        rows.forEach(r=>{
-          tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
-        });
-      }catch(_){}
-    }
+  try{
+    const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    const rows = await jsonp(url);
+    const tb = $('metrics'); tb.innerHTML='';
+    if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
+    rows.forEach(r=>{
+      tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
+    });
+  }catch(_){}
+}
 
     async function refreshRolesAndRoster(){
       const month = $('month').value, date = $('date').value;
@@ -332,51 +348,63 @@
     }
 
     async function initAfterSignIn(){
-      // View ping (optional)
-      try{
-        const url = `${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        getJSON(url).catch(()=>{});
-      }catch(_){}
+  try{
+    const url = `${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN)}`;
+    jsonp(url).catch(()=>{});
+  }catch(_){}
 
-      // Show app & wire up
-      $('app').style.display='block';
-      setDefaultMonth();
-      $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-      $('month').addEventListener('change', loadDates);
-      $('date').addEventListener('change', refreshRolesAndRoster);
-      loadDates();
+  $('app').style.display='block';
+  setDefaultMonth();
+  $('phone').addEventListener('input', ()=> phoneMask($('phone')));
+  $('month').addEventListener('change', loadDates);
+  $('date').addEventListener('change', refreshRolesAndRoster);
+  loadDates();
 
-      $('f').addEventListener('submit', async (e)=>{
-        e.preventDefault();
-        const month = $('month').value, date = $('date').value;
-        const first = $('first').value.trim(), last = $('last').value.trim();
-        const email = $('email').value.trim(), phone = $('phone').value.trim();
-        const comments = $('notes').value.trim();
-        const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
-        const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+  $('f').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const month = $('month').value, date = $('date').value;
+    const first = $('first').value.trim(), last = $('last').value.trim();
+    const email = $('email').value.trim(), phone = $('phone').value.trim();
+    const comments = $('notes').value.trim();
+    const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
+    const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
 
-        if(!month||!date||!re.test(first)||!re.test(last)||!email||!phone||roles.length===0){
-          $('err').style.display='block'; $('err').textContent='Please fill all required fields.'; return;
-        }
-        $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
-
-        try{
-          const body = { mode:'submit', month, date, firstName:first, lastName:last, email, phone, comments, roles, id_token: ID_TOKEN };
-          const out = await postJSON(`${ENDPOINT}?mode=submit`, body);
-          $('ok').style.display='block';
-          $('f').reset();
-          refreshRolesAndRoster();
-          loadMetrics();
-        }catch(err){
-          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-          $('err').style.display='block';
-          refreshRolesAndRoster();
-        }finally{
-          $('submit').disabled = false;
-        }
-      });
+    if(!month||!date||!re.test(first)||!re.test(last)||!email||!phone||roles.length===0){
+      $('err').style.display='block'; $('err').textContent='Please fill all required fields.'; return;
     }
+    $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
 
+    try{
+      // JSONP submit via GET
+      const url = `${ENDPOINT}?mode=submit_get`
+        + `&id_token=${encodeURIComponent(ID_TOKEN)}`
+        + `&month=${encodeURIComponent(month)}`
+        + `&date=${encodeURIComponent(date)}`
+        + `&firstName=${encodeURIComponent(first)}`
+        + `&lastName=${encodeURIComponent(last)}`
+        + `&email=${encodeURIComponent(email)}`
+        + `&phone=${encodeURIComponent(phone)}`
+        + `&comments=${encodeURIComponent(comments)}`
+        + `&roles=${encodeURIComponent(roles.join(','))}`;
+
+      const out = await jsonp(url);
+      if (out && out.ok) {
+        $('ok').style.display='block';
+        $('f').reset();
+        refreshRolesAndRoster();
+        loadMetrics();
+      } else {
+        throw new Error((out && out.error) || 'Submission failed.');
+      }
+    }catch(err){
+      $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
+      $('err').style.display='block';
+      refreshRolesAndRoster();
+    }finally{
+      $('submit').disabled = false;
+    }
+  });
+}
     // Boot
     // Boot logic with localStorage sign-in persistence
 window.addEventListener('load', async () => {
