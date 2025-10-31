@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATC Monthly Signups</title>
   <style>
-    :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
+    :root { --max: 1000px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
 
@@ -23,11 +23,12 @@
     legend { font-weight:800; margin-bottom: 10px; padding: 0; }
     label { font-weight: 800; display:block; margin-bottom: 6px; }
     label[for="month"] { font-size: 1.15rem; }
-    input[type="text"], input[type="email"], textarea, input[type="month"], select {
+    input[type="text"], input[type="email"], textarea, input[type="month"]{
       width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1.05rem; background:#fff;
     }
     input[type="checkbox"] { width: 18px; height: 18px; }
     textarea { min-height: 90px; resize: vertical; }
+    .muted { color:#666; }
 
     .actions { display:flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap:wrap; }
     button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size:1rem; }
@@ -37,23 +38,19 @@
     .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
     .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
 
-    .muted { color:#666; }
-
-    /* Month grid & Sunday cards */
-    .monthGrid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    @media (max-width: 860px){ .monthGrid { grid-template-columns:1fr; } header .brandRow { grid-template-columns: 64px 1fr; } .logo{ height:64px; width:64px; } }
-    #monthGrid .muted { text-align:center; }
-    .sundayCard { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
-    .sundayHead { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .roleList { display:grid; grid-template-columns: 1fr; gap:8px; }
+    /* Roles & Roster area with sidebar */
+    .twoCol { display:grid; grid-template-columns: 2fr 1fr; gap:16px; }
+    @media (max-width: 900px){ .twoCol { grid-template-columns: 1fr; } .brandRow { grid-template-columns: 64px 1fr; } .logo{ height:64px; width:64px; } }
+    .roleList { display:grid; grid-template-columns: 1fr; gap:10px; }
     .roleItem { display:flex; align-items:center; gap:10px; }
     .roleLeft { color:#64748b; font-size:.95rem; min-width: 160px; }
-    .badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
     .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
+    .badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
+    .sidebar { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
 
     footer { text-align:center; color:#374151; padding: 16px; }
 
-    /* Sign-in overlay (Google Identity Services) */
+    /* Sign-in overlay */
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
@@ -98,21 +95,44 @@
             <div>
               <label for="month">Service Month<span class="req">*</span></label>
               <input type="month" id="month">
-              <div class="muted" style="margin-top:6px">Select a month to load Sundays (and Men’s Fellowship if scheduled).</div>
+              <div class="muted" style="margin-top:6px">Select a month to load roles and current roster.</div>
             </div>
           </fieldset>
 
-          <!-- Sundays + roles will render here -->
-          <section class="card" id="monthGridCard" style="margin-top:10px;">
-            <h2 style="margin-top:0;">Select Sundays & Roles</h2>
-            <div id="monthGrid" class="monthGrid">
-              <div class="muted">Select a month to load Sundays…</div>
+          <!-- Month Roles + Sidebar -->
+          <section class="card" id="monthRolesCard" style="margin-top:10px; display:none;">
+            <div class="twoCol">
+              <!-- Left: roles & roster -->
+              <div>
+                <h2 style="margin-top:0;">Select Monthly Roles</h2>
+                <div id="monthRoles" class="roleList">
+                  <div class="muted">Select a month to load roles…</div>
+                </div>
+
+                <div class="muted" style="margin-top:12px">Current Signups (Full Name — Notes):</div>
+                <div id="monthRoster" class="roleList" style="margin-top:4px;">
+                  <div class="muted">No data yet.</div>
+                </div>
+
+                <div id="monthInfo" class="msg success" style="display:none; margin-top:12px;">
+                  Note: This month has no remaining Sundays, but monthly roles are still open. Please coordinate any specific dates in the notes.
+                </div>
+              </div>
+
+              <!-- Right: Remaining Sundays -->
+              <aside class="sidebar">
+                <h3 style="margin:0 0 8px;">Remaining Sundays</h3>
+                <div id="remainingSundays">
+                  <div class="muted">—</div>
+                </div>
+              </aside>
             </div>
           </section>
 
-          <fieldset id="contactFS" style="margin-top:14px">
+          <!-- Contact -->
+          <fieldset id="contactFS" style="margin-top:14px; display:none;">
             <legend>Contact information</legend>
-            <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
                 <label for="first">First Name<span class="req">*</span></label>
                 <input id="first" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John">
@@ -122,7 +142,7 @@
                 <input id="last" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe">
               </div>
             </div>
-            <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
                 <label for="email">Email<span class="req">*</span></label>
                 <input id="email" type="email" required placeholder="name@example.com">
@@ -133,27 +153,27 @@
               </div>
             </div>
             <div>
-              <label for="notes">Comments / Notes</label>
-              <textarea id="notes" placeholder="Any preferences or availability details…"></textarea>
+              <label for="notes">Notes (Sundays you can’t make / details)</label>
+              <textarea id="notes" placeholder="Example: I’m out on the 2nd Sunday, available all others."></textarea>
             </div>
           </fieldset>
 
-          <div class="actions" id="actionsRow">
-      <button class="primary" type="submit" id="submit">Submit</button>
-      <button class="secondary" type="reset">Clear</button>
-    </div>
-    <div id="ok" class="msg success">Thank you! Your signup was recorded.</div>
-    <div id="err" class="msg error">Sorry, something went wrong.</div>
-  </form>
-</section>
+          <div class="actions" id="actionsRow" style="display:none;">
+            <button class="primary" type="submit" id="submit">Submit</button>
+            <button class="secondary" type="reset">Clear</button>
+          </div>
+          <div id="ok" class="msg success">Thank you! Your monthly signup was recorded.</div>
+          <div id="err" class="msg error">Sorry, something went wrong.</div>
+        </form>
+      </section>
 
-      <!-- Admin metrics -->
+      <!-- Admin metrics (optional) -->
       <section class="card" id="adminCard" style="display:none">
         <h2 style="margin-top:0">Admin — Activity Metrics</h2>
-        <div class="tableWrap">
-          <table class="metrics">
-            <thead><tr><th>Email</th><th>Views</th><th>Submits</th></tr></thead>
-            <tbody id="metrics"><tr><td colspan="3" class="muted">No data.</td></tr></tbody>
+        <div style="overflow-x:auto;">
+          <table class="metrics" style="width:100%;border-collapse:collapse;">
+            <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Email</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Views</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Submits</th></tr></thead>
+            <tbody id="metrics"><tr><td colspan="3" class="muted" style="padding:8px;">No data.</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -163,16 +183,18 @@
   </div>
 
   <script>
-    // === Config ===
+    /* ===== CONFIG ===== */
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbzeMYO7V9OX7iBFzuRtfbMXrk9CzP0xArxeB0hOOdXZjdklGtOBlTjeLpYDFOrGQsHk/exec"; // e.g., https://script.google.com/macros/s/AKfy.../exec
 
-    // === State ===
+    /* ===== STATE ===== */
     let ID_TOKEN = '';
-    const MonthState = { dates: [], byDate: {} }; // dates are ISO strings
 
-    // JSONP helper (single definition)
+    /* ===== HELPERS ===== */
+    const $ = (id)=>document.getElementById(id);
+
+    // JSONP (single, shared)
     function jsonp(url){
       return new Promise((resolve, reject)=>{
         const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -186,9 +208,49 @@
       });
     }
 
-    // Google Identity Services
+    // UTC Sunday detector to avoid TZ bugs
+    function isSundayISO(iso){
+      const [y,m,d] = String(iso).trim().split('-').map(Number);
+      const dt = new Date(Date.UTC(y, m-1, d));
+      return dt.getUTCDay() === 0;
+    }
+    function fmtLongDate(iso){
+      const [y,m,d] = iso.split('-').map(Number);
+      return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+    }
+    function phoneMask(el){
+      let v = el.value.replace(/\D/g,'').slice(0,10);
+      const p=[]; if(v.length>0) p.push('(' + v.substring(0,Math.min(3,v.length)));
+      if(v.length>=4) p[0]+=') ' + v.substring(3,Math.min(6,v.length));
+      if(v.length>=7) p[0]+='-' + v.substring(6,10);
+      el.value = p[0] || v;
+    }
+    function renderRemainingSundays(cal, month){
+      const box = $('remainingSundays');
+      const list = (cal||[])
+        .map(r => String(r.ServiceDate).trim())
+        .filter(iso => isSundayISO(iso))
+        .sort();
+      if (!list.length){ box.innerHTML = '<div class="muted">None</div>'; return; }
+
+      const [yy,mm] = month.split('-').map(Number);
+      const today = new Date();
+      const isCurrent = (today.getFullYear()===yy && (today.getMonth()+1)===mm);
+      const todayISO = new Date(yy, mm-1, today.getDate());
+      const remaining = isCurrent ? list.filter(iso => {
+        const [y,m,d]=iso.split('-').map(Number);
+        const dt=new Date(y,m-1,d);
+        return dt >= todayISO;
+      }) : list;
+
+      if (!remaining.length){ box.innerHTML = '<div class="muted">None left this month</div>'; return; }
+
+      box.innerHTML = remaining.map(iso => `<div class="chip">${fmtLongDate(iso)}</div>`).join('');
+    }
+
+    /* ===== GIS Sign-in ===== */
     function initGIS(){
-      const overlay = document.getElementById('signinOverlay');
+      const overlay = $('signinOverlay');
       overlay.style.display = 'flex';
       google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
@@ -199,10 +261,10 @@
             localStorage.setItem('atc_id_token', ID_TOKEN);
             localStorage.setItem('atc_id_token_time', Date.now().toString());
             overlay.style.display='none';
-            document.getElementById('app').style.display='block';
+            $('app').style.display='block';
             initAfterSignIn();
           }catch(e){
-            const el = document.getElementById('signinError');
+            const el = $('signinError');
             el.textContent = e.message || 'Sign-in failed. Please try again.';
             el.style.display = 'block';
           }
@@ -211,199 +273,108 @@
         ux_mode: 'popup'
       });
       google.accounts.id.renderButton(
-        document.getElementById('gSignIn'),
+        $('gSignIn'),
         { theme: "outline", size: "large", text: "signin_with", shape: "pill" }
       );
     }
 
-    // Helpers
-    const $ = (id)=>document.getElementById(id);
-    function phoneMask(el){
-      let v = el.value.replace(/\D/g,'').slice(0,10);
-      const p=[]; if(v.length>0) p.push('(' + v.substring(0,Math.min(3,v.length)));
-      if(v.length>=4) p[0]+=') ' + v.substring(3,Math.min(6,v.length));
-      if(v.length>=7) p[0]+='-' + v.substring(6,10);
-      el.value = p[0] || v;
-    }
-    function fmtLongDate(iso){ const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y,m-1,d); return dt.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}); }
+    /* ===== MAIN LOAD (monthly) ===== */
+    async function loadMonth(){
+      const month = $('month').value; // yyyy-mm
+      const rolesBox   = $('monthRoles');
+      const rosterBox  = $('monthRoster');
+      const infoBanner = $('monthInfo');
 
-    // Month loader
-    async function loadDates(){
-  const month = $('month').value;
-  const grid  = $('monthGrid');
+      $('formCard').style.display = 'block';
 
-  // Always show the form card (so month picker is visible)
-  $('formCard').style.display = 'block';
-
-  // Hide everything else until a month is chosen
-  if (!month) {
-    $('monthGridCard').style.display = 'none';
-    $('contactFS').style.display     = 'none';
-    $('actionsRow').style.display    = 'none';
-    grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
-    return;
-  }
-
-  // Month chosen → show grid; we'll show contact+buttons after data loads
-  $('monthGridCard').style.display = 'block';
-  $('contactFS').style.display     = 'none';
-  $('actionsRow').style.display    = 'none';
-
-  grid.innerHTML = '<div class="muted">Loading…</div>';
-
-  try {
-    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const res = await jsonp(url);
-    const cal = Array.isArray(res?.cal) ? res.cal : [];
-
-    // Split Sundays vs Men’s Fellowship
-    const titleHasMF = d => /men'?s\s+fellowship/i.test(String(d.Title||'').trim());
-    const sundays = cal.filter(d => isSundayISO(String(d.ServiceDate).trim()) && !titleHasMF(d));
-    const mensF   = cal.find(d => titleHasMF(d));
-
-
-    renderMonthGrid(sundays);
-
-    if (mensF){
-      const id = `mf_${mensF.ServiceDate}`;
-      grid.insertAdjacentHTML('beforeend', `
-        <div class="sundayCard" id="${id}">
-          <div class="sundayHead">
-            <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
-          </div>
-          <div class="roleList" data-date="${mensF.ServiceDate}">
-            <div class="muted">Loading roles…</div>
-          </div>
-          <div class="muted" style="margin-top:8px">Current Signups:</div>
-          <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
-            <div class="muted">Loading roster…</div>
-          </div>
-        </div>
-      `);
-      await loadRolesForDate(mensF.ServiceDate);
-      await loadRosterForDate(mensF.ServiceDate);
-    }
-
-    // After we’ve rendered dates/roles successfully, show contact + buttons
-    $('contactFS').style.display  = 'block';
-    $('actionsRow').style.display = 'flex';
-
-  } catch(e){
-    console.error('loadDates error:', e);
-    const el = $('signinError');
-    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
-    el.style.display = 'block';
-  }
-}
-
-    function renderMonthGrid(cal){
-      const grid = $('monthGrid');
-      grid.innerHTML = '';
-
-      if (!cal || !cal.length){
-        grid.innerHTML = '<div class="muted">No Sundays found for this month.</div>';
-        MonthState.dates = [];
+      if (!month) {
+        $('monthRolesCard').style.display = 'none';
+        $('contactFS').style.display      = 'none';
+        $('actionsRow').style.display     = 'none';
+        rolesBox.innerHTML  = '<div class="muted">Select a month to load roles…</div>';
+        rosterBox.innerHTML = '<div class="muted">No data yet.</div>';
+        infoBanner.style.display = 'none';
         return;
       }
 
-      MonthState.dates = cal.map(d => d.ServiceDate); // ISO strings
-      MonthState.byDate = {};
+      $('monthRolesCard').style.display = 'block';
+      $('contactFS').style.display      = 'none';
+      $('actionsRow').style.display     = 'none';
+      rolesBox.innerHTML  = '<div class="muted">Loading roles…</div>';
+      rosterBox.innerHTML = '<div class="muted">Loading roster…</div>';
+      infoBanner.style.display = 'none';
 
-      for (const d of cal){
-        const id = `day_${d.ServiceDate}`;
-        grid.insertAdjacentHTML('beforeend', `
-          <div class="sundayCard" id="${id}">
-            <div class="sundayHead">
-              <div><strong>${fmtLongDate(d.ServiceDate)}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
-            </div>
-            <div class="roleList" data-date="${d.ServiceDate}">
-              <div class="muted">Loading roles…</div>
-            </div>
-            <div class="muted" style="margin-top:8px">Current Signups:</div>
-            <div class="roleList rosterList" data-roster="${d.ServiceDate}">
-              <div class="muted">Loading roster…</div>
-            </div>
-          </div>
-        `);
-      }
-
-      for (const d of cal){
-        loadRolesForDate(d.ServiceDate);
-        loadRosterForDate(d.ServiceDate);
-      }
-    }
-
-    function isSundayISO(iso /* 'yyyy-mm-dd' */){
-  const [y,m,d] = iso.split('-').map(Number);
-  // Use UTC to avoid timezone shifts
-  const dt = new Date(Date.UTC(y, m-1, d));
-  return dt.getUTCDay() === 0; // Sunday
-}
-
-    async function loadRolesForDate(dateISO){
       try{
-        const month = $('month').value;
-        const url = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const { roles } = await jsonp(url);
+        // Calendar: used only for the Sundays sidebar and “no Sundays left” banner
+        const calUrl = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const calRes = await jsonp(calUrl);
+        const cal = Array.isArray(calRes?.cal) ? calRes.cal : [];
 
-        const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
-        if (!list) return;
+        renderRemainingSundays(cal, month);
 
-        if (!roles || !roles.length){
-          list.innerHTML = '<div class="muted">No roles available for this date.</div>';
-          return;
+        // banner if current month has no Sundays left
+        const [yy,mm] = month.split('-').map(Number);
+        const hasSundayRows = cal.some(d => isSundayISO(String(d.ServiceDate).trim()));
+        if (hasSundayRows) {
+          const today = new Date();
+          const isCurrent = (today.getFullYear()===yy && (today.getMonth()+1)===mm);
+          if (isCurrent) {
+            const remaining = (cal||[])
+              .map(r => String(r.ServiceDate).trim())
+              .filter(isSundayISO)
+              .filter(iso => {
+                const [y,m,d]=iso.split('-').map(Number);
+                const dt=new Date(y,m-1,d);
+                return dt >= new Date(yy,mm-1,today.getDate());
+              });
+            infoBanner.style.display = remaining.length ? 'none' : 'block';
+          } else {
+            infoBanner.style.display = 'none';
+          }
+        } else {
+          infoBanner.style.display = 'block';
         }
 
-        list.innerHTML = '';
-        roles.forEach(r=>{
-          list.insertAdjacentHTML('beforeend', `
-            <label class="roleItem">
-              <input type="checkbox" name="role-${dateISO}" value="${r.role.replace(/"/g,'&quot;')}">
-              <span>${r.role}</span>
-            </label>
-          `);
-        });
-      }catch(e){
-        const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
-        if (list) list.innerHTML = `<div class="muted">Failed to load roles.</div>`;
-        console.error('loadRolesForDate error:', e);
-      }
-    }
+        // Roles (monthly)
+        const rolesUrl = `${ENDPOINT}?mode=roles_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const rolesRes = await jsonp(rolesUrl);
+        const roles = Array.isArray(rolesRes?.roles) ? rolesRes.roles : [];
+        rolesBox.innerHTML = roles.length
+          ? roles.map(r => `
+              <label class="roleItem">
+                <input type="checkbox" name="role-month" value="${r.role.replace(/"/g,'&quot;')}">
+                <span>${r.role}</span>
+              </label>
+            `).join('')
+          : '<div class="muted">No roles available this month.</div>';
 
-    async function loadRosterForDate(dateISO){
-      try{
-        const month = $('month').value;
-        const url = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const roster = await jsonp(url); // { role: [names] }
-        const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
-        if (!area) return;
+        // Roster (monthly; names — notes)
+        const rosterUrl = `${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const roster = await jsonp(rosterUrl); // { role: [ "Full Name — notes", ... ] }
+        const rolesKeys = Object.keys(roster||{});
+        rosterBox.innerHTML = rolesKeys.length
+          ? rolesKeys.map(role=>{
+              const names = (roster[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
+              return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
+            }).join('')
+          : '<div class="muted">No signups yet.</div>';
 
-        const roles = Object.keys(roster || {});
-        if (!roles.length) {
-          area.innerHTML = '<div class="muted">No signups yet.</div>';
-          return;
+        // Contact + Submit
+        $('contactFS').style.display  = 'block';
+        $('actionsRow').style.display = 'flex';
+
+        // Admin metrics visibility
+        if (Array.isArray(calRes?.profile?.email) || calRes?.profile?.email) {
+          const me = String(calRes.profile.email||'').toLowerCase();
+          if (ADMIN_EMAILS.includes(me)) { $('adminCard').style.display='block'; try{ await loadMetrics(); }catch(_){} }
         }
 
-        const rows = roles.map(role=>{
-          const names = (roster[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
-          return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
-        }).join('');
-        area.innerHTML = rows;
-
       }catch(e){
-        const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
-        if (area) area.innerHTML = '<div class="muted">Failed to load roster.</div>';
-        console.error('loadRosterForDate error:', e);
+        console.error('loadMonth error:', e);
+        const el = $('signinError');
+        el.textContent = (e && e.message) ? e.message : 'Failed to load monthly roles.';
+        el.style.display = 'block';
       }
-    }
-
-    function collectMonthSelections(){
-      const picks = []; // [{ date:'yyyy-MM-dd', roles:[...] }]
-      for (const date of MonthState.dates){
-        const selected = [...document.querySelectorAll(`input[name="role-${date}"]:checked`)].map(x=>x.value);
-        if (selected.length) picks.push({ date, roles: selected });
-      }
-      return picks;
     }
 
     async function loadMetrics(){
@@ -411,37 +382,87 @@
         const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
         const rows = await jsonp(url);
         const tb = $('metrics'); tb.innerHTML='';
-        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
+        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted" style="padding:8px;">No data.</td></tr>'; return; }
         rows.forEach(r=>{
-          tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
+          tb.insertAdjacentHTML('beforeend','<tr><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.email+'</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.views+'</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.submits+'</td></tr>');
         });
       }catch(_){}
     }
 
+    /* ===== INIT AFTER SIGN-IN ===== */
     async function initAfterSignIn(){
-  try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
+      try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
 
-  $('app').style.display='block';
-  $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-  $('month').addEventListener('change', loadDates);
+      $('app').style.display='block';
+      $('phone').addEventListener('input', ()=> phoneMask($('phone')));
+      $('month').addEventListener('change', loadMonth);
 
-  // Show the form card with only the month picker visible on first load
-  $('formCard').style.display   = 'block';
-  $('monthGridCard').style.display = 'none';
-  $('contactFS').style.display  = 'none';
-  $('actionsRow').style.display = 'none';
-}
+      // Landing: just month picker
+      $('formCard').style.display   = 'block';
+      $('monthRolesCard').style.display = 'none';
+      $('contactFS').style.display  = 'none';
+      $('actionsRow').style.display = 'none';
 
+      // Submit
+      $('f').addEventListener('submit', async (e)=>{
+        e.preventDefault();
 
-    // Boot: reuse sign-in for 1 hour if available
+        const month = $('month').value;
+        const first = $('first').value.trim(), last = $('last').value.trim();
+        const email = $('email').value.trim(), phone = $('phone').value.trim();
+        const comments = $('notes').value.trim();
+        const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+        const roles = [...document.querySelectorAll('input[name="role-month"]:checked')].map(x=>x.value);
+
+        if(!month || !re.test(first) || !re.test(last) || !email || !phone || !roles.length){
+          $('err').style.display='block';
+          $('err').textContent='Please fill all fields and select at least one monthly role.';
+          return;
+        }
+
+        $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
+
+        try{
+          const url = `${ENDPOINT}?mode=submit_month_simple`
+            + `&id_token=${encodeURIComponent(ID_TOKEN)}`
+            + `&month=${encodeURIComponent(month)}`
+            + `&firstName=${encodeURIComponent(first)}`
+            + `&lastName=${encodeURIComponent(last)}`
+            + `&email=${encodeURIComponent(email)}`
+            + `&phone=${encodeURIComponent(phone)}`
+            + `&comments=${encodeURIComponent(comments)}`
+            + `&roles=${encodeURIComponent(JSON.stringify(roles))}`;
+
+          const out = await jsonp(url);
+
+          if (out && out.ok) {
+            const ok = $('ok');
+            ok.textContent = 'Thank you! Your monthly signup was recorded. A confirmation email has been sent.';
+            ok.style.display = 'block';
+            await loadMonth();                // refresh roles & roster
+            try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+          } else {
+            throw new Error((out && out.error) || 'Submission failed.');
+          }
+
+        }catch(err){
+          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
+          $('err').style.display='block';
+        }finally{
+          $('submit').disabled = false;
+        }
+      });
+    }
+
+    /* ===== BOOT ===== */
     window.addEventListener('load', () => {
       const cachedToken = localStorage.getItem('atc_id_token');
       const cachedTime  = parseInt(localStorage.getItem('atc_id_token_time') || '0', 10);
       const now = Date.now();
       if (cachedToken && (now - cachedTime < 3600 * 1000)) {
         ID_TOKEN = cachedToken;
-        document.getElementById('signinOverlay').style.display='none';
-        document.getElementById('app').style.display='block';
+        $('signinOverlay').style.display='none';
+        $('app').style.display='block';
         initAfterSignIn();
       } else {
         initGIS();
