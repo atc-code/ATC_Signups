@@ -333,6 +333,13 @@
       }
     }
 
+    function isSundayISO(iso /* 'yyyy-mm-dd' */){
+  const [y,m,d] = iso.split('-').map(Number);
+  // Use UTC to avoid timezone shifts
+  const dt = new Date(Date.UTC(y, m-1, d));
+  return dt.getUTCDay() === 0; // Sunday
+}
+
     async function loadRolesForDate(dateISO){
       try{
         const month = $('month').value;
