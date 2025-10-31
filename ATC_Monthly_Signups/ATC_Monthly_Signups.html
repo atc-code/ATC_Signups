@@ -45,7 +45,6 @@
     .roleItem { display:flex; align-items:center; gap:10px; }
     .roleLeft { color:#64748b; font-size:.95rem; min-width: 160px; }
     .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
-    .badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
     .sidebar { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
 
     footer { text-align:center; color:#374151; padding: 16px; }
@@ -102,7 +101,7 @@
           <!-- Month Roles + Sidebar -->
           <section class="card" id="monthRolesCard" style="margin-top:10px; display:none;">
             <div class="twoCol">
-              <!-- Left: roles & roster -->
+              <!-- Left: roles -->
               <div>
                 <h2 style="margin-top:0;">Select Monthly Roles</h2>
                 <div id="monthRoles" class="roleList">
@@ -163,13 +162,13 @@
       </section>
 
       <!-- Bottom: Current Signups -->
-<section class="card" id="currentSignupsCard" style="display:none">
-  <h2 style="margin-top:0;">Current Signups</h2>
-  <div class="muted" style="margin: -6px 0 10px 0;">(Full Name — Notes)</div>
-  <div id="monthRoster" class="roleList">
-    <div class="muted">No data yet.</div>
-  </div>
-</section>
+      <section class="card" id="currentSignupsCard" style="display:none">
+        <h2 style="margin-top:0;">Current Signups</h2>
+        <div class="muted" style="margin: -6px 0 10px 0;">(Full Name — Notes)</div>
+        <div id="monthRoster" class="roleList">
+          <div class="muted">No data yet.</div>
+        </div>
+      </section>
 
       <!-- Admin metrics (optional) -->
       <section class="card" id="adminCard" style="display:none">
@@ -198,7 +197,7 @@
     /* ===== HELPERS ===== */
     const $ = (id)=>document.getElementById(id);
 
-    // JSONP (single, shared)
+    // JSONP helper
     function jsonp(url){
       return new Promise((resolve, reject)=>{
         const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -212,7 +211,7 @@
       });
     }
 
-    // UTC Sunday detector to avoid TZ bugs
+    // UTC-based “is Sunday?” to avoid timezone shifts
     function isSundayISO(iso){
       const [y,m,d] = String(iso).trim().split('-').map(Number);
       const dt = new Date(Date.UTC(y, m-1, d));
@@ -295,6 +294,7 @@
         $('monthRolesCard').style.display = 'none';
         $('contactFS').style.display      = 'none';
         $('actionsRow').style.display     = 'none';
+        $('currentSignupsCard').style.display = 'none';
         rolesBox.innerHTML  = '<div class="muted">Select a month to load roles…</div>';
         rosterBox.innerHTML = '<div class="muted">No data yet.</div>';
         infoBanner.style.display = 'none';
@@ -304,6 +304,7 @@
       $('monthRolesCard').style.display = 'block';
       $('contactFS').style.display      = 'none';
       $('actionsRow').style.display     = 'none';
+      $('currentSignupsCard').style.display = 'none';
       rolesBox.innerHTML  = '<div class="muted">Loading roles…</div>';
       rosterBox.innerHTML = '<div class="muted">Loading roster…</div>';
       infoBanner.style.display = 'none';
@@ -352,22 +353,24 @@
             `).join('')
           : '<div class="muted">No roles available this month.</div>';
 
-        // Roster (monthly; names — notes)
+        // Roster (monthly; names — notes). Accept {role:[...]} OR {ok:true, roster:{...}}
         const rosterUrl = `${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const roster = await jsonp(rosterUrl); // { role: [ "Full Name — notes", ... ] }
-        const rolesKeys = Object.keys(roster||{});
+        const rosterRes = await jsonp(rosterUrl);
+        const rosterMap = (rosterRes && rosterRes.ok && rosterRes.roster) ? rosterRes.roster : rosterRes;
+        const rolesKeys = Object.keys(rosterMap || {});
         rosterBox.innerHTML = rolesKeys.length
           ? rolesKeys.map(role=>{
-              const names = (roster[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
+              const names = (rosterMap[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
               return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
             }).join('')
           : '<div class="muted">No signups yet.</div>';
+        $('currentSignupsCard').style.display = 'block';
 
         // Contact + Submit
         $('contactFS').style.display  = 'block';
         $('actionsRow').style.display = 'flex';
 
-        // Admin metrics visibility
+        // Admin metrics visibility (optional)
         if (Array.isArray(calRes?.profile?.email) || calRes?.profile?.email) {
           const me = String(calRes.profile.email||'').toLowerCase();
           if (ADMIN_EMAILS.includes(me)) { $('adminCard').style.display='block'; try{ await loadMetrics(); }catch(_){} }
@@ -406,6 +409,7 @@
       $('monthRolesCard').style.display = 'none';
       $('contactFS').style.display  = 'none';
       $('actionsRow').style.display = 'none';
+      $('currentSignupsCard').style.display = 'none';
 
       // Submit
       $('f').addEventListener('submit', async (e)=>{
