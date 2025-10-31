@@ -109,11 +109,6 @@
                   <div class="muted">Select a month to load roles…</div>
                 </div>
 
-                <div class="muted" style="margin-top:12px">Current Signups (Full Name — Notes):</div>
-                <div id="monthRoster" class="roleList" style="margin-top:4px;">
-                  <div class="muted">No data yet.</div>
-                </div>
-
                 <div id="monthInfo" class="msg success" style="display:none; margin-top:12px;">
                   Note: This month has no remaining Sundays, but monthly roles are still open. Please coordinate any specific dates in the notes.
                 </div>
@@ -166,6 +161,15 @@
           <div id="err" class="msg error">Sorry, something went wrong.</div>
         </form>
       </section>
+
+      <!-- Bottom: Current Signups -->
+<section class="card" id="currentSignupsCard" style="display:none">
+  <h2 style="margin-top:0;">Current Signups</h2>
+  <div class="muted" style="margin: -6px 0 10px 0;">(Full Name — Notes)</div>
+  <div id="monthRoster" class="roleList">
+    <div class="muted">No data yet.</div>
+  </div>
+</section>
 
       <!-- Admin metrics (optional) -->
       <section class="card" id="adminCard" style="display:none">
