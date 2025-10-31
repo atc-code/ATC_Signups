@@ -10,12 +10,12 @@ It combines:
 
 ---
 
-## 🙏 Purpose
+# 🙏 Purpose
 To make volunteer coordination simple and transparent for the **Atlanta Telugu Church (ATC)**, where members can securely sign up to serve on various Sundays and teams — all managed through a clean online signup portal.
 
 ---
 
-## 🧩 Key Features
+# 🧩 Key Features
 
 | Feature | Description |
 |----------|--------------|
@@ -33,7 +33,7 @@ To make volunteer coordination simple and transparent for the **Atlanta Telugu C
 
 ---
 
-## ⚙️ How We Built It
+# ⚙️ How We Built It
 
 1. **Google Sheet Template Created**  
    - Tabs: `Roles`, `Calendar`, `Signups`, `Blocklist`, `ViewLogs`  
@@ -67,9 +67,9 @@ To make volunteer coordination simple and transparent for the **Atlanta Telugu C
 
 ---
 
-## 📄 How to Set It Up (Step-by-Step)
+# 📄 How to Set It Up (Step-by-Step)
 
-### Step 1 — Create the Google Sheet
+## Step 1 — Create the Google Sheet
 Create/Upload `ATC_Monthly_Signups.xlsx` to Google Drive and open it as a Google Sheet.  
 You’ll see these tabs:
 - **Roles** — define all volunteer roles and their capacities.
@@ -87,7 +87,7 @@ Copy the **Sheet ID** from the URL — it’s the long string between `/d/` and 
 
 ---
 
-**Step 2 — Setup Apps Script Backend**
+## Step 2 — Setup Apps Script Backend
 1. Go to [https://script.google.com](https://script.google.com)  
 2. Create a **new project** named `ATC Monthly Signups`
 3. Add two files:
@@ -98,7 +98,7 @@ Copy the **Sheet ID** from the URL — it’s the long string between `/d/` and 
 
 ---
 
-**Step 3 — Deploy the Script**
+## Step 3 — Deploy the Script
 
 Click Deploy → New deployment → Web app
 Set: Execute as: Me
@@ -107,7 +107,7 @@ Copy the Web App URL that appears.
 
 ---
 
-**Step 4 — Upload Frontend to GitHub**
+## Step 4 — Upload Frontend to GitHub
 
 Go to your GitHub repo:
 https://github.com/atc-code/ATC_Signups
@@ -117,7 +117,7 @@ Commit changes.
 
 ---
 
-**Step 5 — Enable GitHub Pages**
+## Step 5 — Enable GitHub Pages
 
 Go to Settings → Pages
 Set Source: main branch → / (root) or /docs depending on your repo
@@ -127,7 +127,7 @@ https://atc-code.github.io/ATC_Signups/Monthly_Signups/ATC_Monthly_Signups.html
 
 ---
 
-**✉️ How to Submit a Monthly Signup Page**
+##  How to Submit a Monthly Signup Page
 
 When you create a new month’s form:
 Open the same hosted link.
@@ -143,7 +143,7 @@ Admin metrics updated automatically
 
 ---
 
-**🔧 Maintenance Notes**
+## 🔧 Maintenance Notes
 
 - To add new roles, update the Roles tab in the Google Sheet.
 - To change capacities or deactivate a team, edit the same tab.
@@ -152,7 +152,7 @@ Admin metrics updated automatically
 
 ---
 
-**🙌 Acknowledgments**
+## 🙌 Acknowledgments
 
 Created for Atlanta Telugu Church (ATC) volunteers to serve God with joy and organization.
 Developed by **Chakravarthy Maddi** with the help of ChatGPT for automation, structure, and user experience.
