@@ -257,8 +257,10 @@
     const cal = Array.isArray(res?.cal) ? res.cal : [];
 
     // Split Sundays vs Men’s Fellowship
-    const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
-    const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
+    const titleHasMF = d => /men'?s\s+fellowship/i.test(String(d.Title||'').trim());
+    const sundays = cal.filter(d => isSundayISO(String(d.ServiceDate).trim()) && !titleHasMF(d));
+    const mensF   = cal.find(d => titleHasMF(d));
+
 
     renderMonthGrid(sundays);
 
