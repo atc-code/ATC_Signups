@@ -67,9 +67,24 @@ header p{
   .teams{display:grid;grid-template-columns:1fr;gap:10px}
   .team{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px}
 
-  /* Sundays chips as single column stack */
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px}
+  /* Remaining Sundays list: one column + smaller text */
+#sundays{
+  display: flex;
+  flex-direction: column;   /* stack vertically */
+  gap: 8px;                 /* space between items */
+  align-items: flex-start;  /* left align */
+}
+
+#sundays .chip{
+  font-size: 0.95rem;       /* smaller */
+  padding: 6px 10px;        /* tighter pill */
+  border-radius: 10px;
+}
+
+@media (max-width: 720px){
+  #sundays .chip{ font-size: 0.9rem; }
+}
+
 
   /* Two-column form layout: Teams (left) + Contact (right) */
   .formGrid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
