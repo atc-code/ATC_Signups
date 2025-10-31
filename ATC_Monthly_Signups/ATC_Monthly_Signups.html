@@ -1,482 +1,250 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC Monthly Signups</title>
-  <style>
-    :root { --max: 1000px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
-
-    /* Header */
-    header { background: #222; color: #fff; padding: 24px var(--pad); }
-    .brandRow { position: relative; min-height: 104px; display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
-    .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
-    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3.2vw, 2.2rem); line-height: 1.25; text-align:center; }
-    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; text-align:center; }
-
-    main { max-width: var(--max); margin: 20px auto; padding: 0 var(--pad); display:grid; gap:16px; }
-    .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
-
-    fieldset { border: 0; padding: 0; margin: 0 0 12px; }
-    legend { font-weight:800; margin-bottom: 10px; padding: 0; }
-    label { font-weight: 800; display:block; margin-bottom: 6px; }
-    label[for="month"] { font-size: 1.15rem; }
-    input[type="text"], input[type="email"], textarea, input[type="month"]{
-      width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1.05rem; background:#fff;
-    }
-    input[type="checkbox"] { width: 18px; height: 18px; }
-    textarea { min-height: 90px; resize: vertical; }
-    .muted { color:#666; }
-
-    .actions { display:flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap:wrap; }
-    button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size:1rem; }
-    .primary { background: var(--accent); color: #fff; }
-    .secondary { background: #edf2f7; }
-    .msg { margin-top: 14px; padding: 12px 14px; border-radius: 10px; display: none; }
-    .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
-    .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
-
-    /* Roles & Roster area with sidebar */
-    .twoCol { display:grid; grid-template-columns: 2fr 1fr; gap:16px; }
-    @media (max-width: 900px){ .twoCol { grid-template-columns: 1fr; } .brandRow { grid-template-columns: 64px 1fr; } .logo{ height:64px; width:64px; } }
-    .roleList { display:grid; grid-template-columns: 1fr; gap:10px; }
-    .roleItem { display:flex; align-items:center; gap:10px; }
-    .roleLeft { color:#64748b; font-size:.95rem; min-width: 160px; }
-    .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
-    .sidebar { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
-
-    footer { text-align:center; color:#374151; padding: 16px; }
-
-    /* Sign-in overlay */
-    .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
-    .overlay .inner { max-width:600px; text-align:center; }
-    .overlay p{ opacity:.9; }
-    .err{margin-top:10px;background:#7f1d1d;color:#fff;border-radius:10px;padding:8px 10px;font-size:.95rem;display:none}
-  </style>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ATC Monthly Signups — RSVP</title>
+<style>
+  :root{--max:980px;--pad:18px;--radius:16px;--ink:#1f2937;--muted:#6b7280;--bg:#f7f7fb;--card:#fff;--accent:#2b6cb0;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:#222;color:#fff;padding:24px var(--pad);text-align:center}
+  header .logo{position:absolute;left:18px;top:18px;height:56px;width:56px;border-radius:12px;background:#fff;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+  header h1{margin:0 0 6px;font-size:clamp(1.4rem,3.4vw,2.2rem)}
+  header p{margin:0;opacity:.95;font-style:italic}
+  main{max-width:var(--max);margin:20px auto;padding:0 var(--pad);display:grid;gap:16px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.08);padding:18px}
+  fieldset{border:0;margin:0 0 12px;padding:0}
+  legend{font-weight:800;margin-bottom:10px}
+  label{font-weight:600;display:block;margin-bottom:6px}
+  input[type="month"],input[type="text"],input[type="email"],textarea,select{width:100%;padding:12px 14px;border:1px solid #d9dbe3;border-radius:10px;background:#fff;font-size:1rem}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:800px){.grid-2{grid-template-columns:1fr}}
+  .teams{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+  @media (max-width:800px){.teams{grid-template-columns:1fr}}
+  .team{display:flex;gap:10px;align-items:center;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
+  .primary{background:var(--accent);color:#fff}
+  .secondary{background:#eef2f7}
+  .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:10px}
+  .ok{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
+  .err{background:#fff5f5;border:1px solid #fecaca;color:#7f1d1d}
+  .muted{color:var(--muted)}
+  .tableWrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid #e5e7eb;text-align:left;padding:10px 6px;vertical-align:top}
+  .chip{display:inline-block;margin:4px 6px 0 0;padding:4px 8px;border:1px solid #e5e7eb;border-radius:999px}
+</style>
 </head>
 <body>
-  <!-- Sign-in overlay -->
-  <div id="signinOverlay" class="overlay" style="display:none">
-    <div class="inner">
-      <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
-        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
-        <div>
-          <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
-          <p>Your Google sign-in confirms your signup and prevents duplicates.</p>
-        </div>
-      </div>
-      <div id="gSignIn" style="display:inline-block;"></div>
-      <div id="signinError" class="err"></div>
-    </div>
-  </div>
+  <header>
+    <img class="logo" src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="ATC"/>
+    <h1>ATC Monthly Signups — RSVP</h1>
+    <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
+  </header>
 
-  <!-- App -->
-  <div id="app" style="display:none">
-    <header>
-      <div class="brandRow">
-        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
-        <div>
-          <h1>ATC Monthly Signups</h1>
-          <p>Colossians 3:23–24 — “Whatever you do, work at it with all your heart… it is the Lord Christ you are serving.”</p>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      <!-- Form -->
-      <section class="card" id="formCard">
-        <form id="f" autocomplete="on">
-          <fieldset>
-            <legend>Service</legend>
+  <main>
+    <section class="card">
+      <form id="f">
+        <fieldset>
+          <legend style="font-size:1.15rem">Service Month</legend>
+          <div class="grid-2">
             <div>
-              <label for="month">Service Month<span class="req">*</span></label>
+              <label for="month">Month *</label>
               <input type="month" id="month">
-              <div class="muted" style="margin-top:6px">Select a month to load roles and current roster.</div>
-            </div>
-          </fieldset>
-
-          <!-- Month Roles + Sidebar -->
-          <section class="card" id="monthRolesCard" style="margin-top:10px; display:none;">
-            <div class="twoCol">
-              <!-- Left: roles -->
-              <div>
-                <h2 style="margin-top:0;">Select Monthly Roles</h2>
-                <div id="monthRoles" class="roleList">
-                  <div class="muted">Select a month to load roles…</div>
-                </div>
-
-                <div id="monthInfo" class="msg success" style="display:none; margin-top:12px;">
-                  Note: This month has no remaining Sundays. New signups are closed.
-                </div>
-              </div>
-
-              <!-- Right: Remaining Sundays -->
-              <aside class="sidebar">
-                <h3 style="margin:0 0 8px;">Remaining Sundays</h3>
-                <div id="remainingSundays">
-                  <div class="muted">—</div>
-                </div>
-              </aside>
-            </div>
-          </section>
-
-          <!-- Contact -->
-          <fieldset id="contactFS" style="margin-top:14px; display:none;">
-            <legend>Contact information</legend>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div>
-                <label for="first">First Name<span class="req">*</span></label>
-                <input id="first" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John">
-              </div>
-              <div>
-                <label for="last">Last Name<span class="req">*</span></label>
-                <input id="last" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe">
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div>
-                <label for="email">Email<span class="req">*</span></label>
-                <input id="email" type="email" required placeholder="name@example.com">
-              </div>
-              <div>
-                <label for="phone">Phone<span class="req">*</span></label>
-                <input id="phone" type="text" inputmode="tel" required placeholder="(###) ###-####">
-              </div>
             </div>
             <div>
-              <label for="notes">Notes (optional)</label>
-              <textarea id="notes" placeholder="Example: I’m out on the 2nd Sunday, available all others."></textarea>
+              <label>Available Roles (auto-hides if full)</label>
+              <div id="roles" class="teams"><div class="muted">Select a month to load roles…</div></div>
             </div>
-          </fieldset>
-
-          <div class="actions" id="actionsRow" style="display:none;">
-            <button class="primary" type="submit" id="submit">Submit</button>
-            <button class="secondary" type="reset">Clear</button>
           </div>
-          <div id="ok" class="msg success">Thank you! Your monthly signup was recorded.</div>
-          <div id="err" class="msg error">Sorry, something went wrong.</div>
-        </form>
-      </section>
+        </fieldset>
 
-      <!-- Bottom: Current Signups -->
-      <section class="card" id="currentSignupsCard" style="display:none">
-        <h2 style="margin-top:0;">Current Signups</h2>
-        <div id="monthRoster" class="roleList">
-          <div class="muted">No data yet.</div>
+        <fieldset>
+          <legend>Contact Information</legend>
+          <div class="grid-2">
+            <div>
+              <label for="first">First Name *</label>
+              <input id="first" type="text" required minlength="4" placeholder="e.g., John">
+            </div>
+            <div>
+              <label for="last">Last Name *</label>
+              <input id="last" type="text" required minlength="4" placeholder="e.g., Doe">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label for="email">Email *</label>
+              <input id="email" type="email" required placeholder="name@example.com">
+            </div>
+            <div>
+              <label for="phone">Phone *</label>
+              <input id="phone" type="text" required placeholder="(###) ###-####">
+            </div>
+          </div>
+          <div>
+            <label for="notes">Comments / Notes</label>
+            <textarea id="notes" placeholder="Any preferences or availability details…"></textarea>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button class="primary" type="submit" id="submit">Submit</button>
+          <button class="secondary" type="reset">Clear</button>
         </div>
-      </section>
+        <div id="ok" class="msg ok">Thank you! Your signup was recorded. A confirmation email has been sent.</div>
+        <div id="err" class="msg err">Sorry, something went wrong.</div>
+      </form>
+    </section>
 
-      <!-- Admin metrics (optional) -->
-      <section class="card" id="adminCard" style="display:none">
-        <h2 style="margin-top:0">Admin — Activity Metrics</h2>
-        <div style="overflow-x:auto;">
-          <table class="metrics" style="width:100%;border-collapse:collapse;">
-            <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Email</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Views</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;">Submits</th></tr></thead>
-            <tbody id="metrics"><tr><td colspan="3" class="muted" style="padding:8px;">No data.</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+    <section class="card" id="rosterCard">
+      <h2 style="margin-top:0">Current Signups</h2>
+      <div class="tableWrap">
+        <table>
+          <thead><tr><th>Role</th><th>Volunteers</th></tr></thead>
+          <tbody id="roster"><tr><td colspan="2" class="muted">No signups yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-    <footer></footer>
-  </div>
+<script>
+  // ====== CONFIG ======
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbxm8ojZW3cMZS_CWtJo-CdLY5Ph2zm3d7pooGWovtlxYkqrNaj4ih_ru5bhrEoCgL7k/exec";
+  
 
-  <script>
-    /* ===== CONFIG ===== */
-    const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
-    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbykrVgfDNzt7F0MVAtYpg3seeOHlbMTC3j2aS9r9WYjA-jW1Jf6FPcj9qhEwWlqWaph/exec";
+  // ====== Helpers ======
+  const $ = id => document.getElementById(id);
+  function saveMonthLocal(m){ try{ localStorage.setItem('atc_month', m);}catch(_){ } }
+  function loadMonthLocal(){ try{ return localStorage.getItem('atc_month')||'';}catch(_){ return '';} }
+  function nowMonth(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+  function phoneMask(v){ return v.replace(/\D/g,'').slice(0,10).replace(/^(\d{0,3})(\d{0,3})(\d{0,4}).*$/, (m,a,b,c)=> (a? '('+a+(b?') '+b:'')+(c?'-'+c:''):'') ); }
 
-    /* ===== STATE ===== */
-    let ID_TOKEN = '';
-
-    /* ===== HELPERS ===== */
-    const $ = (id)=>document.getElementById(id);
-
-    // JSONP helper
-    function jsonp(url){
-      return new Promise((resolve, reject)=>{
-        const cb = 'cb_' + Math.random().toString(36).slice(2);
-        const s  = document.createElement('script');
-        const to = setTimeout(()=>{ cleanup(); reject(new Error('JSONP timeout')); }, 12000);
-        function cleanup(){ clearTimeout(to); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } s.remove(); }
-        window[cb] = (data)=>{ cleanup(); resolve(data); };
-        s.onerror = ()=>{ cleanup(); reject(new Error('JSONP load error')); };
-        s.src = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
-        document.head.appendChild(s);
-      });
-    }
-
-    // UTC-based “is Sunday?” to avoid timezone shifts
-    function isSundayISO(iso){
-      const [y,m,d] = String(iso).trim().split('-').map(Number);
-      const dt = new Date(Date.UTC(y, m-1, d));
-      return dt.getUTCDay() === 0;
-    }
-    function fmtLongDate(iso){
-      const [y,m,d] = iso.split('-').map(Number);
-      return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
-    }
-    function phoneMask(el){
-      let v = el.value.replace(/\D/g,'').slice(0,10);
-      const p=[]; if(v.length>0) p.push('(' + v.substring(0,Math.min(3,v.length)));
-      if(v.length>=4) p[0]+=') ' + v.substring(3,Math.min(6,v.length));
-      if(v.length>=7) p[0]+='-' + v.substring(6,10);
-      el.value = p[0] || v;
-    }
-    function renderRemainingSundays(cal, month){
-      const box = $('remainingSundays');
-      const list = (cal||[])
-        .map(r => String(r.ServiceDate).trim())
-        .filter(iso => isSundayISO(iso))
-        .sort();
-      if (!list.length){ box.innerHTML = '<div class="muted">None</div>'; return; }
-
-      const [yy,mm] = month.split('-').map(Number);
-      const today = new Date();
-      const isCurrent = (today.getFullYear()===yy && (today.getMonth()+1)===mm);
-      const todayISO = new Date(yy, mm-1, today.getDate());
-      const remaining = isCurrent ? list.filter(iso => {
-        const [y,m,d]=iso.split('-').map(Number);
-        const dt=new Date(y,m-1,d);
-        return dt >= todayISO;
-      }) : list;
-
-      if (!remaining.length){ box.innerHTML = '<div class="muted">None left this month</div>'; return; }
-      box.innerHTML = remaining.map(iso => `<div class="chip">${fmtLongDate(iso)}</div>`).join('');
-      return remaining.length; // also return count
-    }
-
-    /* ===== GIS Sign-in ===== */
-    function initGIS(){
-      const overlay = $('signinOverlay');
-      overlay.style.display = 'flex';
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (resp) => {
-          try{
-            if(!resp || !resp.credential) throw new Error('No credential returned.');
-            ID_TOKEN = resp.credential;
-            localStorage.setItem('atc_id_token', ID_TOKEN);
-            localStorage.setItem('atc_id_token_time', Date.now().toString());
-            overlay.style.display='none';
-            $('app').style.display='block';
-            initAfterSignIn();
-          }catch(e){
-            const el = $('signinError');
-            el.textContent = e.message || 'Sign-in failed. Please try again.';
-            el.style.display = 'block';
-          }
-        },
-        auto_select: false,
-        ux_mode: 'popup'
-      });
-      google.accounts.id.renderButton(
-        $('gSignIn'),
-        { theme: "outline", size: "large", text: "signin_with", shape: "pill" }
-      );
-    }
-
-    /* ===== MAIN LOAD (monthly) ===== */
-    async function loadMonth(){
-      const month = $('month').value; // yyyy-mm
-      const rolesBox   = $('monthRoles');
-      const rosterBox  = $('monthRoster');
-      const infoBanner = $('monthInfo');
-
-      $('formCard').style.display = 'block';
-
-      if (!month) {
-        $('monthRolesCard').style.display = 'none';
-        $('contactFS').style.display      = 'none';
-        $('actionsRow').style.display     = 'none';
-        $('currentSignupsCard').style.display = 'none';
-        rolesBox.innerHTML  = '<div class="muted">Select a month to load roles…</div>';
-        rosterBox.innerHTML = '<div class="muted">No data yet.</div>';
-        infoBanner.style.display = 'none';
-        return;
-      }
-
-      // Persist selection so refresh keeps it
-      localStorage.setItem('atc_selected_month', month);
-
-      $('monthRolesCard').style.display = 'block';
-      $('contactFS').style.display      = 'none';
-      $('actionsRow').style.display     = 'none';
-      $('currentSignupsCard').style.display = 'none';
-      rolesBox.innerHTML  = '<div class="muted">Loading roles…</div>';
-      rosterBox.innerHTML = '<div class="muted">Loading roster…</div>';
-      infoBanner.style.display = 'none';
-
-      try{
-        // Calendar → remaining Sundays + banner
-        const calUrl = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const calRes = await jsonp(calUrl);
-        const cal = Array.isArray(calRes?.cal) ? calRes.cal : [];
-
-        const remainingCount = renderRemainingSundays(cal, month) || 0;
-
-        // Roles (monthly) — only if Sundays remain this month
-        if (remainingCount > 0) {
-          const rolesUrl = `${ENDPOINT}?mode=roles_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-          const rolesRes = await jsonp(rolesUrl);
-          const roles = Array.isArray(rolesRes?.roles) ? rolesRes.roles : [];
-          rolesBox.innerHTML = roles.length
-            ? roles.map(r => `
-                <label class="roleItem">
-                  <input type="checkbox" name="role-month" value="${r.role.replace(/"/g,'&quot;')}">
-                  <span>${r.role}</span>
-                </label>
-              `).join('')
-            : '<div class="muted">No roles available this month.</div>';
-
-          // Allow contact + submit
-          $('contactFS').style.display  = 'block';
-          $('actionsRow').style.display = 'flex';
-          infoBanner.style.display = 'none';
-        } else {
-          // No Sundays left → close signups, show banner and hide form
-          rolesBox.innerHTML  = '<div class="muted">Signups closed for this month.</div>';
-          $('contactFS').style.display  = 'none';
-          $('actionsRow').style.display = 'none';
-          infoBanner.style.display = 'block';
-        }
-
-        // Roster (monthly; accept map or {ok,roster})
-        const rosterUrl = `${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const rosterRes = await jsonp(rosterUrl);
-        const rosterMap = (rosterRes && rosterRes.ok && rosterRes.roster) ? rosterRes.roster : rosterRes;
-
-        const rolesKeys = Object.keys(rosterMap || {});
-        rosterBox.innerHTML = rolesKeys.length
-          ? rolesKeys.map(role=>{
-              // items may be strings or objects {name, notes, ts}
-              const items = (rosterMap[role]||[])
-                .map(x => (typeof x === 'string' ? { name:x, notes:'', ts:0 } : x))
-                .sort((a,b)=> (a.ts||0) - (b.ts||0)); // order by signup time
-              const chips = items.map(n=>{
-                const label = n.notes ? `${n.name} — ${n.notes}` : n.name;
-                return `<span class="chip">${label}</span>`;
-              }).join(' ');
-              return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${chips || '<span class="muted">—</span>'}</div></div>`;
-            }).join('')
-          : '<div class="muted">No signups yet.</div>';
-        $('currentSignupsCard').style.display = 'block';
-
-        // Admin metrics visibility (optional)
-        if (calRes?.profile?.email) {
-          const me = String(calRes.profile.email||'').toLowerCase();
-          if (ADMIN_EMAILS.includes(me)) { $('adminCard').style.display='block'; try{ await loadMetrics(); }catch(_){} }
-        }
-
-      }catch(e){
-        console.error('loadMonth error:', e);
-        const el = $('signinError');
-        el.textContent = (e && e.message) ? e.message : 'Failed to load monthly roles.';
-        el.style.display = 'block';
-      }
-    }
-
-    async function loadMetrics(){
-      try{
-        const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        const rows = await jsonp(url);
-        const tb = $('metrics'); tb.innerHTML='';
-        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted" style="padding:8px;">No data.</td></tr>'; return; }
-        rows.forEach(r=>{
-          tb.insertAdjacentHTML('beforeend','<tr><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.email+'</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.views+'</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;">'+r.submits+'</td></tr>');
-        });
-      }catch(_){}
-    }
-
-    /* ===== INIT AFTER SIGN-IN ===== */
-    async function initAfterSignIn(){
-      try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
-
-      $('app').style.display='block';
-      $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-      $('month').addEventListener('change', loadMonth);
-
-      // Default month = current OR last selected (persisted)
-      const saved = localStorage.getItem('atc_selected_month');
-      if (saved) {
-        $('month').value = saved;
-      } else {
-        const now = new Date();
-        $('month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      }
-
-      // Load immediately (landing should show current month roster + roles if Sundays remain)
-      loadMonth();
-
-      // Submit
-      $('f').addEventListener('submit', async (e)=>{
-        e.preventDefault();
-
-        const month = $('month').value;
-        const first = $('first').value.trim(), last = $('last').value.trim();
-        const email = $('email').value.trim(), phone = $('phone').value.trim();
-        const comments = $('notes').value.trim();
-        const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
-        const roles = [...document.querySelectorAll('input[name="role-month"]:checked')].map(x=>x.value);
-
-        if(!month || !re.test(first) || !re.test(last) || !email || !phone || !roles.length){
-          $('err').style.display='block';
-          $('err').textContent='Please fill all fields and select at least one monthly role.';
-          return;
-        }
-
-        $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
-
-        try{
-          const url = `${ENDPOINT}?mode=submit_month_simple`
-            + `&id_token=${encodeURIComponent(ID_TOKEN)}`
-            + `&month=${encodeURIComponent(month)}`
-            + `&firstName=${encodeURIComponent(first)}`
-            + `&lastName=${encodeURIComponent(last)}`
-            + `&email=${encodeURIComponent(email)}`
-            + `&phone=${encodeURIComponent(phone)}`
-            + `&comments=${encodeURIComponent(comments)}`
-            + `&roles=${encodeURIComponent(JSON.stringify(roles))}`;
-
-          const out = await jsonp(url);
-
-          if (out && out.ok) {
-            const ok = $('ok');
-            ok.textContent = 'Thank you! Your monthly signup was recorded. A confirmation email has been sent.';
-            ok.style.display = 'block';
-            await loadMonth();                // refresh roles & roster (keeps selected month)
-            try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
-          } else {
-            throw new Error((out && out.error) || 'Submission failed.');
-          }
-
-        }catch(err){
-          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-          $('err').style.display='block';
-        }finally{
-          $('submit').disabled = false;
-        }
-      });
-    }
-
-    /* ===== BOOT ===== */
-    window.addEventListener('load', () => {
-      const cachedToken = localStorage.getItem('atc_id_token');
-      const cachedTime  = parseInt(localStorage.getItem('atc_id_token_time') || '0', 10);
-      const now = Date.now();
-      if (cachedToken && (now - cachedTime < 3600 * 1000)) {
-        ID_TOKEN = cachedToken;
-        $('signinOverlay').style.display='none';
-        $('app').style.display='block';
-        initAfterSignIn();
-      } else {
-        initGIS();
-      }
+  // JSONP
+  function jsonp(url){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb_'+Math.random().toString(36).slice(2);
+      window[cb] = (data)=>{ resolve(data); delete window[cb]; s.remove(); };
+      const s = document.createElement('script');
+      s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+      s.onerror = () => { delete window[cb]; reject(new Error('Network error')); };
+      document.head.appendChild(s);
     });
-  </script>
+  }
+
+  // ====== UI render ======
+  function renderRoles(roles, remaining){
+    const wrap = $('roles'); wrap.innerHTML='';
+    if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles configured.</div>'; return; }
+    roles.forEach(r=>{
+      const left = remaining.hasOwnProperty(r.role) ? remaining[r.role] : null;
+      if (left !== null && left <= 0) return; // hide when full
+      const id = 'role_'+r.role.replace(/\W+/g,'_');
+      wrap.insertAdjacentHTML('beforeend',
+        `<label class="team"><input type="checkbox" id="${id}" name="role" value="${r.role}"> ${r.role}</label>`);
+    });
+    if (!wrap.innerHTML) wrap.innerHTML = '<div class="muted">All roles are currently full.</div>';
+  }
+
+  function renderRoster(roster){
+    const tb = $('roster'); tb.innerHTML='';
+    const roles = Object.keys(roster||{});
+    if (!roles.length){ tb.innerHTML = '<tr><td colspan="2" class="muted">No signups yet.</td></tr>'; return; }
+    roles.forEach(role=>{
+      const names = roster[role]||[];
+      if (!names.length) return;
+      tb.insertAdjacentHTML('beforeend',
+        `<tr><td>${role}</td><td>${names.map(n=>`<span class="chip">${n}</span>`).join(' ')}</td></tr>`);
+    });
+  }
+
+  // ====== Data loaders ======
+  async function refreshRolesAndRoster(){
+    const month = $('month').value;
+    if (!month) return;
+
+    // roles + remaining
+    try{
+      const r1 = await jsonp(`${ENDPOINT}?mode=roles_remaining&month=${encodeURIComponent(month)}`);
+      if (r1 && r1.ok) renderRoles(r1.roles, r1.remaining);
+      else $('roles').innerHTML = '<div class="muted">Failed to load roles.</div>';
+    }catch(_){
+      $('roles').innerHTML = '<div class="muted">Failed to load roles.</div>';
+    }
+
+    // roster
+    try{
+      const r2 = await jsonp(`${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}`);
+      if (r2 && r2.ok) renderRoster(r2.roster);
+      else renderRoster({});
+    }catch(_){ renderRoster({}); }
+  }
+
+  async function loadCalendarFor(month){
+    // Optional: if you keep Calendar sheet and want to use it later
+    try{
+      await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
+    }catch(_){}
+  }
+
+  // ====== Submit ======
+  $('phone').addEventListener('input', e=> e.target.value = phoneMask(e.target.value));
+
+  $('f').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const month = $('month').value;
+    const first = $('first').value.trim();
+    const last  = $('last').value.trim();
+    const email = $('email').value.trim();
+    const phone = $('phone').value.trim();
+    const notes = $('notes').value.trim();
+    const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
+
+    if (!month || !first || first.length<4 || !last || last.length<4 || !email || !phone || !roles.length){
+      $('err').textContent = 'Please complete all required fields.'; $('err').style.display='block'; return;
+    }
+
+    $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
+
+    try{
+      const url = `${ENDPOINT}?mode=submit_get`
+        + `&month=${encodeURIComponent(month)}`
+        + `&firstName=${encodeURIComponent(first)}`
+        + `&lastName=${encodeURIComponent(last)}`
+        + `&email=${encodeURIComponent(email)}`
+        + `&phone=${encodeURIComponent(phone)}`
+        + `&comments=${encodeURIComponent(notes)}`
+        + `&roles=${encodeURIComponent(roles.join(','))}`;
+
+      const out = await jsonp(url);
+      if (out && out.ok){
+        $('ok').style.display='block';
+        $('f').reset();
+        saveMonthLocal(month); // keep selection across refresh
+        await refreshRolesAndRoster(); // reflect immediately
+      } else {
+        throw new Error((out && out.error) || 'Submission failed.');
+      }
+    }catch(err){
+      $('err').textContent = err.message || 'Submission failed.';
+      $('err').style.display='block';
+    }finally{
+      $('submit').disabled = false;
+    }
+  });
+
+  // ====== Boot ======
+  window.addEventListener('load', async ()=>{
+    // default to current month; if user picked something before, keep it
+    const remembered = loadMonthLocal();
+    $('month').value = remembered || nowMonth();
+    $('month').addEventListener('change', async ()=>{
+      saveMonthLocal($('month').value);
+      await refreshRolesAndRoster();
+    });
+    await refreshRolesAndRoster();
+  });
+</script>
 </body>
 </html>
