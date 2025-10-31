@@ -5,51 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATC Monthly Signups</title>
   <style>
-    #monthGrid .muted { text-align:center; }
-    .sundayCard { background:#fff; }
-    .monthGrid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-@media (max-width: 860px){ .monthGrid { grid-template-columns:1fr; } }
-.sundayCard { border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
-.sundayHead { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.roleList { display:grid; grid-template-columns: 1fr; gap:8px; }
-.roleItem { display:flex; align-items:center; gap:10px; }
-.roleLeft { color:#64748b; font-size:.95rem; }
-.badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
-
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
-    /* Header (Thanksgiving style) */
+
+    /* Header */
     header { background: #222; color: #fff; padding: 24px var(--pad); }
     .brandRow { position: relative; min-height: 104px; display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
     .logo { height:88px;width:88px;border-radius:12px;background:#fff;padding:10px; box-shadow: 0 6px 20px rgba(0,0,0,.18);}
-    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3.2vw, 2.2rem); line-height: 1.25; }
-    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3.2vw, 2.2rem); line-height: 1.25; text-align:center; }
+    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; text-align:center; }
 
     main { max-width: var(--max); margin: 20px auto; padding: 0 var(--pad); display:grid; gap:16px; }
     .card { background: #fff; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: 18px; }
-    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 860px){
-       header .brandRow { grid-template-columns: 64px 1fr; }
-      .grid-2{ grid-template-columns:1fr; }
-      .brandRow{ grid-template-columns: 72px 1fr; min-height: 96px; }
-      header .brandRow > div { text-align: center; }
-      .logo{ height:64px; width:64px; }
-      header h1{ font-size: clamp(1.3rem, 5vw, 1.9rem); }
-    }
 
     fieldset { border: 0; padding: 0; margin: 0 0 12px; }
     legend { font-weight:800; margin-bottom: 10px; padding: 0; }
-    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    label { font-weight: 800; display:block; margin-bottom: 6px; }
+    label[for="month"] { font-size: 1.15rem; }
     input[type="text"], input[type="email"], textarea, input[type="month"], select {
-      width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1rem; background:#fff;
+      width: 100%; padding: 12px 14px; border: 1px solid #d9dbe3; border-radius: 10px; font-size: 1.05rem; background:#fff;
     }
     input[type="checkbox"] { width: 18px; height: 18px; }
     textarea { min-height: 90px; resize: vertical; }
-    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 4px; }
-    @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
-    .team { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border:1px solid #e2e8f0; border-radius: 12px; }
-    .req { color: #c00; margin-left: 4px; }
+
     .actions { display:flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap:wrap; }
     button { border: 0; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size:1rem; }
     .primary { background: var(--accent); color: #fff; }
@@ -59,15 +38,22 @@
     .error { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
 
     .muted { color:#666; }
-    .tableWrap { overflow-x:auto; }
-    table { width:100%; border-collapse: collapse; }
-    th, td { text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align: top; }
-    th { font-size:.95rem; color:#334155; }
+
+    /* Month grid & Sunday cards */
+    .monthGrid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width: 860px){ .monthGrid { grid-template-columns:1fr; } header .brandRow { grid-template-columns: 64px 1fr; } .logo{ height:64px; width:64px; } }
+    #monthGrid .muted { text-align:center; }
+    .sundayCard { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
+    .sundayHead { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .roleList { display:grid; grid-template-columns: 1fr; gap:8px; }
+    .roleItem { display:flex; align-items:center; gap:10px; }
+    .roleLeft { color:#64748b; font-size:.95rem; min-width: 160px; }
+    .badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
     .chip { display:inline-block; margin:4px 6px 0 0; padding:4px 8px; border:1px solid #e2e8f0; border-radius:999px; font-size:.95rem; }
 
     footer { text-align:center; color:#374151; padding: 16px; }
 
-    /* Sign-in overlay */
+    /* Sign-in overlay (Google Identity Services) */
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex; align-items:center; justify-content:center; padding:24px; z-index:1000; }
     .overlay .inner { max-width:600px; text-align:center; }
     .overlay p{ opacity:.9; }
@@ -76,14 +62,14 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <!-- Sign-in overlay (GIS) -->
+  <!-- Sign-in overlay -->
   <div id="signinOverlay" class="overlay" style="display:none">
     <div class="inner">
       <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
         <div>
           <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
-          <p>Your Google sign-in confirms your Signup and prevents duplicates.</p>
+          <p>Your Google sign-in confirms your signup and prevents duplicates.</p>
         </div>
       </div>
       <div id="gSignIn" style="display:inline-block;"></div>
@@ -104,34 +90,29 @@
     </header>
 
     <main>
-      <!-- Submit form -->
+      <!-- Form -->
       <section class="card" id="formCard" style="display:none">
         <form id="f" autocomplete="on">
-          <!-- Service -->
-<fieldset>
-  <legend>Service</legend>
-  <div class="grid-2">
-    <div>
-      label[for="month"] { font-size: 1.15rem; font-weight: 800; }
-      #month { font-size: 1.05rem; padding: 12px 14px; }
-      <label for="month">Month<span class="req">*</span></label>
-      <input type="month" id="month">
-      <div class="muted" style="margin-top:6px">Pick a month; Sundays will appear below with roles.</div>
-    </div>
-  </div>
-</fieldset>
-
-<!-- Month Sundays + roles (auto-generated) -->
-<section class="card" id="monthGridCard">
-  <h2 style="margin-top:0;">Select Sundays & Roles</h2>
-  <div id="monthGrid" class="monthGrid">
-    <div class="muted">Select a month to load Sundays…</div>
-  </div>
-</section>
-
           <fieldset>
+            <legend>Service</legend>
+            <div>
+              <label for="month">Service Month<span class="req">*</span></label>
+              <input type="month" id="month">
+              <div class="muted" style="margin-top:6px">Select a month to load Sundays (and Men’s Fellowship if scheduled).</div>
+            </div>
+          </fieldset>
+
+          <!-- Sundays + roles will render here -->
+          <section class="card" id="monthGridCard" style="margin-top:10px;">
+            <h2 style="margin-top:0;">Select Sundays & Roles</h2>
+            <div id="monthGrid" class="monthGrid">
+              <div class="muted">Select a month to load Sundays…</div>
+            </div>
+          </section>
+
+          <fieldset style="margin-top:14px">
             <legend>Contact information</legend>
-            <div class="grid-2">
+            <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
                 <label for="first">First Name<span class="req">*</span></label>
                 <input id="first" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John">
@@ -141,7 +122,7 @@
                 <input id="last" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe">
               </div>
             </div>
-            <div class="grid-2">
+            <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div>
                 <label for="email">Email<span class="req">*</span></label>
                 <input id="email" type="email" required placeholder="name@example.com">
@@ -157,11 +138,6 @@
             </div>
           </fieldset>
 
-          <fieldset>
-            <legend>Choose your team(s)<span class="req">*</span></legend>
-            <div id="roles" class="teams"><div class="muted">Pick a month/date to load roles…</div></div>
-          </fieldset>
-
           <div class="actions">
             <button class="primary" type="submit" id="submit">Submit</button>
             <button class="secondary" type="reset">Clear</button>
@@ -171,7 +147,7 @@
         </form>
       </section>
 
-      <!-- Admin metrics (only if admin) -->
+      <!-- Admin metrics -->
       <section class="card" id="adminCard" style="display:none">
         <h2 style="margin-top:0">Admin — Activity Metrics</h2>
         <div class="tableWrap">
@@ -187,36 +163,30 @@
   </div>
 
   <script>
-    // === Config (use your deployed Web App URL) ===
+    // === Config ===
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzeMYO7V9OX7iBFzuRtfbMXrk9CzP0xArxeB0hOOdXZjdklGtOBlTjeLpYDFOrGQsHk/exec";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzeMYO7V9OX7iBFzuRtfbMXrk9CzP0xArxeB0hOOdXZjdklGtOBlTjeLpYDFOrGQsHk/exec"; // e.g., https://script.google.com/macros/s/AKfy.../exec
 
     // === State ===
     let ID_TOKEN = '';
-    let PROFILE  = null;
+    const MonthState = { dates: [], byDate: {} }; // dates are ISO strings
 
-    function jsonp(url) {
-    return new Promise((resolve, reject) => {
-      const cb = 'cb_' + Math.random().toString(36).slice(2);
-      const s = document.createElement('script');
-      const timedOut = setTimeout(() => {
-        cleanup();
-        reject(new Error('JSONP timeout'));
-      }, 12000);
-      function cleanup() {
-        clearTimeout(timedOut);
-        try { delete window[cb]; } catch(_) { window[cb] = undefined; }
-        s.remove();
-      }
-      window[cb] = (data) => { cleanup(); resolve(data); };
-      s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
-      s.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
-      document.head.appendChild(s);
-    });
-  }
+    // JSONP helper (single definition)
+    function jsonp(url){
+      return new Promise((resolve, reject)=>{
+        const cb = 'cb_' + Math.random().toString(36).slice(2);
+        const s  = document.createElement('script');
+        const to = setTimeout(()=>{ cleanup(); reject(new Error('JSONP timeout')); }, 12000);
+        function cleanup(){ clearTimeout(to); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } s.remove(); }
+        window[cb] = (data)=>{ cleanup(); resolve(data); };
+        s.onerror = ()=>{ cleanup(); reject(new Error('JSONP load error')); };
+        s.src = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
+        document.head.appendChild(s);
+      });
+    }
 
-    // === GIS init ===
+    // Google Identity Services
     function initGIS(){
       const overlay = document.getElementById('signinOverlay');
       overlay.style.display = 'flex';
@@ -246,198 +216,8 @@
       );
     }
 
-    // === Helpers ===
+    // Helpers
     const $ = (id)=>document.getElementById(id);
-
-    function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Math.random().toString(36).slice(2);
-    const s = document.createElement('script');
-    const to = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 12000);
-    function cleanup(){ clearTimeout(to); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } s.remove(); }
-    window[cb] = (data) => { cleanup(); resolve(data); };
-    s.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
-    s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
-    document.head.appendChild(s);
-  });
-}
-    // Store per-date roles/remaining in memory so we don't refetch on every tiny change
-const MonthState = {
-  dates: [],            // array of ISO 'yyyy-MM-dd'
-  byDate: {},           // { date: { roles:[{role,limit}], remaining:{role:n|null} } }
-};
-
-// Render the grid of Sunday cards
-function renderMonthGrid(cal){
-  const grid = $('monthGrid');
-  grid.innerHTML = '';
-
-  if (!cal || !cal.length){
-    grid.innerHTML = '<div class="muted">No Sundays found for this month.</div>';
-    return;
-  }
-
-  MonthState.dates = cal.map(d => fmtLongDate(d.ServiceDate));
-  MonthState.byDate = {}; // reset
-
-  for (const d of cal){
-    const id = `day_${fmtLongDate(d.ServiceDate)}`;
-    grid.insertAdjacentHTML('beforeend', `
-      <div class="sundayCard" id="${id}">
-        <div class="sundayHead">
-          <div><strong>${fmtLongDate(d.ServiceDate)}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
-        </div>
-        <div class="roleList" data-date="${fmtLongDate(d.ServiceDate)}">
-          <div class="muted">Loading roles…</div>
-        </div>
-        <div class="muted" style="margin-top:8px">Current Signups:</div>
-        <div class="roleList rosterList" data-roster="${fmtLongDate(d.ServiceDate)}">
-          <div class="muted">Loading roster…</div>
-        </div>
-      </div>
-    `);
-  }
-
-  // Load roles & roster for each date
-  for (const d of cal){
-    loadRolesForDate(fmtLongDate(d.ServiceDate));
-    loadRosterForDate(fmtLongDate(d.ServiceDate));
-  }
-}
-
-// Load roles + remaining for a specific date and render into that card
-async function loadRolesForDate(dateISO){
-  try{
-    const month = $('month').value;
-    const url = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const { roles } = await jsonp(url);
-
-    const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
-    if (!list) return;
-
-    if (!roles || !roles.length){
-      list.innerHTML = '<div class="muted">No roles available for this date.</div>';
-      return;
-    }
-
-    list.innerHTML = '';
-    roles.forEach(r=>{
-      list.insertAdjacentHTML('beforeend', `
-        <label class="roleItem">
-          <input type="checkbox" name="role-${dateISO}" value="${r.role.replace(/"/g,'&quot;')}">
-          <span>${r.role}</span>
-        </label>
-      `);
-    });
-  }catch(e){
-    const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
-    if (list) list.innerHTML = `<div class="muted">Failed to load roles.</div>`;
-    console.error('loadRolesForDate error:', e);
-  }
-}
-
-async function loadRosterForDate(dateISO){
-  try{
-    const month = $('month').value;
-    const url = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const roster = await jsonp(url); // { role: [names] }
-    const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
-    if (!area) return;
-
-    const roles = Object.keys(roster || {});
-    if (!roles.length) {
-      area.innerHTML = '<div class="muted">No signups yet.</div>';
-      return;
-    }
-
-    // table-like list (role → names chips)
-    const rows = roles.map(role=>{
-      const names = (roster[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
-      return `<div class="roleItem"><div class="roleLeft" style="min-width:160px">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
-    }).join('');
-    area.innerHTML = rows;
-
-  }catch(e){
-    const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
-    if (area) area.innerHTML = '<div class="muted">Failed to load roster.</div>';
-    console.error('loadRosterForDate error:', e);
-  }
-}
-
-// Gather all selected roles across all selected Sundays for one submit
-function collectMonthSelections(){
-  const picks = []; // [{ date:'yyyy-MM-dd', roles:[...] }]
-  for (const date of MonthState.dates){
-    const selected = [...document.querySelectorAll(`input[name="role-${date}"]:checked`)].map(x=>x.value);
-    if (selected.length) picks.push({ date, roles: selected });
-  }
-  return picks;
-}
-
-
-    async function loadDates(){
-  const month = $('month').value;
-  const grid  = $('monthGrid');
-  grid.innerHTML = '';
-  if (!month) {
-    grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
-    // hide form pieces until month chosen
-    document.getElementById('formCard').style.display = 'none';
-    return;
-  }
-
-  try{
-    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const res = await jsonp(url);
-    const cal = Array.isArray(res?.cal) ? res.cal : [];
-
-    // Split Sundays vs Men’s Fellowship (by Title)
-    const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
-    const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
-
-    // Render Sundays (multi-cards)
-    renderMonthGrid(sundays);
-
-    // Render Men’s Fellowship (single card), if present
-    if (mensF){
-      const id = `mf_${mensF.ServiceDate}`;
-      grid.insertAdjacentHTML('beforeend', `
-        <div class="sundayCard" id="${id}">
-          <div class="sundayHead">
-            <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
-          </div>
-          <div class="roleList" data-date="${mensF.ServiceDate}">
-            <div class="muted">Loading roles…</div>
-          </div>
-          <div class="muted" style="margin-top:8px">Current Signups:</div>
-          <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
-            <div class="muted">Loading roster…</div>
-          </div>
-        </div>
-      `);
-      // Load roles/roster for MF date
-      await loadRolesForDate(mensF.ServiceDate);
-      await loadRosterForDate(mensF.ServiceDate);
-    }
-
-    // Show the contact form only after month is selected (per your #7)
-    document.getElementById('formCard').style.display = 'block';
-
-  }catch(e){
-    console.error('loadDates error:', e);
-    const el = $('signinError');
-    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
-    el.style.display = 'block';
-  }
-}
-
-    function setDefaultMonth(){
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth()+1).padStart(2,'0');
-      $('month').value = y + '-' + m;
-    }
-
     function phoneMask(el){
       let v = el.value.replace(/\D/g,'').slice(0,10);
       const p=[]; if(v.length>0) p.push('(' + v.substring(0,Math.min(3,v.length)));
@@ -445,134 +225,252 @@ function collectMonthSelections(){
       if(v.length>=7) p[0]+='-' + v.substring(6,10);
       el.value = p[0] || v;
     }
+    function fmtLongDate(iso){ const [y,m,d] = iso.split('-').map(Number); const dt = new Date(y,m-1,d); return dt.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}); }
+
+    // Month loader
+    async function loadDates(){
+      const month = $('month').value;
+      const grid  = $('monthGrid');
+      grid.innerHTML = '';
+      if (!month) {
+        grid.innerHTML = '<div class="muted">Select a month to load Sundays…</div>';
+        document.getElementById('formCard').style.display = 'none';
+        return;
+      }
+
+      try{
+        const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const res = await jsonp(url);
+        const cal = Array.isArray(res?.cal) ? res.cal : [];
+
+        // Split Sundays vs Men’s Fellowship
+        const sundays = cal.filter(d => (new Date(d.ServiceDate).getDay() === 0) && !/men'?s\s+fellowship/i.test(d.Title||''));
+        const mensF   = cal.find(d => /men'?s\s+fellowship/i.test(d.Title||''));
+
+        renderMonthGrid(sundays);
+
+        if (mensF){
+          const id = `mf_${mensF.ServiceDate}`;
+          grid.insertAdjacentHTML('beforeend', `
+            <div class="sundayCard" id="${id}">
+              <div class="sundayHead">
+                <div><strong>${fmtLongDate(mensF.ServiceDate)}</strong> <span class="badge">Men’s Fellowship</span></div>
+              </div>
+              <div class="roleList" data-date="${mensF.ServiceDate}">
+                <div class="muted">Loading roles…</div>
+              </div>
+              <div class="muted" style="margin-top:8px">Current Signups:</div>
+              <div class="roleList rosterList" data-roster="${mensF.ServiceDate}">
+                <div class="muted">Loading roster…</div>
+              </div>
+            </div>
+          `);
+          await loadRolesForDate(mensF.ServiceDate);
+          await loadRosterForDate(mensF.ServiceDate);
+        }
+
+        document.getElementById('formCard').style.display = 'block';
+      }catch(e){
+        console.error('loadDates error:', e);
+        const el = $('signinError');
+        el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
+        el.style.display = 'block';
+      }
+    }
+
+    function renderMonthGrid(cal){
+      const grid = $('monthGrid');
+      grid.innerHTML = '';
+
+      if (!cal || !cal.length){
+        grid.innerHTML = '<div class="muted">No Sundays found for this month.</div>';
+        MonthState.dates = [];
+        return;
+      }
+
+      MonthState.dates = cal.map(d => d.ServiceDate); // ISO strings
+      MonthState.byDate = {};
+
+      for (const d of cal){
+        const id = `day_${d.ServiceDate}`;
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="sundayCard" id="${id}">
+            <div class="sundayHead">
+              <div><strong>${fmtLongDate(d.ServiceDate)}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
+            </div>
+            <div class="roleList" data-date="${d.ServiceDate}">
+              <div class="muted">Loading roles…</div>
+            </div>
+            <div class="muted" style="margin-top:8px">Current Signups:</div>
+            <div class="roleList rosterList" data-roster="${d.ServiceDate}">
+              <div class="muted">Loading roster…</div>
+            </div>
+          </div>
+        `);
+      }
+
+      for (const d of cal){
+        loadRolesForDate(d.ServiceDate);
+        loadRosterForDate(d.ServiceDate);
+      }
+    }
+
+    async function loadRolesForDate(dateISO){
+      try{
+        const month = $('month').value;
+        const url = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const { roles } = await jsonp(url);
+
+        const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
+        if (!list) return;
+
+        if (!roles || !roles.length){
+          list.innerHTML = '<div class="muted">No roles available for this date.</div>';
+          return;
+        }
+
+        list.innerHTML = '';
+        roles.forEach(r=>{
+          list.insertAdjacentHTML('beforeend', `
+            <label class="roleItem">
+              <input type="checkbox" name="role-${dateISO}" value="${r.role.replace(/"/g,'&quot;')}">
+              <span>${r.role}</span>
+            </label>
+          `);
+        });
+      }catch(e){
+        const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
+        if (list) list.innerHTML = `<div class="muted">Failed to load roles.</div>`;
+        console.error('loadRolesForDate error:', e);
+      }
+    }
+
+    async function loadRosterForDate(dateISO){
+      try{
+        const month = $('month').value;
+        const url = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+        const roster = await jsonp(url); // { role: [names] }
+        const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
+        if (!area) return;
+
+        const roles = Object.keys(roster || {});
+        if (!roles.length) {
+          area.innerHTML = '<div class="muted">No signups yet.</div>';
+          return;
+        }
+
+        const rows = roles.map(role=>{
+          const names = (roster[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
+          return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
+        }).join('');
+        area.innerHTML = rows;
+
+      }catch(e){
+        const area = document.querySelector(`.rosterList[data-roster="${dateISO}"]`);
+        if (area) area.innerHTML = '<div class="muted">Failed to load roster.</div>';
+        console.error('loadRosterForDate error:', e);
+      }
+    }
+
+    function collectMonthSelections(){
+      const picks = []; // [{ date:'yyyy-MM-dd', roles:[...] }]
+      for (const date of MonthState.dates){
+        const selected = [...document.querySelectorAll(`input[name="role-${date}"]:checked`)].map(x=>x.value);
+        if (selected.length) picks.push({ date, roles: selected });
+      }
+      return picks;
+    }
 
     async function loadMetrics(){
-  try{
-    const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
-    const rows = await jsonp(url);
-    const tb = $('metrics'); tb.innerHTML='';
-    if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
-    rows.forEach(r=>{
-      tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
-    });
-  }catch(_){}
-}
-
-    async function loadDates(){
-  const $month = $('month');
-  if (!$month.value) setDefaultMonth();
-  const month = $month.value;
-
-  try{
-    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const res = await jsonp(url);
-    console.log('[loadDates] calendar →', res);
-
-    const cal = Array.isArray(res?.cal) ? res.cal : [];
-    if (!cal.length){
-      $('monthGrid').innerHTML = '<div class="muted">No Sundays found for this month.</div>';
-      return;
+      try{
+        const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
+        const rows = await jsonp(url);
+        const tb = $('metrics'); tb.innerHTML='';
+        if(!rows || !rows.length){ tb.innerHTML='<tr><td colspan="3" class="muted">No data.</td></tr>'; return; }
+        rows.forEach(r=>{
+          tb.insertAdjacentHTML('beforeend','<tr><td>'+r.email+'</td><td>'+r.views+'</td><td>'+r.submits+'</td></tr>');
+        });
+      }catch(_){}
     }
-
-    renderMonthGrid(cal);  // builds empty cards, then loads per-date roles
-
-  }catch(e){
-    console.error('loadDates error:', e);
-    const el = $('signinError');
-    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
-    el.style.display = 'block';
-  }
-}
 
     async function initAfterSignIn(){
+      try{ jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{}); }catch(_){}
 
-  try {
-  jsonp(`${ENDPOINT}?mode=view_ping&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`).catch(()=>{});
-} catch(_) {}
+      $('app').style.display='block';
+      $('phone').addEventListener('input', ()=> phoneMask($('phone')));
+      $('month').addEventListener('change', loadDates);
+      // No default month, no initial load (landing shows only month picker)
 
-  $('app').style.display='block';
-  $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-  $('month').addEventListener('change', loadDates);
-  // no default month, no initial load
+      // Submit handler
+      $('f').addEventListener('submit', async (e)=>{
+        e.preventDefault();
 
+        const month = $('month').value;
+        const first = $('first').value.trim(), last = $('last').value.trim();
+        const email = $('email').value.trim(), phone = $('phone').value.trim();
+        const comments = $('notes').value.trim();
+        const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
 
-  $('f').addEventListener('submit', async (e)=>{
-  e.preventDefault();
+        const selections = collectMonthSelections();
+        if(!month || !re.test(first) || !re.test(last) || !email || !phone || !selections.length){
+          $('err').style.display='block';
+          $('err').textContent='Please fill all fields and pick at least one date & role.';
+          return;
+        }
 
-  const month = $('month').value;
-  const first = $('first').value.trim(), last = $('last').value.trim();
-  const email = $('email').value.trim(), phone = $('phone').value.trim();
-  const comments = $('notes').value.trim();
-  const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+        $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
 
-  const selections = collectMonthSelections(); // [{date, roles:[]}]
-  if(!month || !re.test(first) || !re.test(last) || !email || !phone || !selections.length){
-    $('err').style.display='block';
-    $('err').textContent='Please fill all fields and pick at least one date & role.';
-    return;
-  }
+        try{
+          const url = `${ENDPOINT}?mode=submit_month_get`
+            + `&id_token=${encodeURIComponent(ID_TOKEN)}`
+            + `&month=${encodeURIComponent(month)}`
+            + `&firstName=${encodeURIComponent(first)}`
+            + `&lastName=${encodeURIComponent(last)}`
+            + `&email=${encodeURIComponent(email)}`
+            + `&phone=${encodeURIComponent(phone)}`
+            + `&comments=${encodeURIComponent(comments)}`
+            + `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
 
-  $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
+          const out = await jsonp(url);
 
-  try{
-    const url = `${ENDPOINT}?mode=submit_month_get`
-      + `&id_token=${encodeURIComponent(ID_TOKEN)}`
-      + `&month=${encodeURIComponent(month)}`
-      + `&firstName=${encodeURIComponent(first)}`
-      + `&lastName=${encodeURIComponent(last)}`
-      + `&email=${encodeURIComponent(email)}`
-      + `&phone=${encodeURIComponent(phone)}`
-      + `&comments=${encodeURIComponent(comments)}`
-      + `&selections=${encodeURIComponent(JSON.stringify(selections))}`;
+          if (out && out.ok) {
+            const ok = $('ok');
+            ok.textContent = 'Thank you! Your signup was recorded. A confirmation email has been sent.';
+            ok.style.display = 'block';
 
-    const out = await jsonp(url);
+            $('f').reset();
+            // Keep the selected month as-is; just reload the dates to refresh roles/rosters
+            await loadDates();
 
-    // >>> SUCCESS BRANCH (replaced) <<<
-    if (out && out.ok) {
-      const ok = $('ok');
-      ok.textContent = 'Thank you! Your signup was recorded. A confirmation email has been sent.';
-      ok.style.display = 'block';
+            if ($('adminCard') && $('adminCard').style.display !== 'none') loadMetrics();
+            try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+          } else {
+            throw new Error((out && out.error) || 'Submission failed.');
+          }
 
-      $('f').reset();
-      setDefaultMonth();
-      await loadDates();
-
-      if ($('adminCard') && $('adminCard').style.display !== 'none') {
-        loadMetrics();
-      }
-      try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
-    } else {
-      throw new Error((out && out.error) || 'Submission failed.');
+        } catch(err){
+          $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
+          $('err').style.display='block';
+        } finally{
+          $('submit').disabled = false;
+        }
+      });
     }
 
-  } catch(err){
-    $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-    $('err').style.display='block';
-  } finally{
-    $('submit').disabled = false;
-  }
-});
-}
-    // Boot
-    // Boot logic with localStorage sign-in persistence
-window.addEventListener('load', async () => {
-  const cachedToken = localStorage.getItem('atc_id_token');
-  const cachedTime  = parseInt(localStorage.getItem('atc_id_token_time') || '0', 10);
-  const now = Date.now();
-
-  // If cached token is < 1 hour old, reuse it
-  if (cachedToken && (now - cachedTime < 3600 * 1000)) {
-    ID_TOKEN = cachedToken;
-    document.getElementById('signinOverlay').style.display='none';
-    document.getElementById('app').style.display='block';
-    console.log('✅ Reusing existing sign-in token.');
-    initAfterSignIn();
-  } else {
-    console.log('🕓 Need to sign in again.');
-    initGIS();
-  }
-});
-
+    // Boot: reuse sign-in for 1 hour if available
+    window.addEventListener('load', () => {
+      const cachedToken = localStorage.getItem('atc_id_token');
+      const cachedTime  = parseInt(localStorage.getItem('atc_id_token_time') || '0', 10);
+      const now = Date.now();
+      if (cachedToken && (now - cachedTime < 3600 * 1000)) {
+        ID_TOKEN = cachedToken;
+        document.getElementById('signinOverlay').style.display='none';
+        document.getElementById('app').style.display='block';
+        initAfterSignIn();
+      } else {
+        initGIS();
+      }
+    });
   </script>
 </body>
 </html>
