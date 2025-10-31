@@ -354,23 +354,59 @@
     }
 
     async function loadDates(){
-      const month = $('month').value;
-      $('date').innerHTML = '';
-      try{
-        const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        const {cal, profile, isAdmin} = await getJSON(url);
-        PROFILE = profile || null;
-        if(isAdmin){ $('adminCard').style.display='block'; loadMetrics(); }
-        if(!cal || cal.length===0){
-          $('date').insertAdjacentHTML('beforeend','<option value="">No dates</option>');
-          return;
-        }
-        cal.forEach(d => $('date').insertAdjacentHTML('beforeend','<option value="'+d.ServiceDate+'">'+d.ServiceDate+' — '+(d.Title||'Service')+'</option>'));
-        refreshRolesAndRoster();
-      }catch(e){
-        const el = $('signinError'); el.textContent = (e && e.message) ? e.message : 'Failed to load dates.'; el.style.display='block';
-      }
+  const $month = $('month');
+  const $date  = $('date');
+
+  // Ensure month is set
+  if (!$month.value) setDefaultMonth();
+  const month = $month.value;
+  $date.innerHTML = '';
+
+  try{
+    const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+    const res = await jsonp(url);
+    console.log('[loadDates] response:', res);
+
+    const cal = Array.isArray(res?.cal) ? res.cal : [];
+    const isAdmin = !!res?.isAdmin;
+
+    if (isAdmin) { $('adminCard').style.display = 'block'; loadMetrics(); }
+
+    if (!cal.length) {
+      $date.insertAdjacentHTML('beforeend','<option value="">No dates</option>');
+      console.log('[loadDates] inserted 0 options');
+      return;
     }
+
+    // Insert options
+    for (const d of cal) {
+      const iso = d.ServiceDate;
+      const title = d.Title || 'Service';
+      $date.insertAdjacentHTML('beforeend', `<option value="${iso}">${iso} — ${title}</option>`);
+    }
+
+    // Force-select the first date if none selected
+    if (!$date.value && cal[0]) {
+      $date.value = cal[0].ServiceDate;
+    }
+
+    // Diagnostics
+    console.log('[loadDates] options count:', $date.options.length);
+    console.log('[loadDates] selected value:', $date.value);
+    console.log('[loadDates] innerHTML:', $date.innerHTML.slice(0,180));
+
+    // Kick off roles/roster
+    // (wrap in microtask to ensure DOM paints first)
+    setTimeout(() => refreshRolesAndRoster(), 0);
+
+  } catch(e){
+    console.error('loadDates error:', e);
+    const el = $('signinError');
+    el.textContent = (e && e.message) ? e.message : 'Failed to load dates.';
+    el.style.display = 'block';
+  }
+}
+
 
     async function initAfterSignIn(){
 
@@ -383,7 +419,7 @@
   $('phone').addEventListener('input', ()=> phoneMask($('phone')));
   $('month').addEventListener('change', loadDates);
   $('date').addEventListener('change', refreshRolesAndRoster);
-  loadDates();
+  await loadDates();
 
   $('f').addEventListener('submit', async (e)=>{
     e.preventDefault();
