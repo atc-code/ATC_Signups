@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATC Monthly Signups</title>
   <style>
+    .monthGrid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+@media (max-width: 860px){ .monthGrid { grid-template-columns:1fr; } }
+.sundayCard { border:1px solid #e2e8f0; border-radius:12px; padding:12px; }
+.sundayHead { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.roleList { display:grid; grid-template-columns: 1fr; gap:8px; }
+.roleItem { display:flex; align-items:center; gap:10px; }
+.roleLeft { color:#64748b; font-size:.95rem; }
+.badge { font-size:.82rem; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
+
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f7f7fb; color:#1a202c; }
@@ -94,19 +103,25 @@
       <!-- Submit form -->
       <section class="card" id="formCard">
         <form id="f" autocomplete="on">
-          <fieldset>
-            <legend>Service</legend>
-            <div class="grid-2">
-              <div>
-                <label for="month">Month<span class="req">*</span></label>
-                <input type="month" id="month">
-              </div>
-              <div>
-                <label for="date">Service Date<span class="req">*</span></label>
-                <select id="date"></select>
-              </div>
-            </div>
-          </fieldset>
+          <!-- Service -->
+<fieldset>
+  <legend>Service</legend>
+  <div class="grid-2">
+    <div>
+      <label for="month">Month<span class="req">*</span></label>
+      <input type="month" id="month">
+      <div class="muted" style="margin-top:6px">Pick a month; Sundays will appear below with roles.</div>
+    </div>
+  </div>
+</fieldset>
+
+<!-- Month Sundays + roles (auto-generated) -->
+<section class="card" id="monthGridCard">
+  <h2 style="margin-top:0;">Select Sundays & Roles</h2>
+  <div id="monthGrid" class="monthGrid">
+    <div class="muted">Select a month to load Sundays…</div>
+  </div>
+</section>
 
           <fieldset>
             <legend>Contact information</legend>
@@ -251,6 +266,112 @@
     document.head.appendChild(s);
   });
 }
+    // Store per-date roles/remaining in memory so we don't refetch on every tiny change
+const MonthState = {
+  dates: [],            // array of ISO 'yyyy-MM-dd'
+  byDate: {},           // { date: { roles:[{role,limit}], remaining:{role:n|null} } }
+};
+
+// Render the grid of Sunday cards
+function renderMonthGrid(cal){
+  const grid = $('monthGrid');
+  grid.innerHTML = '';
+
+  if (!cal || !cal.length){
+    grid.innerHTML = '<div class="muted">No Sundays found for this month.</div>';
+    return;
+  }
+
+  MonthState.dates = cal.map(d => d.ServiceDate);
+  MonthState.byDate = {}; // reset cache
+
+  // Create basic empty cards first (roles will load async)
+  for (const d of cal){
+    const id = `day_${d.ServiceDate}`;
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="sundayCard" id="${id}">
+        <div class="sundayHead">
+          <div><strong>${d.ServiceDate}</strong> <span class="badge">${d.Title || 'Service'}</span></div>
+          <label style="display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" class="day-enable" data-date="${d.ServiceDate}">
+            <span class="roleLeft">Include this date</span>
+          </label>
+        </div>
+        <div class="roleList" data-date="${d.ServiceDate}">
+          <div class="muted">Loading roles…</div>
+        </div>
+      </div>
+    `);
+  }
+
+  // Wire “Include this date” toggles → enable/disable role checkboxes
+  grid.querySelectorAll('.day-enable').forEach(chk=>{
+    chk.addEventListener('change', (e)=>{
+      const date = e.target.dataset.date;
+      const list = grid.querySelector(`.roleList[data-date="${date}"]`);
+      const inputs = list.querySelectorAll('input[type="checkbox"][name="role-'+date+'"]');
+      inputs.forEach(i => { i.disabled = !e.target.checked; if (!e.target.checked) i.checked=false; });
+    });
+  });
+
+  // Load roles/remaining for each date (JSONP one-by-one; typical month has 4–5 Sundays)
+  for (const d of cal){
+    loadRolesForDate(d.ServiceDate);
+  }
+}
+
+// Load roles + remaining for a specific date and render into that card
+async function loadRolesForDate(dateISO){
+  try{
+    const month = $('month').value;
+    const url = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(dateISO)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+    const { roles, remaining } = await jsonp(url);
+    MonthState.byDate[dateISO] = { roles, remaining };
+    const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
+    if (!list) return;
+
+    if (!roles || !roles.length){
+      list.innerHTML = '<div class="muted">No roles defined.</div>';
+      return;
+    }
+
+    // Build checkboxes for that date
+    list.innerHTML = '';
+    roles.forEach(r=>{
+      const left = Number.isFinite(remaining?.[r.role]) ? remaining[r.role] : null;
+      const disabledCap = (left!==null) ? (left<=0) : false;
+      list.insertAdjacentHTML('beforeend', `
+        <label class="roleItem">
+          <input type="checkbox" name="role-${dateISO}" value="${r.role.replace(/"/g,'&quot;')}" ${disabledCap?'disabled':''}>
+          <span>${r.role} ${left!==null ? `<span class="badge">${left} left</span>` : ''}</span>
+        </label>
+      `);
+    });
+
+    // Initially keep disabled until the user checks "Include this date"
+    const enable = document.querySelector(`.day-enable[data-date="${dateISO}"]`);
+    const inputs = list.querySelectorAll('input[type="checkbox"]');
+    inputs.forEach(i => i.disabled = !(enable && enable.checked));
+
+  }catch(e){
+    const list = document.querySelector(`.roleList[data-date="${dateISO}"]`);
+    if (list) list.innerHTML = `<div class="muted">Failed to load roles.</div>`;
+    console.error('loadRolesForDate error:', e);
+  }
+}
+
+// Gather all selected roles across all selected Sundays for one submit
+function collectMonthSelections(){
+  const picks = []; // [{ date:'yyyy-MM-dd', roles:[...] }]
+  for (const date of MonthState.dates){
+    const enabled = document.querySelector(`.day-enable[data-date="${date}"]`);
+    if (!enabled || !enabled.checked) continue;
+    const selected = [...document.querySelectorAll(`input[name="role-${date}"]:checked`)].map(x=>x.value);
+    if (selected.length) picks.push({ date, roles: selected });
+  }
+  return picks;
+}
+
     async function loadDates(){
     const month = $('month').value;
     const $date = $('date');
@@ -296,30 +417,6 @@
       el.value = p[0] || v;
     }
 
-    async function refreshRolesAndRoster(){
-  const month = $('month').value;
-  const date  = $('date').value;
-  if (!month || !date) return;
-
-  try{
-    const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const { roles, remaining } = await jsonp(rolesUrl);
-    renderRoles(roles, remaining);
-  }catch(e){
-    console.error('roles error:', e);
-    alert(e.message || 'Failed to load roles');
-  }
-
-  try{
-    const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-    const roster = await jsonp(rosterUrl);
-    renderRoster(roster);
-  }catch(e){
-    console.error('roster error:', e);
-    alert(e.message || 'Failed to load roster');
-  }
-}
-
     async function loadMetrics(){
   try{
     const url = `${ENDPOINT}?mode=metrics&id_token=${encodeURIComponent(ID_TOKEN)}`;
@@ -332,81 +429,31 @@
   }catch(_){}
 }
 
-    async function refreshRolesAndRoster(){
-      const month = $('month').value, date = $('date').value;
-      if(!month || !date) return;
-
-      try{
-        const rolesUrl = `${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        const {roles, remaining} = await getJSON(rolesUrl);
-        renderRoles(roles, remaining);
-      }catch(e){
-        alert(e.message || 'Failed to load roles');
-      }
-
-      try{
-        const rosterUrl = `${ENDPOINT}?mode=roster&month=${encodeURIComponent(month)}&date=${encodeURIComponent(date)}&id_token=${encodeURIComponent(ID_TOKEN)}`;
-        const roster = await getJSON(rosterUrl);
-        renderRoster(roster);
-      }catch(e){
-        alert(e.message || 'Failed to load roster');
-      }
-    }
-
     async function loadDates(){
   const $month = $('month');
-  const $date  = $('date');
-
-  // Ensure month is set
   if (!$month.value) setDefaultMonth();
   const month = $month.value;
-  $date.innerHTML = '';
 
   try{
     const url = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
     const res = await jsonp(url);
-    console.log('[loadDates] response:', res);
+    console.log('[loadDates] calendar →', res);
 
     const cal = Array.isArray(res?.cal) ? res.cal : [];
-    const isAdmin = !!res?.isAdmin;
-
-    if (isAdmin) { $('adminCard').style.display = 'block'; loadMetrics(); }
-
-    if (!cal.length) {
-      $date.insertAdjacentHTML('beforeend','<option value="">No dates</option>');
-      console.log('[loadDates] inserted 0 options');
+    if (!cal.length){
+      $('monthGrid').innerHTML = '<div class="muted">No Sundays found for this month.</div>';
       return;
     }
 
-    // Insert options
-    for (const d of cal) {
-      const iso = d.ServiceDate;
-      const title = d.Title || 'Service';
-      $date.insertAdjacentHTML('beforeend', `<option value="${iso}">${iso} — ${title}</option>`);
-    }
+    renderMonthGrid(cal);  // builds empty cards, then loads per-date roles
 
-    // Force-select the first date if none selected
-    if (!$date.value && cal[0]) {
-      $date.value = cal[0].ServiceDate;
-    }
-
-    // Diagnostics
-    console.log('[loadDates] options count:', $date.options.length);
-    console.log('[loadDates] selected value:', $date.value);
-    console.log('[loadDates] innerHTML:', $date.innerHTML.slice(0,180));
-
-    // Kick off roles/roster
-    // (wrap in microtask to ensure DOM paints first)
-    setTimeout(() => refreshRolesAndRoster(), 0);
-
-  } catch(e){
+  }catch(e){
     console.error('loadDates error:', e);
     const el = $('signinError');
-    el.textContent = (e && e.message) ? e.message : 'Failed to load dates.';
+    el.textContent = (e && e.message) ? e.message : 'Failed to load Sundays.';
     el.style.display = 'block';
   }
 }
-
 
     async function initAfterSignIn(){
 
@@ -422,49 +469,54 @@
   await loadDates();
 
   $('f').addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const month = $('month').value, date = $('date').value;
-    const first = $('first').value.trim(), last = $('last').value.trim();
-    const email = $('email').value.trim(), phone = $('phone').value.trim();
-    const comments = $('notes').value.trim();
-    const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
-    const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+  e.preventDefault();
 
-    if(!month||!date||!re.test(first)||!re.test(last)||!email||!phone||roles.length===0){
-      $('err').style.display='block'; $('err').textContent='Please fill all required fields.'; return;
+  const month = $('month').value;
+  const first = $('first').value.trim(), last = $('last').value.trim();
+  const email = $('email').value.trim(), phone = $('phone').value.trim();
+  const comments = $('notes').value.trim();
+  const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+
+  // Gather selected dates + roles
+  const selections = collectMonthSelections(); // [{date, roles:[]}]
+
+  if(!month || !re.test(first) || !re.test(last) || !email || !phone || !selections.length){
+    $('err').style.display='block';
+    $('err').textContent='Please fill all fields and pick at least one date & role.';
+    return;
+  }
+
+  $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
+
+  try{
+    const url = `${ENDPOINT}?mode=submit_month_get`
+      + `&id_token=${encodeURIComponent(ID_TOKEN)}`
+      + `&month=${encodeURIComponent(month)}`
+      + `&firstName=${encodeURIComponent(first)}`
+      + `&lastName=${encodeURIComponent(last)}`
+      + `&email=${encodeURIComponent(email)}`
+      + `&phone=${encodeURIComponent(phone)}`
+      + `&comments=${encodeURIComponent(comments)}`
+      + `&selections=${encodeURIComponent(JSON.stringify(selections))}`; // JSON string of picks
+
+    const out = await jsonp(url);
+    if (out && out.ok){
+      $('ok').style.display='block';
+      $('f').reset();
+      setDefaultMonth();
+      await loadDates();  // rebuild month grid
+      if ($('adminCard').style.display !== 'none') loadMetrics();
+    } else {
+      throw new Error((out && out.error) || 'Submission failed.');
     }
-    $('submit').disabled = true; $('ok').style.display='none'; $('err').style.display='none';
 
-    try{
-      // JSONP submit via GET
-      const url = `${ENDPOINT}?mode=submit_get`
-        + `&id_token=${encodeURIComponent(ID_TOKEN)}`
-        + `&month=${encodeURIComponent(month)}`
-        + `&date=${encodeURIComponent(date)}`
-        + `&firstName=${encodeURIComponent(first)}`
-        + `&lastName=${encodeURIComponent(last)}`
-        + `&email=${encodeURIComponent(email)}`
-        + `&phone=${encodeURIComponent(phone)}`
-        + `&comments=${encodeURIComponent(comments)}`
-        + `&roles=${encodeURIComponent(roles.join(','))}`;
-
-      const out = await jsonp(url);
-      if (out && out.ok) {
-        $('ok').style.display='block';
-        $('f').reset();
-        refreshRolesAndRoster();
-        loadMetrics();
-      } else {
-        throw new Error((out && out.error) || 'Submission failed.');
-      }
-    }catch(err){
-      $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
-      $('err').style.display='block';
-      refreshRolesAndRoster();
-    }finally{
-      $('submit').disabled = false;
-    }
-  });
+  }catch(err){
+    $('err').textContent = (err && err.message) ? err.message : 'Submission failed.';
+    $('err').style.display='block';
+  }finally{
+    $('submit').disabled = false;
+  }
+});
 }
     // Boot
     // Boot logic with localStorage sign-in persistence
