@@ -204,12 +204,12 @@
   const $ = id => document.getElementById(id);
 
   function isTodayOrFutureISO(iso){
-    const [y,m,d] = iso.split('-').map(Number);
-    const dt = new Date(y, m-1, d);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return dt.getTime() >= today.getTime();
-  }
+  // iso = "YYYY-MM-DD"
+  if(!iso) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(iso + 'T00:00:00');
+  return d >= today;
+}
 
   function phoneMask(el){
     let v = el.value.replace(/\D/g,'').slice(0,10);
@@ -236,29 +236,40 @@
 
   /* ====== Rendering ====== */
   function renderSundays(cal){
-  const box = $('sundays'); box.innerHTML = '';
-  const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
-  const submitBtn = $('submit');
+  // cal is an array of { ServiceDate: "YYYY-MM-DD", Title: "..." }
+  const box = document.getElementById('sundays');
+  const submitBtn = document.getElementById('submitBtn');
 
+  // Safety: if container or button aren't found, do nothing
+  if (!box || !submitBtn) return;
+
+  // Clear current UI
+  box.innerHTML = '';
+
+  // Keep only today-or-future Sundays
+  const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
+
+  // If no Sundays left, show message and disable submit
   if (!upcoming.length){
     box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
-    if (submitBtn) submitBtn.disabled = true;
+    submitBtn.disabled = true;
     return;
   }
 
-  // We have Sundays: enable submit
-  if (submitBtn) submitBtn.disabled = false;
+  // We have Sundays -> enable submit
+  submitBtn.disabled = false;
 
+  // Render pretty chips like "November 24, 2025"
   upcoming.forEach(d=>{
-    const pretty = new Date(d.ServiceDate+'T00:00:00').toLocaleDateString(undefined,
-      {year:'numeric',month:'long',day:'numeric'});
+    const pretty = new Date(d.ServiceDate + 'T00:00:00').toLocaleDateString(
+      undefined, { year:'numeric', month:'long', day:'numeric' }
+    );
     const chip = document.createElement('span');
     chip.className = 'chip';
     chip.textContent = pretty;
     box.appendChild(chip);
   });
 }
-
   function renderRoles(roles, remaining){
     const wrap = $('roles'); wrap.innerHTML = '';
     if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles for this month.</div>'; return; }
