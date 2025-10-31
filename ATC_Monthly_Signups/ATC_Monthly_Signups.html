@@ -2,113 +2,102 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ATC Monthly Signups</title>
+
 <style>
-  :root{--max:1000px;--pad:18px;--radius:16px;--accent:#2b6cb0}
+  :root{--max:1100px;--pad:18px;--radius:16px;--accent:#2b6cb0;}
   *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7fb;color:#111827}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7fb;color:#0f172a}
 
-  /* Banner */
-header { background:#172230; color:#fff; }
-.headerInner{
-  max-width:1100px;
-  margin:0 auto;
-  position:relative;
-  text-align:center;
-  padding:28px clamp(16px,3vw,24px);
-  /* leave room so centered text doesn't overlap the logo */
-  padding-left:128px;        
-}
-.headerLogo{
-  position:absolute;
-  left:clamp(12px,3vw,24px); /* hugs the left nicely on all screens */
-  top:50%;
-  transform:translateY(-50%);
-  height:84px; width:84px;
-  border-radius:12px;
-  background:#fff; padding:10px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-
-@media (max-width:720px){
-  .headerInner{ padding-left:96px; }
-  .headerLogo{ height:64px; width:64px; }
-}
-
-header h1{
-  margin:0 0 8px;
-  font-size:clamp(1.6rem,4.2vw,2.4rem);
-  line-height:1.25;
-}
-header p{
-  margin:0;
-  opacity:.95;
-  font-style:italic;
-  font-size:clamp(1rem,2.4vw,1.15rem);
-}
- /* Layout */
-  main{max-width:var(--max);margin:18px auto;padding:0 var(--pad);display:grid;gap:16px}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:0 8px 28px rgba(0,0,0,.08);padding:18px}
-
-  fieldset{border:0;margin:0 0 12px;padding:0}
-  legend{font-weight:900;margin-bottom:10px;font-size:1.2rem} /* bigger sub-headers */
-  label{font-weight:600;display:block;margin:6px 0}
-
-  input[type="text"],input[type="email"],input[type="month"],textarea{
-    width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff
+  /* ===== Header with left logo, centered title/verse ===== */
+  header{background:#172230;color:#fff}
+  .headerInner{
+    max-width:var(--max);
+    margin:0 auto;
+    position:relative;
+    text-align:center;
+    padding:28px clamp(16px,3vw,24px);
+    padding-left:128px;              /* keeps text from overlapping the logo */
   }
-  textarea{min-height:90px;resize:vertical}
+  .headerLogo{
+    position:absolute; left:clamp(12px,3vw,24px); top:50%; transform:translateY(-50%);
+    height:84px;width:84px;border-radius:12px;background:#fff;padding:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  header h1{margin:0 0 8px;font-size:clamp(1.6rem,4.2vw,2.4rem);line-height:1.25}
+  header p{margin:0;opacity:.95;font-style:italic;font-size:clamp(1rem,2.4vw,1.15rem)}
+  @media (max-width:720px){
+    .headerInner{padding-left:96px}
+    .headerLogo{height:64px;width:64px}
+  }
 
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media (max-width:900px){.grid2{grid-template-columns:1fr}.hdr{grid-template-columns:80px 1fr}.logo{width:80px;height:80px}}
+  /* ===== Layout cards ===== */
+  main{max-width:var(--max);margin:22px auto;padding:0 var(--pad);display:grid;gap:16px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:0 6px 24px rgba(0,0,0,.08);padding:18px}
+  .sectionTitle{margin:0 0 12px;font-size:1.4rem;letter-spacing:.2px}
 
-  /* Teams: one column */
+  /* Service month grid (month + sundays list) */
+  .monthGrid{display:grid;gap:16px}
+  @media (min-width:900px){ .monthGrid{grid-template-columns:1fr 1fr} }
+
+  label{font-weight:700;display:block;margin:8px 0 6px}
+  input[type="month"],input[type="text"],input[type="email"],textarea,select{
+    width:100%;padding:12px 14px;border:1px solid #e3e6ef;border-radius:14px;font-size:1rem;background:#fff
+  }
+  textarea{min-height:96px;resize:vertical}
+  .muted{color:#667085}
+
+  /* Remaining Sundays list: one column, smaller pills */
+  #sundays{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding-top:8px}
+  .chip{display:inline-block;border:1px solid #e3e6ef;border-radius:999px;padding:6px 10px;font-size:.95rem;background:#fff}
+
+  /* Roles vs Contact two-column layout (40/60) */
+  .wideContact{display:grid;gap:16px}
+  @media (min-width:900px){ .wideContact{grid-template-columns:40% 60%} }
+  @media (max-width:899px){ .wideContact{grid-template-columns:1fr} }
+
+  .team{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid #e3e6ef;border-radius:14px}
   .teams{display:grid;grid-template-columns:1fr;gap:10px}
-  .team{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px}
+  .rolesCol .team{max-width:680px}
 
-  /* Remaining Sundays list: one column + smaller text */
-#sundays{
-  display: flex;
-  flex-direction: column;   /* stack vertically */
-  gap: 8px;                 /* space between items */
-  align-items: flex-start;  /* left align */
-}
-
-#sundays .chip{
-  font-size: 0.95rem;       /* smaller */
-  padding: 6px 10px;        /* tighter pill */
-  border-radius: 10px;
-}
-
-@media (max-width: 720px){
-  #sundays .chip{ font-size: 0.9rem; }
-}
-
-
-  /* Two-column form layout: Teams (left) + Contact (right) */
-  .formGrid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-  @media (max-width:1000px){.formGrid{grid-template-columns:1fr}}
-
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  button{border:0;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+  .actions{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  button{border:0;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer;font-size:1rem}
   .primary{background:var(--accent);color:#fff}
-  .secondary{background:#eef2f7}
+  .secondary{background:#edf2f7}
+  .msg{margin-top:12px;padding:12px 14px;border-radius:12px;display:none}
+  .success{background:#e6fffa;border:1px solid #b2f5ea;color:#234e52}
+  .error{background:#fff5f5;border:1px solid #fed7d7;color:#7f1d1d}
 
-  .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:12px}
-  .ok{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
-  .err{background:#fff5f5;border:1px solid #fecaca;color:#7f1d1d}
-
-  /* Roster table */
+  /* Current signups table */
   .tableWrap{overflow-x:auto}
   table{width:100%;border-collapse:collapse}
-  th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-  th{color:#374151;font-size:.95rem}
+  th,td{padding:10px 8px;border-bottom:1px solid #e3e6ef;text-align:left}
+  th{color:#334155;font-weight:800}
 
-  footer{padding:10px 0 24px;text-align:center;color:#6b7280}
+  footer{max-width:var(--max);margin:6px auto 28px;padding:0 var(--pad);text-align:center;color:#475569}
+  footer a{color:inherit;text-decoration:underline}
+  .site-footer{
+  background:#0f172a;           /* subtle dark bar (harmonizes with header) */
+  color:#cbd5e1;
+  margin-top: 8px;
+}
+.site-footer .foot-inner{
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 14px var(--pad);
+  text-align:center;
+  font-size:.95rem;
+  letter-spacing:.2px;
+}
+.site-footer a{ color:#e2e8f0; text-decoration: underline; }
+.site-footer a:hover{ text-decoration: none; }
 </style>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
 <header>
   <div class="headerInner">
     <img class="headerLogo" src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="ATC logo">
@@ -118,249 +107,250 @@ header p{
 </header>
 
 <main>
-  <!-- Month + Sundays info -->
+  <!-- Service Month -->
   <section class="card">
-    <fieldset>
-      <legend>Service Month<span style="color:#b91c1c;margin-left:6px">*</span></legend>
-      <div class="grid2">
-        <div>
-          <label for="month">Select Month</label>
-          <input type="month" id="month">
-        </div>
-        <div>
-          <label>Remaining Sundays (for info)</label>
-          <div id="sundays" class="chips"><span class="muted">Select a month…</span></div>
-        </div>
+    <h2 class="sectionTitle">Service Month <span style="color:#c00">*</span></h2>
+    <div class="monthGrid">
+      <div>
+        <label for="month">Select Month</label>
+        <input type="month" id="month">
       </div>
-    </fieldset>
+      <div>
+        <label>Remaining Sundays (for info)</label>
+        <div id="sundays"><span class="muted">Select a month…</span></div>
+      </div>
+    </div>
   </section>
 
-  <!-- Signup form -->
+  <!-- Roles + Contact -->
   <section class="card">
-    <form id="f" autocomplete="on">
-      <div class="formGrid">
-        <!-- Left: Teams -->
-        <div>
-          <fieldset>
-            <legend>Choose your team(s)<span style="color:#b91c1c;margin-left:6px">*</span></legend>
-            <div id="roles" class="teams"><div class="muted">Pick a month to load roles…</div></div>
-          </fieldset>
+    <div class="wideContact">
+      <!-- Roles -->
+      <fieldset class="rolesCol">
+        <legend class="sectionTitle">Choose your team(s) <span style="color:#c00">*</span></legend>
+        <div id="roles" class="teams"><div class="muted">Pick a month to load roles…</div></div>
+      </fieldset>
+
+      <!-- Contact -->
+      <fieldset class="contactCol">
+        <legend class="sectionTitle">Contact information</legend>
+        <div style="display:grid;gap:12px;grid-template-columns:1fr 1fr">
+          <div>
+            <label for="first">First Name<span style="color:#c00">*</span></label>
+            <input id="first" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., John">
+          </div>
+          <div>
+            <label for="last">Last Name<span style="color:#c00">*</span></label>
+            <input id="last" type="text" required minlength="4" pattern="[A-Za-z][A-Za-z\s\-']{3,}" placeholder="e.g., Doe">
+          </div>
+          <div>
+            <label for="email">Email<span style="color:#c00">*</span></label>
+            <input id="email" type="email" required placeholder="name@example.com">
+          </div>
+          <div>
+            <label for="phone">Phone<span style="color:#c00">*</span></label>
+            <input id="phone" type="text" inputmode="tel" required placeholder="(###) ###-####">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label for="notes">Comments / Notes</label>
+          <textarea id="notes" placeholder="Any preferences or dates you can’t make…"></textarea>
         </div>
 
-        <!-- Right: Contact -->
-        <div>
-          <fieldset>
-            <legend>Contact information</legend>
-            <div class="grid2">
-              <div>
-                <label for="first">First Name<span style="color:#b91c1c">*</span></label>
-                <input id="first" type="text" required minlength="4" placeholder="e.g., John">
-              </div>
-              <div>
-                <label for="last">Last Name<span style="color:#b91c1c">*</span></label>
-                <input id="last" type="text" required minlength="4" placeholder="e.g., Doe">
-              </div>
-            </div>
-            <div class="grid2">
-              <div>
-                <label for="email">Email<span style="color:#b91c1c">*</span></label>
-                <input id="email" type="email" required placeholder="name@example.com">
-              </div>
-              <div>
-                <label for="phone">Phone<span style="color:#b91c1c">*</span></label>
-                <input id="phone" type="text" inputmode="tel" required placeholder="(###) ###-####">
-              </div>
-            </div>
-            <div>
-              <label for="notes">Comments / Notes</label>
-              <textarea id="notes" placeholder="Any preferences or dates you can’t make…"></textarea>
-            </div>
-          </fieldset>
+        <div class="actions">
+          <button class="primary" type="button" id="submit">Submit</button>
+          <button class="secondary" type="reset" id="clearBtn">Clear</button>
         </div>
-      </div>
-
-      <div class="actions">
-        <button type="submit" id="submit" class="primary">Submit</button>
-        <button type="reset" class="secondary">Clear</button>
-      </div>
-      <div id="ok" class="msg ok">Thank you! Your monthly signup was recorded. A confirmation email is on its way.</div>
-      <div id="err" class="msg err">Sorry, something went wrong.</div>
-    </form>
+        <div id="ok" class="msg success">Thank you! Your signup was recorded.</div>
+        <div id="err" class="msg error">Sorry, something went wrong.</div>
+      </fieldset>
+    </div>
   </section>
 
-  <!-- Roster (bottom, tabular) -->
+  <!-- Current Signups (bottom) -->
   <section class="card">
-    <h2 style="margin:0 0 10px">Current Signups</h2>
+    <h2 class="sectionTitle">Current Signups</h2>
     <div class="tableWrap">
       <table>
-        <thead><tr><th style="width:32%">Role</th><th>Volunteers</th></tr></thead>
-        <tbody id="roster"><tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr></tbody>
+        <thead><tr><th>Role</th><th>Volunteer</th><th>Notes</th></tr></thead>
+        <tbody id="roster"><tr><td colspan="3" class="muted">No signups yet.</td></tr></tbody>
       </table>
     </div>
   </section>
 </main>
 
-<footer>© Atlanta Telugu Church and/or https://atlantateluguchurch.org/</footer>
+<footer class="site-footer">
+  <div class="foot-inner">
+    <span id="foot-year"></span> <a href="https://atlantateluguchurch.org/" target="_blank" rel="noopener">
+      Atlanta Telugu Church
+    </a> • All rights reserved
+  </div>
+</footer>
+
 
 <script>
-  // === CONFIG ===
+  /* ====== Config ====== */
   const ENDPOINT = "https://script.google.com/macros/s/AKfycbxm8ojZW3cMZS_CWtJo-CdLY5Ph2zm3d7pooGWovtlxYkqrNaj4ih_ru5bhrEoCgL7k/exec";
 
-  // === HELPERS ===
-  const $ = (id)=>document.getElementById(id);
+  /* ====== Helpers ====== */
+  const $ = id => document.getElementById(id);
 
-  function jsonp(url){
-    return new Promise((res, rej)=>{
-      const cb = 'cb_' + Math.random().toString(36).slice(2);
-      const s  = document.createElement('script');
-      const q  = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
-      window[cb] = (data)=>{ delete window[cb]; s.remove(); res(data); };
-      s.onerror = ()=>{ delete window[cb]; s.remove(); rej(new Error('Network/JSONP error')); };
-      s.src = q;
-      document.body.appendChild(s);
-    });
-  }
-
-  function setDefaultMonth(){
+  function isTodayOrFutureISO(iso){
+    const [y,m,d] = iso.split('-').map(Number);
+    const dt = new Date(y, m-1, d);
     const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth()+1).padStart(2,'0');
-    $('month').value = y + '-' + m;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return dt.getTime() >= today.getTime();
   }
 
   function phoneMask(el){
     let v = el.value.replace(/\D/g,'').slice(0,10);
-    let o = '';
-    if (v.length>0) o = '(' + v.substring(0, Math.min(3,v.length));
-    if (v.length>=4) o += ') ' + v.substring(3, Math.min(6,v.length));
-    if (v.length>=7) o += '-' + v.substring(6, 10);
-    el.value = o || v;
+    let out = '';
+    if (v.length > 0) out = '(' + v.substring(0,Math.min(3,v.length));
+    if (v.length >= 4) out += ') ' + v.substring(3,Math.min(6,v.length));
+    if (v.length >= 7) out += '-' + v.substring(6,10);
+    el.value = out || v;
   }
+
+  // JSONP helper to avoid CORS
+  function jsonp(url){
+    return new Promise((resolve,reject)=>{
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      const s = document.createElement('script');
+      const timeout = setTimeout(()=>{ cleanup(); reject(new Error('Timeout')); }, 15000);
+      window[cb] = (data)=>{ cleanup(); resolve(data); };
+      function cleanup(){ clearTimeout(timeout); delete window[cb]; s.remove(); }
+      s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+      s.onerror = ()=>{ cleanup(); reject(new Error('Network error')); };
+      document.head.appendChild(s);
+    });
+  }
+
+  /* ====== Rendering ====== */
   function renderSundays(cal){
-  const box = $('sundays'); box.innerHTML = '';
-  const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
-  if (!upcoming.length){
-    box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
-    return;
-  }
-  upcoming.forEach(d=>{
-    const pretty = new Date(d.ServiceDate + 'T00:00:00')
-      .toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'});
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.textContent = pretty;
-    box.appendChild(chip);
-  });
-}
-  function renderRoles(roles, remaining){
-    const wrap = $('roles'); wrap.innerHTML = '';
-    if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles configured.</div>'; return; }
-    roles.forEach(r=>{
-      const role = r.role;
-      const left = (remaining && Object.prototype.hasOwnProperty.call(remaining, role)) ? remaining[role] : null;
-      if (left !== null && left <= 0) return; // hide full
-      const label = document.createElement('label');
-      label.className = 'team';
-      label.innerHTML = `<input type="checkbox" name="role" value="${role.replace(/"/g,'&quot;')}"> <span>${role}</span>`;
-      wrap.appendChild(label);
-    });
-    if (!wrap.children.length){
-      wrap.innerHTML = '<div class="muted">All roles are full for this month.</div>';
-    }
-  }
-
-  function renderRoster(roster){
-    const tb = $('roster'); tb.innerHTML = '';
-    const roles = Object.keys(roster||{});
-    if (!roles.length){ tb.innerHTML = '<tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr>'; return; }
-    roles.forEach(role=>{
-      const names = roster[role] || [];
-      if (!names.length) return;
-      const listHtml = names.map(n => `<div class="chip" style="display:inline-block;margin:4px 6px 0 0">${n}</div>`).join('');
-      tb.insertAdjacentHTML('beforeend', `<tr><td><strong>${role}</strong></td><td>${listHtml}</td></tr>`);
-    });
-  }
-
-  function isTodayOrFutureISO(iso){
-  // iso = 'YYYY-MM-DD'
-  const [y,m,d] = iso.split('-').map(Number);
-  const dt = new Date(y, m-1, d);           // local midnight
-  const now = new Date();                   // now
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return dt.getTime() >= today.getTime();
-  }
-  async function refreshForMonth(){
-    const month = $('month').value;
-    if (!month){
-      $('sundays').innerHTML = '<span class="muted">Select a month…</span>';
-      $('roles').innerHTML = '<div class="muted">Pick a month to load roles…</div>';
-      $('roster').innerHTML = '<tr><td colspan="2"><span class="muted">No signups yet.</span></td></tr>';
+    const box = $('sundays'); box.innerHTML = '';
+    const upcoming = (cal || []).filter(d => isTodayOrFutureISO(d.ServiceDate));
+    if (!upcoming.length){
+      box.innerHTML = '<span class="muted">No Sundays remaining.</span>';
       return;
     }
+    upcoming.forEach(d=>{
+      const pretty = new Date(d.ServiceDate+'T00:00:00').toLocaleDateString(undefined,
+        {year:'numeric',month:'long',day:'numeric'});
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = pretty;
+      box.appendChild(chip);
+    });
+  }
+
+  function renderRoles(roles, remaining){
+    const wrap = $('roles'); wrap.innerHTML = '';
+    if (!roles || !roles.length){ wrap.innerHTML = '<div class="muted">No roles for this month.</div>'; return; }
+    roles.forEach(r=>{
+      const left = Number.isFinite(remaining?.[r.role]) ? remaining[r.role] : null;
+      const full = (left !== null) && (left <= 0);
+      if (full) return; // hide full roles entirely
+      wrap.insertAdjacentHTML('beforeend',
+        `<label class="team"><input type="checkbox" name="role" value="${r.role.replace(/"/g,'&quot;')}"> ${r.role}</label>`
+      );
+    });
+  }
+
+  function renderRoster(rows){
+    const tb = $('roster'); tb.innerHTML = '';
+    if (!rows || !rows.length){
+      tb.innerHTML = '<tr><td colspan="3" class="muted">No signups yet.</td></tr>';
+      return;
+    }
+    // Expecting rows of { role, name, notes, ts } already sorted by time in backend
+    rows.forEach(r=>{
+      const role  = r.role || '';
+      const name  = r.name || '';
+      const notes = r.notes || '';
+      tb.insertAdjacentHTML('beforeend', `<tr><td>${role}</td><td>${name}</td><td>${notes}</td></tr>`);
+    });
+  }
+
+  /* ====== Data flow ====== */
+  async function loadForMonth(){
+    const month = $('month').value;
+    if (!month){ $('sundays').innerHTML = '<span class="muted">Select a month…</span>'; return; }
 
     try{
       const calResp = await jsonp(`${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}`);
-      renderSundays((calResp && calResp.cal) || []);
+      renderSundays(calResp.cal || []);
 
-      const rr = await jsonp(`${ENDPOINT}?mode=roles_remaining&month=${encodeURIComponent(month)}`);
-      renderRoles((rr && rr.roles)||[], (rr && rr.remaining)||{});
+      const rolesResp = await jsonp(`${ENDPOINT}?mode=roles&month=${encodeURIComponent(month)}`);
+      renderRoles(rolesResp.roles || [], rolesResp.remaining || {});
 
-      const ro = await jsonp(`${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}`);
-      renderRoster(ro && ro.roster);
+      const rosterResp = await jsonp(`${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}`);
+      renderRoster(rosterResp.rows || []);
     }catch(e){
       console.error(e);
-      $('roles').innerHTML = '<div class="muted">Failed to load. Try again.</div>';
+      $('sundays').innerHTML = '<span class="muted">Failed to load Sundays.</span>';
     }
   }
 
-  // === INIT ===
+  document.addEventListener('DOMContentLoaded', ()=>{
+  const y = new Date().getFullYear();
+  const el = document.getElementById('foot-year');
+  if (el) el.textContent = `© ${y} `;
+});
+
+
+  async function submitForm(){
+    const month = $('month').value;
+    const first = $('first').value.trim();
+    const last  = $('last').value.trim();
+    const email = $('email').value.trim();
+    const phone = $('phone').value.trim();
+    const notes = $('notes').value.trim();
+    const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
+    const re = /^[A-Za-z][A-Za-z\s\-']{3,}$/;
+
+    if(!month || !re.test(first) || !re.test(last) || !email || !phone || roles.length===0){
+      $('err').textContent = 'Please fill all required fields.';
+      $('err').style.display = 'block';
+      return;
+    }
+
+    $('ok').style.display='none';
+    $('err').style.display='none';
+    $('submit').disabled = true;
+
+    try{
+      const url = `${ENDPOINT}?mode=submit_month`
+        + `&month=${encodeURIComponent(month)}`
+        + `&first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}`
+        + `&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`
+        + `&notes=${encodeURIComponent(notes)}`
+        + `&roles=${encodeURIComponent(roles.join(','))}`;
+      const out = await jsonp(url);
+      if (!out || !out.ok) throw new Error(out && out.error || 'Submission failed');
+      $('ok').style.display='block';
+      // clear roles only; keep month & contact in place
+      document.querySelectorAll('input[name="role"]:checked').forEach(x=>x.checked=false);
+      $('notes').value='';
+      // refresh roster & roles
+      await loadForMonth();
+    }catch(err){
+      $('err').textContent = err.message || 'Submission failed.';
+      $('err').style.display = 'block';
+    }finally{
+      $('submit').disabled = false;
+    }
+  }
+
+  /* ====== Boot ====== */
   window.addEventListener('load', ()=>{
-    setDefaultMonth();
-    refreshForMonth();
-    $('month').addEventListener('change', refreshForMonth);
+    // Don’t auto-select a month; keep current value if user already picked one
     $('phone').addEventListener('input', ()=> phoneMask($('phone')));
-
-    $('f').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const month = $('month').value;
-      const roles = [...document.querySelectorAll('input[name="role"]:checked')].map(x=>x.value);
-      const first = $('first').value.trim();
-      const last  = $('last').value.trim();
-      const email = $('email').value.trim();
-      const phone = $('phone').value.trim();
-      const comments = $('notes').value.trim();
-
-      if (!month || !roles.length || first.length<4 || last.length<4 || !email || !phone){
-        $('err').textContent = 'Please complete all required fields.';
-        $('err').style.display = 'block';
-        $('ok').style.display = 'none';
-        return;
-      }
-
-      $('submit').disabled = true; $('err').style.display='none'; $('ok').style.display='none';
-      try{
-        const url = `${ENDPOINT}?mode=submit_get`
-          + `&month=${encodeURIComponent(month)}`
-          + `&roles=${encodeURIComponent(roles.join(','))}`
-          + `&firstName=${encodeURIComponent(first)}`
-          + `&lastName=${encodeURIComponent(last)}`
-          + `&email=${encodeURIComponent(email)}`
-          + `&phone=${encodeURIComponent(phone)}`
-          + `&comments=${encodeURIComponent(comments)}`;
-        const out = await jsonp(url);
-        if (out && out.ok){
-          $('ok').style.display='block';
-          $('f').reset();
-          await refreshForMonth(); // keep month, refresh lists
-        }else{
-          throw new Error((out && out.error) || 'Submission failed.');
-        }
-      }catch(err){
-        $('err').textContent = err.message || 'Submission failed.';
-        $('err').style.display = 'block';
-      }finally{
-        $('submit').disabled = false;
-      }
+    $('month').addEventListener('change', loadForMonth);
+    $('submit').addEventListener('click', submitForm);
+    $('clearBtn').addEventListener('click', ()=>{
+      document.querySelectorAll('input[name="role"]:checked').forEach(x=>x.checked=false);
+      $('notes').value='';
     });
   });
 </script>
