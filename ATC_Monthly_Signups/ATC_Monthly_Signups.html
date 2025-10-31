@@ -109,7 +109,7 @@
                 </div>
 
                 <div id="monthInfo" class="msg success" style="display:none; margin-top:12px;">
-                  Note: This month has no remaining Sundays, but monthly roles are still open. Please coordinate any specific dates in the notes.
+                  Note: This month has no remaining Sundays. New signups are closed.
                 </div>
               </div>
 
@@ -147,7 +147,7 @@
               </div>
             </div>
             <div>
-              <label for="notes">Notes (Sundays you can’t make / details)</label>
+              <label for="notes">Notes (optional)</label>
               <textarea id="notes" placeholder="Example: I’m out on the 2nd Sunday, available all others."></textarea>
             </div>
           </fieldset>
@@ -164,7 +164,6 @@
       <!-- Bottom: Current Signups -->
       <section class="card" id="currentSignupsCard" style="display:none">
         <h2 style="margin-top:0;">Current Signups</h2>
-        <div class="muted" style="margin: -6px 0 10px 0;">(Full Name — Notes)</div>
         <div id="monthRoster" class="roleList">
           <div class="muted">No data yet.</div>
         </div>
@@ -189,7 +188,7 @@
     /* ===== CONFIG ===== */
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzeMYO7V9OX7iBFzuRtfbMXrk9CzP0xArxeB0hOOdXZjdklGtOBlTjeLpYDFOrGQsHk/exec"; // e.g., https://script.google.com/macros/s/AKfy.../exec
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzeMYO7V9OX7iBFzuRtfbMXrk9CzP0xArxeB0hOOdXZjdklGtOBlTjeLpYDFOrGQsHk/exec";
 
     /* ===== STATE ===== */
     let ID_TOKEN = '';
@@ -247,8 +246,8 @@
       }) : list;
 
       if (!remaining.length){ box.innerHTML = '<div class="muted">None left this month</div>'; return; }
-
       box.innerHTML = remaining.map(iso => `<div class="chip">${fmtLongDate(iso)}</div>`).join('');
+      return remaining.length; // also return count
     }
 
     /* ===== GIS Sign-in ===== */
@@ -301,6 +300,9 @@
         return;
       }
 
+      // Persist selection so refresh keeps it
+      localStorage.setItem('atc_selected_month', month);
+
       $('monthRolesCard').style.display = 'block';
       $('contactFS').style.display      = 'none';
       $('actionsRow').style.display     = 'none';
@@ -310,68 +312,62 @@
       infoBanner.style.display = 'none';
 
       try{
-        // Calendar: used only for the Sundays sidebar and “no Sundays left” banner
+        // Calendar → remaining Sundays + banner
         const calUrl = `${ENDPOINT}?mode=calendar&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
         const calRes = await jsonp(calUrl);
         const cal = Array.isArray(calRes?.cal) ? calRes.cal : [];
 
-        renderRemainingSundays(cal, month);
+        const remainingCount = renderRemainingSundays(cal, month) || 0;
 
-        // banner if current month has no Sundays left
-        const [yy,mm] = month.split('-').map(Number);
-        const hasSundayRows = cal.some(d => isSundayISO(String(d.ServiceDate).trim()));
-        if (hasSundayRows) {
-          const today = new Date();
-          const isCurrent = (today.getFullYear()===yy && (today.getMonth()+1)===mm);
-          if (isCurrent) {
-            const remaining = (cal||[])
-              .map(r => String(r.ServiceDate).trim())
-              .filter(isSundayISO)
-              .filter(iso => {
-                const [y,m,d]=iso.split('-').map(Number);
-                const dt=new Date(y,m-1,d);
-                return dt >= new Date(yy,mm-1,today.getDate());
-              });
-            infoBanner.style.display = remaining.length ? 'none' : 'block';
-          } else {
-            infoBanner.style.display = 'none';
-          }
+        // Roles (monthly) — only if Sundays remain this month
+        if (remainingCount > 0) {
+          const rolesUrl = `${ENDPOINT}?mode=roles_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
+          const rolesRes = await jsonp(rolesUrl);
+          const roles = Array.isArray(rolesRes?.roles) ? rolesRes.roles : [];
+          rolesBox.innerHTML = roles.length
+            ? roles.map(r => `
+                <label class="roleItem">
+                  <input type="checkbox" name="role-month" value="${r.role.replace(/"/g,'&quot;')}">
+                  <span>${r.role}</span>
+                </label>
+              `).join('')
+            : '<div class="muted">No roles available this month.</div>';
+
+          // Allow contact + submit
+          $('contactFS').style.display  = 'block';
+          $('actionsRow').style.display = 'flex';
+          infoBanner.style.display = 'none';
         } else {
+          // No Sundays left → close signups, show banner and hide form
+          rolesBox.innerHTML  = '<div class="muted">Signups closed for this month.</div>';
+          $('contactFS').style.display  = 'none';
+          $('actionsRow').style.display = 'none';
           infoBanner.style.display = 'block';
         }
 
-        // Roles (monthly)
-        const rolesUrl = `${ENDPOINT}?mode=roles_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
-        const rolesRes = await jsonp(rolesUrl);
-        const roles = Array.isArray(rolesRes?.roles) ? rolesRes.roles : [];
-        rolesBox.innerHTML = roles.length
-          ? roles.map(r => `
-              <label class="roleItem">
-                <input type="checkbox" name="role-month" value="${r.role.replace(/"/g,'&quot;')}">
-                <span>${r.role}</span>
-              </label>
-            `).join('')
-          : '<div class="muted">No roles available this month.</div>';
-
-        // Roster (monthly; names — notes). Accept {role:[...]} OR {ok:true, roster:{...}}
+        // Roster (monthly; accept map or {ok,roster})
         const rosterUrl = `${ENDPOINT}?mode=roster_month&month=${encodeURIComponent(month)}&id_token=${encodeURIComponent(ID_TOKEN||'TEST')}`;
         const rosterRes = await jsonp(rosterUrl);
         const rosterMap = (rosterRes && rosterRes.ok && rosterRes.roster) ? rosterRes.roster : rosterRes;
+
         const rolesKeys = Object.keys(rosterMap || {});
         rosterBox.innerHTML = rolesKeys.length
           ? rolesKeys.map(role=>{
-              const names = (rosterMap[role]||[]).map(n=>`<span class="chip">${n}</span>`).join(' ');
-              return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${names || '<span class="muted">—</span>'}</div></div>`;
+              // items may be strings or objects {name, notes, ts}
+              const items = (rosterMap[role]||[])
+                .map(x => (typeof x === 'string' ? { name:x, notes:'', ts:0 } : x))
+                .sort((a,b)=> (a.ts||0) - (b.ts||0)); // order by signup time
+              const chips = items.map(n=>{
+                const label = n.notes ? `${n.name} — ${n.notes}` : n.name;
+                return `<span class="chip">${label}</span>`;
+              }).join(' ');
+              return `<div class="roleItem"><div class="roleLeft">${role}</div><div>${chips || '<span class="muted">—</span>'}</div></div>`;
             }).join('')
           : '<div class="muted">No signups yet.</div>';
         $('currentSignupsCard').style.display = 'block';
 
-        // Contact + Submit
-        $('contactFS').style.display  = 'block';
-        $('actionsRow').style.display = 'flex';
-
         // Admin metrics visibility (optional)
-        if (Array.isArray(calRes?.profile?.email) || calRes?.profile?.email) {
+        if (calRes?.profile?.email) {
           const me = String(calRes.profile.email||'').toLowerCase();
           if (ADMIN_EMAILS.includes(me)) { $('adminCard').style.display='block'; try{ await loadMetrics(); }catch(_){} }
         }
@@ -404,12 +400,17 @@
       $('phone').addEventListener('input', ()=> phoneMask($('phone')));
       $('month').addEventListener('change', loadMonth);
 
-      // Landing: just month picker
-      $('formCard').style.display   = 'block';
-      $('monthRolesCard').style.display = 'none';
-      $('contactFS').style.display  = 'none';
-      $('actionsRow').style.display = 'none';
-      $('currentSignupsCard').style.display = 'none';
+      // Default month = current OR last selected (persisted)
+      const saved = localStorage.getItem('atc_selected_month');
+      if (saved) {
+        $('month').value = saved;
+      } else {
+        const now = new Date();
+        $('month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      }
+
+      // Load immediately (landing should show current month roster + roles if Sundays remain)
+      loadMonth();
 
       // Submit
       $('f').addEventListener('submit', async (e)=>{
@@ -447,7 +448,7 @@
             const ok = $('ok');
             ok.textContent = 'Thank you! Your monthly signup was recorded. A confirmation email has been sent.';
             ok.style.display = 'block';
-            await loadMonth();                // refresh roles & roster
+            await loadMonth();                // refresh roles & roster (keeps selected month)
             try { ok.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
           } else {
             throw new Error((out && out.error) || 'Submission failed.');
