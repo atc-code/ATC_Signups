@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATC Carols — Signup</title>
+  <style>
+    :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+      background: #f7f7fb;
+      color:#1a202c;
+    }
+    header { background: #222; color: #fff; padding: 24px var(--pad); }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+      line-height: 1.25;
+    }
+    header p  { margin: 0; opacity: .95; font-size: clamp(1rem, 2.2vw, 1.15rem); font-style: italic; }
+
+    main {
+      max-width: var(--max);
+      margin: 20px auto;
+      padding: 0 var(--pad);
+      display:grid;
+      gap:16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 24px rgba(0,0,0,.08);
+      padding: 18px;
+    }
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 860px){ .grid-2{ grid-template-columns:1fr; } }
+
+    fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+    legend { font-weight:800; margin-bottom: 10px; padding: 0; }
+    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d9dbe3;
+      border-radius: 10px;
+      font-size: 1rem;
+      background:#fff;
+    }
+    input[readonly] {
+      background:#edf2f7;
+      cursor:not-allowed;
+    }
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .teams {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      margin-top: 4px;
+    }
+    @media (max-width: 720px) { .teams { grid-template-columns: 1fr; } }
+    .team {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border:1px solid #e2e8f0;
+      border-radius: 12px;
+    }
+
+    .req { color: #c00; margin-left: 4px; }
+    .actions {
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px;
+      flex-wrap:wrap;
+    }
+    button {
+      border: 0;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size:1rem;
+    }
+    .primary { background: var(--accent); color: #fff; }
+    .secondary { background: #edf2f7; }
+
+    .msg {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      display: none;
+    }
+    .success { background: #e6fffa; border: 1px solid #b2f5ea; color: #234e52; }
+    .error   { background: #fff5f5; border: 1px solid #fed7d7; color: #742a2a; }
+
+    h2 { margin:0 0 10px; font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+    .chip {
+      display:inline-block;
+      margin:4px 6px 0 0;
+      padding:4px 8px;
+      border:1px solid #e2e8f0;
+      border-radius:999px;
+      font-size:.95rem;
+    }
+    .muted { color:#666; }
+    .small { font-size:.9rem; }
+
+    .tableWrap { overflow-x:auto; }
+    table.roster, table.metrics { width:100%; border-collapse: collapse; }
+    table.roster th, table.roster td,
+    table.metrics th, table.metrics td {
+      text-align:left;
+      border-bottom:1px solid #e2e8f0;
+      padding:10px 6px;
+      vertical-align: top;
+    }
+    table.roster th, table.metrics th {
+      font-size:.95rem;
+      color:#334155;
+    }
+
+    .overlay {
+      position:fixed;
+      inset:0;
+      background:#0f172a;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:1000;
+    }
+    .overlay .inner { max-width:600px; text-align:center; }
+    .overlay p{ opacity:.9; }
+
+    .logo {
+      height:88px;
+      width:88px;
+      border-radius:12px;
+      background:#fff;
+      padding:10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .brandRow { position: relative; min-height: 104px; }
+    .brandRow .logo{
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .brandRow > :nth-child(2){
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+      text-wrap: balance;
+      padding-left: 0;
+    }
+
+    footer { text-align:center; color:#374151; padding: 16px; }
+
+    .hero {
+      background:#0f172a;
+      color:#e5e7eb;
+      border:0;
+      text-align:center;
+    }
+    .hero h2 {
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      margin:0 0 8px;
+      color:#fff;
+    }
+    .hero p {
+      margin:0;
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+    }
+
+    @media (max-width: 560px){
+      header .brandRow{ min-height: 120px; padding-top: 12px; }
+      header .brandRow .logo{ top: 12px; transform: none; height: 64px; width: 64px; }
+      header .brandRow > :nth-child(2){
+        max-width: 92%;
+        margin: 0 auto;
+        padding-left: 72px;
+      }
+      header h1{ font-size: clamp(1.2rem, 6vw, 1.8rem); }
+    }
+  </style>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <!-- Sign-in overlay -->
+  <div id="signinOverlay" class="overlay" style="display:none">
+    <div class="inner">
+      <div class="brandRow" style="justify-content:center;margin-bottom:8px;">
+        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
+        <h2 style="margin:0">Sign in to register for ATC Carols</h2>
+      </div>
+      <p>Please sign in with your Google account to access this ATC Carols Signup page.</p>
+      <div id="gSignIn" style="display:inline-block;"></div>
+      <div class="subtle" style="margin-top:10px;">Your email is used to confirm and manage your Carols signup.</div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="app" style="display:none">
+    <header>
+      <div class="brandRow">
+        <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png" alt="Church Logo" class="logo" />
+        <div>
+          <h1 id="pageTitle">ATC Carols — Signup</h1>
+          <p>Luke 2:14 — “Glory to God in the highest, and on earth peace, goodwill toward men.”</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Big banner after Carols signups close -->
+      <section class="card hero" id="closedBanner" style="display:none">
+        <h2>Carols signups are now closed.</h2>
+        <p>Thank you for opening your homes and hearts. See you next year!</p>
+      </section>
+
+      <!-- Submit form (visible only while signups are open) -->
+      <section class="card" id="formCard">
+        <form id="signupForm" autocomplete="on">
+          <fieldset>
+            <legend>Contact & home details</legend>
+            <div class="grid-2">
+              <div>
+                <label for="firstName">First Name<span class="req">*</span></label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  required
+                  minlength="2"
+                  pattern="[A-Za-z][A-Za-z\s\-']{1,}"
+                  placeholder="e.g., John"
+                />
+              </div>
+              <div>
+                <label for="lastName">Last Name<span class="req">*</span></label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  required
+                  minlength="2"
+                  pattern="[A-Za-z][A-Za-z\s\-']{1,}"
+                  placeholder="e.g., Doe"
+                />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <label for="email">Email<span class="req">*</span></label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  readonly
+                  placeholder="Signed-in email"
+                  title="Email is taken from your Google sign-in."
+                />
+                <div id="emailNote" class="muted small"></div>
+              </div>
+              <div>
+                <label for="phone">Phone<span class="req">*</span></label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  inputmode="tel"
+                  required
+                  placeholder="(###) ###-####"
+                />
+                <div class="muted small">US mobile preferred. No 0000000000 / 1234567890 / 9876543210 etc.</div>
+              </div>
+            </div>
+
+            <div>
+              <label for="address">Address for Carols visit<span class="req">*</span></label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                required
+                placeholder="Street, City, State ZIP"
+              />
+            </div>
+
+            <div>
+              <label for="parking">Parking instructions (if any)</label>
+              <textarea
+                id="parking"
+                name="parking"
+                placeholder="Gate codes, street parking info, special instructions…"
+              ></textarea>
+            </div>
+          </fieldset>
+
+          <div class="divider"></div>
+
+          <fieldset>
+            <legend>Choose your Carols date<span class="req">*</span></legend>
+            <div id="dateOptions" class="teams">
+              <div class="muted">Loading available dates…</div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <label for="comments">Comments / notes</label>
+            <textarea
+              id="comments"
+              name="comments"
+              placeholder="Any special requests or timing preferences…"
+            ></textarea>
+          </fieldset>
+
+          <div class="actions">
+            <button class="primary" type="submit" id="submitBtn">Submit</button>
+            <button class="secondary" type="reset">Clear</button>
+          </div>
+
+          <div id="success" class="msg success">
+            Thank you! Your Carols signup was recorded.
+          </div>
+          <div id="error" class="msg error">
+            Sorry, something went wrong. Please try again or contact the coordinator.
+          </div>
+        </form>
+      </section>
+
+      <!-- Live signup always visible -->
+      <section class="card" id="rosterCard">
+        <h2 style="margin-top:0;">LIVE Carols Signup Status</h2>
+        <p class="muted small">
+          Shows which homes have signed up for each Carols date.
+        </p>
+        <div class="tableWrap">
+          <table class="roster" id="rosterTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Homes / Families</th>
+              </tr>
+            </thead>
+            <tbody id="rosterBody">
+              <tr><td colspan="2" class="muted">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="rosterError" class="msg error" style="display:none;"></div>
+      </section>
+
+      <!-- Admin metrics always visible to admins -->
+      <section class="card" id="adminMetrics" style="display:none">
+        <h2 style="margin-top:0">Admin — Activity Metrics</h2>
+        <div class="muted" id="metricsTotals" style="margin-bottom:8px"></div>
+        <div class="tableWrap">
+          <table class="metrics" id="metricsTable">
+            <thead><tr><th>Email</th><th>Submits</th><th>Views</th></tr></thead>
+            <tbody id="metricsBody"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer></footer>
+  </div>
+
+  <script>
+    // ---------- CONFIG (edit here, minimal yearly changes) ----------
+    const ENDPOINT = "PASTE_YOUR_CAROLS_APPS_SCRIPT_WEBAPP_URL_HERE";
+    const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
+    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
+
+    // If you want to hard-code specific dates instead of auto 3 Saturdays in December,
+    // put ISO YYYY-MM-DD strings here (leave [] to use auto logic).
+    // Example: ["2025-12-06","2025-12-13","2025-12-20"]
+    const CAROL_DATE_OVERRIDES = [];
+
+    // Optional: used only for labeling/page title; the script will auto-pick year if left null.
+    const CAROL_YEAR_OVERRIDE = null; // e.g. 2025
+
+    // ---------- INTERNAL STATE ----------
+    let ID_TOKEN = null;
+    let USER_EMAIL = "";
+    let USER_INFO = {};
+    let CAROL_DATES = []; // { id, label, iso, remaining|null, dateObj }
+
+    // ---------- HELPERS ----------
+    function decodeJwtResponse(token) {
+      try {
+        return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      } catch(e){
+        return {};
+      }
+    }
+
+    function isAdmin(email) {
+      email = (email||"").toLowerCase();
+      return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email);
+    }
+
+    function tokenFromSession() {
+      try {
+        const t = sessionStorage.getItem("ID_TOKEN");
+        const exp = Number(sessionStorage.getItem("ID_TOKEN_EXP") || "0");
+        if (!t || !exp) return null;
+        const now = Math.floor(Date.now()/1000);
+        if (now >= exp - 30) {
+          sessionStorage.removeItem("ID_TOKEN");
+          sessionStorage.removeItem("ID_TOKEN_EXP");
+          return null;
+        }
+        USER_INFO = decodeJwtResponse(t || "");
+        USER_EMAIL = (USER_INFO.email || "").toLowerCase();
+        return t;
+      } catch(e){
+        return null;
+      }
+    }
+
+    function saveTokenToSession(t) {
+      try {
+        const info = decodeJwtResponse(t || "");
+        const exp = info && info.exp ? Number(info.exp) : 0;
+        sessionStorage.setItem("ID_TOKEN", t || "");
+        if (exp) sessionStorage.setItem("ID_TOKEN_EXP", String(exp));
+      } catch(e){
+        // ignore
+      }
+    }
+
+    function formatDateLabel(d) {
+      return d.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+    }
+
+    function computeDefaultCarolYear() {
+      const now = new Date();
+      let year = now.getFullYear();
+      // If it's already after Christmas in December, use next year.
+      if (now.getMonth() === 11 && now.getDate() > 25) {
+        year = year + 1;
+      }
+      if (CAROL_YEAR_OVERRIDE && Number.isInteger(CAROL_YEAR_OVERRIDE)) {
+        year = CAROL_YEAR_OVERRIDE;
+      }
+      return year;
+    }
+
+    function computeFirstThreeDecemberSaturdays(year) {
+      const dates = [];
+      const month = 11; // December (0-based)
+      let d = new Date(year, month, 1);
+      const firstDow = d.getDay(); // 0=Sun..6=Sat
+      const offset = (6 - firstDow + 7) % 7; // days to first Saturday
+      d.setDate(1 + offset);
+      for (let i = 0; i < 3; i++) {
+        const di = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i * 7);
+        dates.push(di);
+      }
+      return dates;
+    }
+
+    function buildInitialCarolDates() {
+      if (Array.isArray(CAROL_DATE_OVERRIDES) && CAROL_DATE_OVERRIDES.length) {
+        return CAROL_DATE_OVERRIDES.map(iso => {
+          const d = new Date(iso + "T00:00:00");
+          return {
+            id: iso,
+            iso: iso + "T00:00:00",
+            dateObj: d,
+            label: formatDateLabel(d),
+            remaining: null
+          };
+        }).sort((a,b) => a.dateObj - b.dateObj);
+      }
+      const year = computeDefaultCarolYear();
+      const decSats = computeFirstThreeDecemberSaturdays(year);
+      return decSats.map(d => {
+        const iso = d.toISOString().slice(0,10);
+        return {
+          id: iso,
+          iso: iso + "T00:00:00",
+          dateObj: d,
+          label: formatDateLabel(d),
+          remaining: null
+        };
+      });
+    }
+
+    async function loadCarolDates() {
+      // Try to load from Apps Script (mode=dates); if not available, fall back to local.
+      try {
+        const res = await fetch(
+          ENDPOINT + "?mode=dates&id_token=" + encodeURIComponent(ID_TOKEN || "")
+        );
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          if (data && data.ok && Array.isArray(data.dates) && data.dates.length) {
+            CAROL_DATES = data.dates.map((d, idx) => {
+              const iso = d.iso || d.id || "";
+              const dateObj = iso ? new Date(iso) : null;
+              return {
+                id: d.id || (iso ? iso.slice(0,10) : "date_"+idx),
+                iso: iso || null,
+                dateObj,
+                label: d.label || (dateObj ? formatDateLabel(dateObj) : (d.id || "Date "+(idx+1))),
+                remaining: (typeof d.remaining === "number" ? d.remaining : null)
+              };
+            }).sort((a,b) => {
+              if (a.dateObj && b.dateObj) return a.dateObj - b.dateObj;
+              return (a.label || "").localeCompare(b.label || "");
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        // ignore; we'll fall back
+      }
+      CAROL_DATES = buildInitialCarolDates();
+    }
+
+    function toggleUIForClosed() {
+      if (!CAROL_DATES || !CAROL_DATES.length) {
+        document.getElementById("closedBanner").style.display = "none";
+        document.getElementById("formCard").style.display = "block";
+        return false;
+      }
+      const last = CAROL_DATES[CAROL_DATES.length - 1];
+      const base = last.dateObj || (last.iso ? new Date(last.iso) : null);
+      if (!base) {
+        document.getElementById("closedBanner").style.display = "none";
+        document.getElementById("formCard").style.display = "block";
+        return false;
+      }
+      const close = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 23, 59, 59);
+      const now = new Date();
+      const closed = now > close;
+      document.getElementById("closedBanner").style.display = closed ? "block" : "none";
+      document.getElementById("formCard").style.display = closed ? "none" : "block";
+      return closed;
+    }
+
+    function renderDateOptions() {
+      const container = document.getElementById("dateOptions");
+      container.innerHTML = "";
+      if (!CAROL_DATES || !CAROL_DATES.length) {
+        container.innerHTML = '<div class="muted">No Carols dates are available yet.</div>';
+        return;
+      }
+      CAROL_DATES.forEach((d, idx) => {
+        const id = "carolDate_" + (d.id || idx);
+        const label = document.createElement("label");
+        label.className = "team";
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "carolDate";
+        input.id = id;
+        input.value = d.id;
+        if (typeof d.remaining === "number" && d.remaining <= 0) {
+          input.disabled = true;
+        }
+        const span = document.createElement("span");
+        span.className = "teamName";
+        span.innerHTML = d.label + (
+          typeof d.remaining === "number"
+            ? ' <span class="muted small">(' + (d.remaining > 0 ? (d.remaining + " slots left") : "Full") + ')</span>'
+            : ""
+        );
+
+        label.appendChild(input);
+        label.appendChild(span);
+        container.appendChild(label);
+      });
+
+      // Update page title year based on dates
+      const first = CAROL_DATES[0];
+      if (first && first.dateObj) {
+        const year = first.dateObj.getFullYear();
+        const title = document.getElementById("pageTitle");
+        title.textContent = "ATC Carols " + year + " — Signup";
+      }
+    }
+
+    async function refreshDatesFromServer() {
+      await loadCarolDates();
+      renderDateOptions();
+      toggleUIForClosed();
+    }
+
+    function renderRoster(roster) {
+      const tbody = document.getElementById("rosterBody");
+      const errBox = document.getElementById("rosterError");
+      errBox.style.display = "none";
+      tbody.innerHTML = "";
+
+      let any = false;
+      const dateMap = (CAROL_DATES || []).reduce((acc, d) => {
+        acc[d.id] = d;
+        acc[d.label] = d;
+        return acc;
+      }, {});
+
+      const usedKeys = new Set();
+
+      // Prefer rendering in the order of CAROL_DATES
+      (CAROL_DATES || []).forEach(d => {
+        const keyLabel = d.label;
+        const keyId = d.id;
+        const names =
+          (roster && (roster[keyLabel] || roster[keyId])) || [];
+        if (names && names.length > 0) {
+          any = true;
+          usedKeys.add(keyLabel);
+          usedKeys.add(keyId);
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          td1.textContent = d.label;
+          td2.innerHTML = names
+            .map(n => '<span class="chip">' + n + "</span>")
+            .join(" ");
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tbody.appendChild(tr);
+        }
+      });
+
+      // Any extra keys from backend we don't know about
+      if (roster) {
+        Object.keys(roster).forEach(k => {
+          if (usedKeys.has(k)) return;
+          const names = roster[k] || [];
+          if (!names.length) return;
+          any = true;
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          td1.textContent = k;
+          td2.innerHTML = names
+            .map(n => '<span class="chip">' + n + "</span>")
+            .join(" ");
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tbody.appendChild(tr);
+        });
+      }
+
+      if (!any) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 2;
+        td.className = "muted";
+        td.textContent = "No Carols signups yet.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function refreshRoster() {
+      const errBox = document.getElementById("rosterError");
+      try {
+        const res = await fetch(
+          ENDPOINT + "?mode=roster&id_token=" + encodeURIComponent(ID_TOKEN || "")
+        );
+        if (res.status === 403) {
+          const data = await res.json().catch(()=>({}));
+          document.getElementById("app").innerHTML =
+            '<section class="card"><h2>Access restricted</h2><p>' +
+            (data.error || "This signup is limited to ATC members.") +
+            "</p></section>";
+          return;
+        }
+        if (!res.ok) {
+          errBox.textContent = "Could not load signup status (" + res.status + ").";
+          errBox.style.display = "block";
+          return;
+        }
+        const data = await res.json();
+        if (!(data && data.ok)) {
+          errBox.textContent = "Could not load signup status (invalid response).";
+          errBox.style.display = "block";
+          return;
+        }
+        renderRoster(data.roster || {});
+      } catch (e) {
+        errBox.textContent = "Could not load signup status (network error).";
+        errBox.style.display = "block";
+      }
+    }
+
+    async function logView(kind="load") {
+      try {
+        const params = new URLSearchParams();
+        params.append("mode","log_view");
+        params.append("id_token", ID_TOKEN || "");
+        params.append("path", location.pathname + location.search);
+        params.append("ua", navigator.userAgent || "");
+        params.append("kind", kind);
+        await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8" },
+          body: params.toString()
+        });
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    async function loadMetrics() {
+      try {
+        const res = await fetch(
+          ENDPOINT + "?mode=view_breakdown&id_token=" + encodeURIComponent(ID_TOKEN || "")
+        );
+        if (res.status === 403) {
+          document.getElementById("adminMetrics").style.display = "none";
+          return;
+        }
+        const data = await res.json();
+        const wrap = document.getElementById("adminMetrics");
+        const body = document.getElementById("metricsBody");
+        const totals = document.getElementById("metricsTotals");
+        if (!(data && data.ok)) {
+          wrap.style.display="none";
+          return;
+        }
+        wrap.style.display = "block";
+        totals.textContent =
+          "Totals — Views: " + (data.totalViews||0) +
+          " • Unique People: " + (data.unique||0) +
+          " • Submits: " + (data.totalSubmits||0);
+        body.innerHTML = "";
+        (data.rows || []).forEach(row => {
+          body.insertAdjacentHTML(
+            "beforeend",
+            "<tr><td>"+(row.email||"")+"</td><td>"+(row.submits||0)+"</td><td>"+(row.views||0)+"</td></tr>"
+          );
+        });
+      } catch (e) {
+        document.getElementById("adminMetrics").style.display = "none";
+      }
+    }
+
+    // Name + phone validation
+    function validateNames(first, last) {
+      const re = /^[A-Za-z][A-Za-z\s\-']{1,}$/;
+      return re.test(first) && re.test(last);
+    }
+
+    function formatPhoneOnInput(el) {
+      let v = el.value.replace(/\D/g, "").slice(0, 10);
+      const parts = [];
+      if (v.length > 0) parts.push("(" + v.substring(0, Math.min(3, v.length)));
+      if (v.length >= 4) parts[0] += ") " + v.substring(3, Math.min(6, v.length));
+      if (v.length >= 7) parts[0] += "-" + v.substring(6, 10);
+      el.value = parts[0] || v;
+    }
+
+    function isPlausiblePhone(phoneRaw) {
+      const digits = (phoneRaw || "").replace(/\D/g,"");
+      if (digits.length !== 10) return false;
+
+      // reject all same digit like 0000000000 or 1111111111
+      if (/^(\d)\1{9}$/.test(digits)) return false;
+
+      const badSequences = ["0123456789","1234567890","9876543210","0987654321"];
+      if (badSequences.includes(digits)) return false;
+
+      // optionally reject if area code starts with 0 or 1 (US rule-of-thumb)
+      if (digits[0] === "0" || digits[0] === "1") return false;
+
+      return true;
+    }
+
+    // ---------- APP INIT ----------
+    function initGoogleSignIn() {
+      const overlay = document.getElementById("signinOverlay");
+
+      const cached = tokenFromSession();
+      if (cached) {
+        ID_TOKEN = cached;
+        document.getElementById("app").style.display = "block";
+        initApp();
+        return;
+      }
+
+      overlay.style.display = "flex";
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          ID_TOKEN = response.credential || null;
+          if (!ID_TOKEN) return;
+          saveTokenToSession(ID_TOKEN);
+          USER_INFO = decodeJwtResponse(ID_TOKEN || "");
+          USER_EMAIL = (USER_INFO.email || "").toLowerCase();
+          overlay.style.display = "none";
+          document.getElementById("app").style.display = "block";
+          initApp();
+        },
+        auto_select: false,
+        cancel_on_tap_outside: false,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById("gSignIn"),
+        { theme: "outline", size: "large", text: "signin_with", shape: "pill" }
+      );
+    }
+
+    async function initApp() {
+      await refreshDatesFromServer();   // builds CAROL_DATES, renders options, sets closed state
+      await logView("load");
+      await refreshRoster();
+
+      if (isAdmin(USER_EMAIL)) {
+        await loadMetrics();
+        setTimeout(loadMetrics, 600);
+        setInterval(loadMetrics, 60000);
+      }
+
+      const emailEl = document.getElementById("email");
+      if (USER_EMAIL) {
+        emailEl.value = USER_EMAIL;
+        const note = document.getElementById("emailNote");
+        if (note) {
+          note.textContent = "Signed in as " + USER_EMAIL + ". This email will be used for your signup.";
+        }
+      }
+
+      // Optionally prefill names from Google profile
+      if (USER_INFO && USER_INFO.given_name) {
+        const fn = document.getElementById("firstName");
+        if (fn && !fn.value) fn.value = USER_INFO.given_name;
+      }
+      if (USER_INFO && USER_INFO.family_name) {
+        const ln = document.getElementById("lastName");
+        if (ln && !ln.value) ln.value = USER_INFO.family_name;
+      }
+
+      const phoneEl = document.getElementById("phone");
+      phoneEl.addEventListener("input", () => formatPhoneOnInput(phoneEl));
+
+      document.getElementById("signupForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById("submitBtn");
+        const success = document.getElementById("success");
+        const error = document.getElementById("error");
+        success.style.display = "none";
+        error.style.display = "none";
+
+        const form = e.currentTarget;
+        const firstName = form.firstName.value.trim();
+        const lastName  = form.lastName.value.trim();
+        const email     = form.email.value.trim();
+        const phone     = form.phone.value.trim();
+        const address   = form.address.value.trim();
+        const parking   = form.parking.value.trim();
+        const comments  = form.comments.value.trim();
+        const dateChoice = form.carolDate.value;
+
+        // Re-check closed state based on last date
+        if (toggleUIForClosed()) {
+          error.textContent = "Signups are closed. Thank you for your interest!";
+          error.style.display = "block";
+          return;
+        }
+
+        if (!validateNames(firstName, lastName) || !email || !isPlausiblePhone(phone) || !address || !dateChoice) {
+          error.textContent =
+            "Please enter a valid first and last name, phone number, address, and select a Carols date.";
+          error.style.display = "block";
+          return;
+        }
+
+        // Email must match signed-in email (extra safety, front-end; backend should also enforce)
+        if (USER_EMAIL && email.toLowerCase() !== USER_EMAIL.toLowerCase()) {
+          error.textContent = "Email must match the Google account you used to sign in.";
+          error.style.display = "block";
+          return;
+        }
+
+        const selectedDateObj = (CAROL_DATES || []).find(d => d.id === dateChoice);
+        const dateLabel = selectedDateObj ? selectedDateObj.label : dateChoice;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting…";
+        try {
+          const params = new URLSearchParams();
+          params.append("firstName", firstName);
+          params.append("lastName", lastName);
+          params.append("name", firstName + " " + lastName);
+          params.append("email", email);
+          params.append("phone", phone);
+          params.append("address", address);
+          params.append("parking", parking);
+          params.append("comments", comments);
+          params.append("carolDateId", dateChoice);
+          params.append("carolDateLabel", dateLabel);
+          params.append("id_token", ID_TOKEN || "");
+
+          const res = await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+            body: params.toString()
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.ok) {
+            success.style.display = "block";
+            form.reset();
+            await refreshDatesFromServer();
+            await refreshRoster();
+            if (isAdmin(USER_EMAIL)) setTimeout(loadMetrics, 800);
+          } else {
+            error.textContent = (data && data.error)
+              ? data.error
+              : "Submission failed. Please try again.";
+            error.style.display = "block";
+            await refreshDatesFromServer();
+            await refreshRoster();
+          }
+        } catch (err) {
+          error.textContent = "Network error. Please check your connection and try again.";
+          error.style.display = "block";
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit";
+        }
+      });
+    }
+
+    // ---------- BOOTSTRAP ----------
+    window.addEventListener("load", () => {
+      if (!GOOGLE_CLIENT_ID) {
+        const overlay = document.getElementById("signinOverlay");
+        overlay.style.display = "flex";
+        document.getElementById("gSignIn").innerHTML =
+          '<div style="background:#111827;padding:12px 16px;border-radius:10px;display:inline-block">' +
+          "Admin setup required: set GOOGLE_CLIENT_ID in the HTML." +
+          "</div>";
+      } else {
+        initGoogleSignIn();
+      }
+    });
+  </script>
+</body>
+</html>
