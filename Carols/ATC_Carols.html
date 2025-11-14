@@ -286,7 +286,7 @@
                   required
                   placeholder="(###) ###-####"
                 />
-                <div class="muted small">US mobile preferred. No 0000000000 / 1234567890 / 9876543210 etc.</div>
+                <div class="muted small">US mobile preferred </div>
               </div>
             </div>
 
@@ -841,7 +841,7 @@
         emailEl.value = USER_EMAIL;
         const note = document.getElementById("emailNote");
         if (note) {
-          note.textContent = "Signed in as " + USER_EMAIL + ". This email will be used for your signup.";
+          note.textContent = USER_EMAIL + " --> will be used for your signup.";
         }
       }
 
