@@ -37,14 +37,15 @@
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 860px){ .grid-2{ grid-template-columns:1fr; } }
 
-    fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+    fieldset { border: 0; padding: 0; margin: 0 0 18px; }
     legend {
       font-weight:800;
       margin-bottom: 10px;
       padding: 0;
     }
     .legend-main {
-      font-size: 1.2rem;
+      font-size: 1.35rem;
+      margin-bottom: 14px;
     }
 
     label { font-weight: 600; display:block; margin-bottom: 6px; }
@@ -324,7 +325,7 @@
           <div class="divider"></div>
 
           <fieldset>
-            <legend>Carols date &amp; hosting</legend>
+            <legend class="legend-main">Carols Date</legend>
             <div class="grid-2">
               <div>
                 <label>Choose your Carols date<span class="req">*</span></label>
@@ -335,10 +336,6 @@
               <div>
                 <label>Host meal (optional)</label>
                 <div id="hostOptions" class="teams singleColumn">
-                  <label class="team">
-                    <input type="radio" name="hostType" value="none" checked />
-                    <span>Not hosting meal</span>
-                  </label>
                   <label class="team">
                     <input type="radio" name="hostType" value="Lunch" />
                     <span>Host Lunch</span>
@@ -420,17 +417,14 @@
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
 
-    // If you want to hard-code specific dates instead of auto 3 Saturdays in December
     const CAROL_DATE_OVERRIDES = [];
     const CAROL_YEAR_OVERRIDE = null; // e.g. 2025
 
-    // ---------- INTERNAL STATE ----------
     let ID_TOKEN = null;
     let USER_EMAIL = "";
     let USER_INFO = {};
-    let CAROL_DATES = []; // { id, label, iso, remaining|null, dateObj, lunchTaken, dinnerTaken }
+    let CAROL_DATES = [];
 
-    // ---------- HELPERS ----------
     function decodeJwtResponse(token) {
       try {
         return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
@@ -482,10 +476,15 @@
       });
     }
 
+    function cleanLabel(label) {
+      let text = (label || "").replace(/\s*\(Carols\)\s*/i, " ");
+      text = text.replace(/\s+/g, " ").trim();
+      return text;
+    }
+
     function computeDefaultCarolYear() {
       const now = new Date();
       let year = now.getFullYear();
-      // If it's already after Christmas in December, use next year.
       if (now.getMonth() === 11 && now.getDate() > 25) {
         year = year + 1;
       }
@@ -497,10 +496,10 @@
 
     function computeFirstThreeDecemberSaturdays(year) {
       const dates = [];
-      const month = 11; // December (0-based)
+      const month = 11;
       let d = new Date(year, month, 1);
-      const firstDow = d.getDay(); // 0=Sun..6=Sat
-      const offset = (6 - firstDow + 7) % 7; // days to first Saturday
+      const firstDow = d.getDay();
+      const offset = (6 - firstDow + 7) % 7;
       d.setDate(1 + offset);
       for (let i = 0; i < 3; i++) {
         const di = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i * 7);
@@ -541,7 +540,6 @@
     }
 
     async function loadCarolDates() {
-      // Try to load from Apps Script (mode=dates); if not available, fall back to local.
       try {
         const res = await fetch(
           ENDPOINT + "?mode=dates&id_token=" + encodeURIComponent(ID_TOKEN || "")
@@ -563,14 +561,16 @@
                   dinnerTaken: !!d.dinnerTaken
                 };
               }).sort((a,b) => {
-                if (a.dateObj && b.dateObj) return a.dateObj - b.dateObj;
+                if (a.dateObj && b.dateObj && !isNaN(a.dateObj.getTime()) && !isNaN(b.dateObj.getTime())) {
+                  return a.dateObj - b.dateObj;
+                }
                 return (a.label || "").localeCompare(b.label || "");
               });
             return;
           }
         }
       } catch (e) {
-        // ignore; we'll fall back
+        // ignore; fallback below
       }
       CAROL_DATES = buildInitialCarolDates();
     }
@@ -583,7 +583,7 @@
       }
       const last = CAROL_DATES[CAROL_DATES.length - 1];
       const base = last.dateObj || (last.iso ? new Date(last.iso) : null);
-      if (!base) {
+      if (!base || isNaN(base.getTime())) {
         document.getElementById("closedBanner").style.display = "none";
         document.getElementById("formCard").style.display = "block";
         return false;
@@ -617,7 +617,8 @@
         }
         const span = document.createElement("span");
         span.className = "teamName";
-        span.innerHTML = d.label + (
+        const prettyLabel = cleanLabel(d.label);
+        span.innerHTML = prettyLabel + (
           typeof d.remaining === "number"
             ? ' <span class="muted small">(' + (d.remaining > 0 ? (d.remaining + " slots left") : "Full") + ')</span>'
             : ""
@@ -628,11 +629,13 @@
         container.appendChild(label);
       });
 
-      // Update page title year based on dates
       const first = CAROL_DATES[0];
-      if (first && first.dateObj) {
+      const title = document.getElementById("pageTitle");
+      if (first && first.dateObj && !isNaN(first.dateObj.getTime())) {
         const year = first.dateObj.getFullYear();
-        const title = document.getElementById("pageTitle");
+        title.textContent = "ATC Carols " + year + " — Signup";
+      } else {
+        const year = new Date().getFullYear();
         title.textContent = "ATC Carols " + year + " — Signup";
       }
     }
@@ -664,7 +667,7 @@
           const tr = document.createElement("tr");
           const td1 = document.createElement("td");
           const td2 = document.createElement("td");
-          td1.textContent = d.label;
+          td1.textContent = cleanLabel(d.label);
           td2.innerHTML = names
             .map(n => '<span class="chip">' + n + "</span>")
             .join(" ");
@@ -683,7 +686,7 @@
           const tr = document.createElement("tr");
           const td1 = document.createElement("td");
           const td2 = document.createElement("td");
-          td1.textContent = k;
+          td1.textContent = cleanLabel(k);
           td2.innerHTML = names
             .map(n => '<span class="chip">' + n + "</span>")
             .join(" ");
@@ -788,7 +791,6 @@
       }
     }
 
-    // Name + phone validation
     function validateNames(first, last) {
       const re = /^[A-Za-z][A-Za-z\s\-']{1,}$/;
       return re.test(first) && re.test(last);
@@ -806,37 +808,33 @@
     function isPlausiblePhone(phoneRaw) {
       const digits = (phoneRaw || "").replace(/\D/g,"");
       if (digits.length !== 10) return false;
-
-      // reject all same digit like 0000000000 or 1111111111
       if (/^(\d)\1{9}$/.test(digits)) return false;
-
       const badSequences = ["0123456789","1234567890","9876543210","0987654321"];
       if (badSequences.includes(digits)) return false;
-
-      // optionally reject if area code starts with 0 or 1 (US rule-of-thumb)
       if (digits[0] === "0" || digits[0] === "1") return false;
-
       return true;
     }
 
-    // Host availability based on selected date
     function updateHostAvailabilityForCurrentSelection() {
       const form = document.getElementById("signupForm");
       if (!form) return;
 
-      const dateChoice = form.carolDate ? form.carolDate.value : "";
       const lunchRadio  = document.querySelector('input[name="hostType"][value="Lunch"]');
       const dinnerRadio = document.querySelector('input[name="hostType"][value="Dinner"]');
-      const noneRadio   = document.querySelector('input[name="hostType"][value="none"]');
       const msgEl       = document.getElementById("hostStatusMsg");
 
-      if (!lunchRadio || !dinnerRadio || !noneRadio || !msgEl) return;
+      if (!lunchRadio || !dinnerRadio || !msgEl) return;
+
+      let dateChoice = "";
+      const chosen = form.querySelector('input[name="carolDate"]:checked');
+      if (chosen) dateChoice = chosen.value;
 
       if (!dateChoice) {
         lunchRadio.disabled = true;
         dinnerRadio.disabled = true;
-        noneRadio.checked = true;
-        msgEl.textContent = "Select a date to see hosting availability.";
+        lunchRadio.checked = false;
+        dinnerRadio.checked = false;
+        msgEl.textContent = "Select a date to see hosting availability, or leave this blank if you're not hosting a meal.";
         return;
       }
 
@@ -844,7 +842,8 @@
       if (!d) {
         lunchRadio.disabled = true;
         dinnerRadio.disabled = true;
-        noneRadio.checked = true;
+        lunchRadio.checked = false;
+        dinnerRadio.checked = false;
         msgEl.textContent = "";
         return;
       }
@@ -852,8 +851,8 @@
       lunchRadio.disabled  = !!d.lunchTaken;
       dinnerRadio.disabled = !!d.dinnerTaken;
 
-      if (lunchRadio.disabled && lunchRadio.checked) noneRadio.checked = true;
-      if (dinnerRadio.disabled && dinnerRadio.checked) noneRadio.checked = true;
+      if (lunchRadio.disabled) lunchRadio.checked = false;
+      if (dinnerRadio.disabled) dinnerRadio.checked = false;
 
       const taken = [];
       if (d.lunchTaken) taken.push("Lunch");
@@ -868,7 +867,6 @@
       }
     }
 
-    // ---------- APP INIT ----------
     function initGoogleSignIn() {
       const overlay = document.getElementById("signinOverlay");
 
@@ -952,9 +950,15 @@
         const address   = form.address.value.trim();
         const parking   = form.parking.value.trim();
         const comments  = form.comments.value.trim();
-        const dateChoice   = form.carolDate.value;
-        const hostTypeRaw  = form.hostType.value;
-        const hostType     = (hostTypeRaw === "Lunch" || hostTypeRaw === "Dinner") ? hostTypeRaw : "";
+
+        let dateChoice = "";
+        const chosenDate = form.querySelector('input[name="carolDate"]:checked');
+        if (chosenDate) dateChoice = chosenDate.value;
+
+        let hostType = "";
+        const hostInputs = form.querySelectorAll('input[name="hostType"]');
+        hostInputs.forEach(input => { if (input.checked) { hostType = input.value; } });
+        if (hostType !== "Lunch" && hostType !== "Dinner") hostType = "";
 
         if (toggleUIForClosed()) {
           error.textContent = "Signups are closed. Thank you for your interest!";
@@ -994,6 +998,7 @@
           params.append("carolDateId", dateChoice);
           params.append("carolDateLabel", dateLabel);
           params.append("id_token", ID_TOKEN || "");
+          params.append("ua", navigator.userAgent || "");
 
           const res = await fetch(ENDPOINT, {
             method: "POST",
@@ -1027,7 +1032,6 @@
       });
     }
 
-    // ---------- BOOTSTRAP ----------
     window.addEventListener("load", () => {
       if (!GOOGLE_CLIENT_ID) {
         const overlay = document.getElementById("signinOverlay");
