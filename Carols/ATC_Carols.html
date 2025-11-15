@@ -344,6 +344,10 @@
                     <input type="radio" name="hostType" value="Dinner" />
                     <span>Host Dinner</span>
                   </label>
+                  <label class="team">
+                    <input type="radio" name="hostType" value="Snacks" />
+                    <span>Host Snacks</span>
+                  </label>
                 </div>
                 <div id="hostStatusMsg" class="muted small"></div>
               </div>
@@ -364,16 +368,20 @@
             <button class="secondary" type="reset">Clear</button>
           </div>
 
-          <div id="success" class="msg success">
-            Thank you! Your Carols signup was recorded.
-          </div>
           <div id="error" class="msg error">
             Sorry, something went wrong. Please try again or contact the coordinator.
           </div>
         </form>
       </section>
 
-      <!-- Live signup always visible -->
+      <!-- Confirmation card (shown after successful signup only) -->
+      <section class="card" id="confirmCard" style="display:none; text-align:center;">
+        <h2>Thank you for signing up!</h2>
+        <p>Your ATC Carols signup has been recorded.</p>
+        <p class="muted small">You can close this page now.</p>
+      </section>
+
+      <!-- Live signup always visible (until user submits) -->
       <section class="card" id="rosterCard">
         <h2 style="margin-top:0;">LIVE Carols Signup Status</h2>
         <p class="muted small">
@@ -395,7 +403,7 @@
         <div id="rosterError" class="msg error" style="display:none;"></div>
       </section>
 
-      <!-- Admin metrics always visible to admins -->
+      <!-- Admin metrics -->
       <section class="card" id="adminMetrics" style="display:none">
         <h2 style="margin-top:0">Admin — Activity Metrics</h2>
         <div class="muted" id="metricsTotals" style="margin-bottom:8px"></div>
@@ -463,9 +471,7 @@
         const exp = info && info.exp ? Number(info.exp) : 0;
         sessionStorage.setItem("ID_TOKEN", t || "");
         if (exp) sessionStorage.setItem("ID_TOKEN_EXP", String(exp));
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
 
     function formatDateLabel(d) {
@@ -569,9 +575,7 @@
             return;
           }
         }
-      } catch (e) {
-        // ignore; fallback below
-      }
+      } catch (e) {}
       CAROL_DATES = buildInitialCarolDates();
     }
 
@@ -603,10 +607,12 @@
         container.innerHTML = '<div class="muted">No Carols dates are available yet.</div>';
         return;
       }
+
       CAROL_DATES.forEach((d, idx) => {
         const id = "carolDate_" + (d.id || idx);
         const label = document.createElement("label");
         label.className = "team";
+
         const input = document.createElement("input");
         input.type = "radio";
         input.name = "carolDate";
@@ -615,9 +621,18 @@
         if (typeof d.remaining === "number" && d.remaining <= 0) {
           input.disabled = true;
         }
+
         const span = document.createElement("span");
         span.className = "teamName";
-        const prettyLabel = cleanLabel(d.label);
+
+        let dateObj = null;
+        if (d.dateObj && !isNaN(new Date(d.dateObj).getTime())) {
+          dateObj = new Date(d.dateObj);
+        }
+        const prettyLabel = dateObj
+          ? formatDateLabel(dateObj)
+          : cleanLabel(String(d.label || ""));
+
         span.innerHTML = prettyLabel + (
           typeof d.remaining === "number"
             ? ' <span class="muted small">(' + (d.remaining > 0 ? (d.remaining + " slots left") : "Full") + ')</span>'
@@ -629,15 +644,9 @@
         container.appendChild(label);
       });
 
-      const first = CAROL_DATES[0];
       const title = document.getElementById("pageTitle");
-      if (first && first.dateObj && !isNaN(first.dateObj.getTime())) {
-        const year = first.dateObj.getFullYear();
-        title.textContent = "ATC Carols " + year + " — Signup";
-      } else {
-        const year = new Date().getFullYear();
-        title.textContent = "ATC Carols " + year + " — Signup";
-      }
+      const year = computeDefaultCarolYear();
+      title.textContent = "ATC Carols " + year + " — Signup";
     }
 
     async function refreshDatesFromServer() {
@@ -664,10 +673,19 @@
           any = true;
           usedKeys.add(keyLabel);
           usedKeys.add(keyId);
+
           const tr = document.createElement("tr");
           const td1 = document.createElement("td");
           const td2 = document.createElement("td");
-          td1.textContent = cleanLabel(d.label);
+
+          let dateObj = null;
+          if (d.dateObj && !isNaN(new Date(d.dateObj).getTime())) {
+            dateObj = new Date(d.dateObj);
+          }
+          td1.textContent = dateObj
+            ? formatDateLabel(dateObj)
+            : cleanLabel(String(d.label || ""));
+
           td2.innerHTML = names
             .map(n => '<span class="chip">' + n + "</span>")
             .join(" ");
@@ -752,9 +770,7 @@
           headers: { "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8" },
           body: params.toString()
         });
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
 
     async function loadMetrics() {
@@ -821,9 +837,10 @@
 
       const lunchRadio  = document.querySelector('input[name="hostType"][value="Lunch"]');
       const dinnerRadio = document.querySelector('input[name="hostType"][value="Dinner"]');
+      const snacksRadio = document.querySelector('input[name="hostType"][value="Snacks"]');
       const msgEl       = document.getElementById("hostStatusMsg");
 
-      if (!lunchRadio || !dinnerRadio || !msgEl) return;
+      if (!lunchRadio || !dinnerRadio || !snacksRadio || !msgEl) return;
 
       let dateChoice = "";
       const chosen = form.querySelector('input[name="carolDate"]:checked');
@@ -832,9 +849,10 @@
       if (!dateChoice) {
         lunchRadio.disabled = true;
         dinnerRadio.disabled = true;
+        snacksRadio.disabled = false; // Snacks always allowed
         lunchRadio.checked = false;
         dinnerRadio.checked = false;
-        msgEl.textContent = "Select a date to see hosting availability, or leave this blank if you're not hosting a meal.";
+        msgEl.textContent = "Select a date to see Lunch/Dinner availability, or choose Snacks which is always welcome.";
         return;
       }
 
@@ -842,6 +860,7 @@
       if (!d) {
         lunchRadio.disabled = true;
         dinnerRadio.disabled = true;
+        snacksRadio.disabled = false;
         lunchRadio.checked = false;
         dinnerRadio.checked = false;
         msgEl.textContent = "";
@@ -850,20 +869,21 @@
 
       lunchRadio.disabled  = !!d.lunchTaken;
       dinnerRadio.disabled = !!d.dinnerTaken;
+      snacksRadio.disabled = false; // never disabled, multiple Snacks allowed
 
-      if (lunchRadio.disabled) lunchRadio.checked = false;
+      if (lunchRadio.disabled)  lunchRadio.checked = false;
       if (dinnerRadio.disabled) dinnerRadio.checked = false;
 
       const taken = [];
-      if (d.lunchTaken) taken.push("Lunch");
+      if (d.lunchTaken)  taken.push("Lunch");
       if (d.dinnerTaken) taken.push("Dinner");
 
       if (!taken.length) {
-        msgEl.textContent = "Optional: you may host Lunch or Dinner for this date.";
+        msgEl.textContent = "Optional: you may host Lunch, Dinner, or Snacks for this date.";
       } else if (taken.length === 2) {
-        msgEl.textContent = "Hosting for Lunch and Dinner is already taken for this date.";
+        msgEl.textContent = "Lunch and Dinner hosting are already taken for this date. Snacks is still available.";
       } else {
-        msgEl.textContent = taken[0] + " hosting is already taken for this date.";
+        msgEl.textContent = taken[0] + " hosting is already taken for this date. Other options may still be available.";
       }
     }
 
@@ -901,6 +921,10 @@
     }
 
     async function initApp() {
+      // Set header based on current date immediately
+      const yearNow = computeDefaultCarolYear();
+      document.getElementById("pageTitle").textContent = "ATC Carols " + yearNow + " — Signup";
+
       await refreshDatesFromServer();
       await logView("load");
       await refreshRoster();
@@ -937,9 +961,7 @@
       document.getElementById("signupForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const submitBtn = document.getElementById("submitBtn");
-        const success = document.getElementById("success");
         const error = document.getElementById("error");
-        success.style.display = "none";
         error.style.display = "none";
 
         const form = e.currentTarget;
@@ -958,7 +980,7 @@
         let hostType = "";
         const hostInputs = form.querySelectorAll('input[name="hostType"]');
         hostInputs.forEach(input => { if (input.checked) { hostType = input.value; } });
-        if (hostType !== "Lunch" && hostType !== "Dinner") hostType = "";
+        if (hostType !== "Lunch" && hostType !== "Dinner" && hostType !== "Snacks") hostType = "";
 
         if (toggleUIForClosed()) {
           error.textContent = "Signups are closed. Thank you for your interest!";
@@ -1007,12 +1029,12 @@
           });
           const data = await res.json().catch(() => ({}));
           if (res.ok && data.ok) {
-            success.style.display = "block";
-            form.reset();
-            await refreshDatesFromServer();
-            updateHostAvailabilityForCurrentSelection();
-            await refreshRoster();
-            if (isAdmin(USER_EMAIL)) setTimeout(loadMetrics, 800);
+            // Show only confirmation card, hide all signup UI
+            document.getElementById("formCard").style.display = "none";
+            document.getElementById("rosterCard").style.display = "none";
+            document.getElementById("adminMetrics").style.display = "none";
+            document.getElementById("closedBanner").style.display = "none";
+            document.getElementById("confirmCard").style.display = "block";
           } else {
             error.textContent = (data && data.error)
               ? data.error
