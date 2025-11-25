@@ -496,6 +496,14 @@ function doPost(e) {
     if (!isValidEmail_(email)) {
       return json_({ ok:false, error:'Please enter a valid email address.' });
     }
+    
+    var emailFromToken = (user.email || '').toString().trim().toLowerCase();
+    if (!emailFromToken || email !== emailFromToken) {
+    return json_({
+    ok:false,
+    error:'Email mismatch: please use the same email address you used to sign in with Google.'
+    });
+    }
 
     if (!isValidPhone_(phone)) {
       return json_({
