@@ -499,6 +499,11 @@
       await refreshAvailability();
       await refreshRoster();
       await logView('load');
+      
+      const emailInput = document.getElementById('email');
+      if (emailInput && USER_EMAIL) {
+        emailInput.value = USER_EMAIL;
+      }
 
       if (isAdmin(USER_EMAIL)) {
         await loadMetrics();
@@ -563,8 +568,10 @@
           if (!validateEmail(email)) {
             errors.push('• Email: please enter a valid email like name@example.com.');
             emailEl.classList.add('input-error');
-          }
-          
+          } else if (USER_EMAIL && email.toLowerCase() !== USER_EMAIL.toLowerCase()) {
+            errors.push('• Email: must match the Google account you used to sign in (' + USER_EMAIL + ').');
+            emailEl.classList.add('input-error');
+          }   
           // Phone
           if (!validatePhone(phone)) {
             errors.push('• Phone: please enter a valid 10-digit number (e.g., (404) 555-1234), not all 1s/0s or a simple sequence like 1234567890.');
