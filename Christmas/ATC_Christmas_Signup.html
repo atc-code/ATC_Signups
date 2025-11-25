@@ -442,30 +442,51 @@
       return re.test(email.trim());
    }
     
-    function validatePhone(phone) {
-      const digits = phone.replace(/\D/g, '');
-    
-      // Must be exactly 10 digits
-      if (digits.length !== 10) return false;
-    
-      // 1) Reject all-same digit (0000000000, 1111111111, etc.)
-      const allSame = digits.split('').every(ch => ch === digits[0]);
-      if (allSame) return false;
-    
-      // 2) Reject strictly increasing or strictly decreasing by 1
-      let inc = true;
-      let dec = true;
-      for (let i = 1; i < digits.length; i++) {
-        const diff = Number(digits[i]) - Number(digits[i - 1]);
-        if (diff !== 1) inc = false;
-        if (diff !== -1) dec = false;
-      }
-      if (inc || dec) return false;
-    
-      // Otherwise accept
-      return true;
-    }
+  function validatePhone(phone) {
+  const digits = phone.replace(/\D/g, '');
 
+  // Must be exactly 10 digits
+  if (digits.length !== 10) return false;
+
+  // Block explicit junk sequences
+  const badSequences = [
+    '0000000000',
+    '0001111111',
+    '1112223333',
+    '1111111111',
+    '2222222222',
+    '3333333333',
+    '4444444444',
+    '5555555555',
+    '6666666666',
+    '7777777777',
+    '8888888888',
+    '9999999999',
+    '0123456789',
+    '1234567890',
+    '9876543210',
+    '0987654321'
+  ];
+  if (badSequences.includes(digits)) return false;
+
+  // 1) Reject all-same digit (redundant but safe even with list above)
+  const allSame = digits.split('').every(ch => ch === digits[0]);
+  if (allSame) return false;
+
+  // 2) Reject strictly increasing or decreasing by 1 (for other 10-digit sequences)
+  let inc = true;
+  let dec = true;
+  for (let i = 1; i < digits.length; i++) {
+    const diff = Number(digits[i]) - Number(digits[i - 1]);
+    if (diff !== 1) inc = false;
+    if (diff !== -1) dec = false;
+  }
+  if (inc || dec) return false;
+
+  // Otherwise OK
+  return true;
+}
+    
     async function initApp() {
       updateRosterTitle();
       const closed = toggleUIForClosed();
