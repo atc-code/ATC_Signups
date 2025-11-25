@@ -32,6 +32,11 @@
     .team { display:flex; gap:10px; align-items:center; padding:10px 12px;
             border:1px solid #e2e8f0; border-radius:12px; }
 
+    .input-error {
+      border-color: #e11d48 !important;
+      box-shadow: 0 0 0 1px rgba(225, 29, 72, 0.3);
+      }
+
     .req { color:#c00; margin-left:4px; }
     .actions { display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
     button { border:0; padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; }
@@ -529,6 +534,10 @@
           const teams     = teamCheckboxes()
                               .filter(cb => cb.checked)
                               .map(cb => cb.value);
+          const firstNameEl = form.firstName;
+          const lastNameEl  = form.lastName;
+          const emailEl     = form.email;
+          const phoneEl     = form.phone;
 
           if (new Date() > new Date(EVENT_DATE_ISO)) {
             error.textContent = 'Signup is closed — the event has concluded. Thank you for serving!';
@@ -536,11 +545,43 @@
             return;
           }
 
-          if (!validateNames(firstName, lastName) || !validateEmail(email) || !validatePhone(phone) || teams.length === 0) {
-             error.textContent ='Please enter a valid First and Last Name (min 4 letters), a valid email address, a 10-digit phone number, and pick at least one team.';
-             error.style.display = 'block';
-             return;
+          // Clear any previous highlight (optional)
+          [firstNameEl, lastNameEl, emailEl, phoneEl].forEach(el => {
+            el.classList.remove('input-error');
+          });
+          
+          const errors = [];
+          
+          // First + Last
+          if (!validateNames(firstName, lastName)) {
+            errors.push('• First & Last Name: at least 4 letters each, letters/spaces/\'/-.');
+            firstNameEl.classList.add('input-error');
+            lastNameEl.classList.add('input-error');
           }
+          
+          // Email
+          if (!validateEmail(email)) {
+            errors.push('• Email: please enter a valid email like name@example.com.');
+            emailEl.classList.add('input-error');
+          }
+          
+          // Phone
+          if (!validatePhone(phone)) {
+            errors.push('• Phone: please enter a valid 10-digit number (e.g., (404) 555-1234), not all 1s/0s or a simple sequence like 1234567890.');
+            phoneEl.classList.add('input-error');
+          }
+          
+          // Teams
+          if (teams.length === 0) {
+            errors.push('• Teams: please pick at least one team to serve on.');
+          }
+          
+          if (errors.length) {
+            error.innerHTML = errors.join('<br>');
+            error.style.display = 'block';
+            return;
+          }
+
 
 
           submitBtn.disabled = true;
