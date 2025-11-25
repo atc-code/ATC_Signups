@@ -17,7 +17,7 @@
     @media (max-width:860px){ .grid-2{ grid-template-columns:1fr; } }
 
     fieldset { border:0; padding:0; margin:0 0 12px; }
-    legend { font-weight:800; margin-bottom:10px; font-size:1.2rem; } /* ↑ bigger legends */
+    legend { font-weight:800; margin-bottom:10px; font-size:1.2rem; } /* bigger legends */
 
     label { font-weight:600; display:block; margin-bottom:6px; }
     input[type="text"], input[type="email"], textarea {
@@ -47,11 +47,11 @@
             border-radius:999px; font-size:.95rem; }
     .muted { color:#666; }
     .tableWrap { overflow-x:auto; }
-    table.roster { width:100%; border-collapse:collapse; }
-    table.roster th, table.roster td {
+    table.roster, table.metrics { width:100%; border-collapse:collapse; }
+    table.roster th, table.roster td, table.metrics th, table.metrics td {
       text-align:left; border-bottom:1px solid #e2e8f0; padding:10px 6px; vertical-align:top;
     }
-    table.roster th { font-size:.95rem; color:#334155; }
+    table.roster th, table.metrics th { font-size:.95rem; color:#334155; }
 
     .overlay { position:fixed; inset:0; background:#0f172a; color:#fff; display:flex;
                align-items:center; justify-content:center; padding:24px; z-index:1000; }
@@ -188,6 +188,18 @@
         </div>
         <div id="rosterError" class="msg error" style="display:none;"></div>
       </section>
+
+      <!-- Admin metrics -->
+      <section class="card" id="adminMetrics" style="display:none">
+        <h2 style="margin-top:0">Admin — Activity Metrics</h2>
+        <div class="muted" id="metricsTotals" style="margin-bottom:8px"></div>
+        <div class="tableWrap">
+          <table class="metrics" id="metricsTable">
+            <thead><tr><th>Email</th><th>Submits</th><th>Views</th></tr></thead>
+            <tbody id="metricsBody"><tr><td colspan="3" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </main>
 
     <footer></footer>
@@ -195,20 +207,26 @@
 
   <script>
     // === CONFIG (EDIT THESE) ===
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzFs7IWCkzfctrI2j6Xg9riJbJupoNs-BYtfm1pGFJBsmEJb0pLflhWpwSo8bHfLqztfA/exec"; // Apps Script web app URL
+    const ENDPOINT = "PASTE_YOUR_CHRISTMAS_WEB_APP_URL_HERE"; // Apps Script web app URL
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
     const EVENT_DATE_ISO = "2025-12-25T23:59:59-05:00"; // controls close banner & year
+    const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
 
     const EVENT_YEAR = new Date(EVENT_DATE_ISO).getFullYear();
 
     let ID_TOKEN = null;
-    let USER_EMAIL = '';
+    let USER_EMAIL = "";
     let TEAM_LIST = [];
 
     function decodeJwtResponse(token) {
       try {
         return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
       } catch(e){ return {}; }
+    }
+
+    function isAdmin(email) {
+      email = (email || "").toLowerCase();
+      return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email);
     }
 
     function tokenFromSession() {
@@ -277,23 +295,15 @@
       const errBox = document.getElementById('rosterError');
       try {
         const res = await fetch(ENDPOINT + '?id_token=' + encodeURIComponent(ID_TOKEN || ''));
-        if (res.status === 403) {
-          const data = await res.json().catch(()=>({}));
-          document.getElementById('app').innerHTML =
-            '<section class="card"><h2>Access restricted</h2><p>' +
-            (data.error || 'This signup is limited to ATC members.') +
-            '</p></section>';
-          return;
-        }
         const data = await res.json();
+
         if (!data || !data.ok) {
-          errBox.textContent = 'Could not load availability.';
+          errBox.textContent = data && data.error ? data.error : 'Could not load availability.';
           errBox.style.display = 'block';
           return;
         }
 
         if (Array.isArray(data.teams) && data.teams.length) {
-          // Build / refresh team list from backend
           if (!TEAM_LIST.length || TEAM_LIST.join('|') !== data.teams.join('|')) {
             TEAM_LIST = data.teams.slice();
             buildTeamCheckboxes(TEAM_LIST);
@@ -302,7 +312,8 @@
 
         const remaining = data.remaining || {};
         teamCheckboxes().forEach(cb => {
-          const left = Number.isFinite(remaining[cb.value]) ? remaining[cb.value] : null;
+          const raw = remaining[cb.value];
+          const left = typeof raw === 'number' ? raw : null;
           if (left === null) {
             cb.disabled = false;
             cb.parentElement.style.opacity = 1;
@@ -355,17 +366,9 @@
       const errBox = document.getElementById('rosterError');
       try {
         const res = await fetch(ENDPOINT + '?mode=roster&id_token=' + encodeURIComponent(ID_TOKEN || ''));
-        if (res.status === 403) {
-          const data = await res.json().catch(()=>({}));
-          document.getElementById('app').innerHTML =
-            '<section class="card"><h2>Access restricted</h2><p>' +
-            (data.error || 'This signup is limited to ATC members.') +
-            '</p></section>';
-          return;
-        }
         const data = await res.json();
         if (!data || !data.ok) {
-          errBox.textContent = 'Could not load signup status.';
+          errBox.textContent = data && data.error ? data.error : 'Could not load signup status.';
           errBox.style.display = 'block';
           return;
         }
@@ -377,6 +380,53 @@
       } catch (e) {
         errBox.textContent = 'Could not load signup status (network error).';
         errBox.style.display = 'block';
+      }
+    }
+
+    async function logView(kind = 'load') {
+      try {
+        const params = new URLSearchParams();
+        params.append('mode','log_view');
+        params.append('id_token', ID_TOKEN || '');
+        params.append('path', location.pathname + location.search);
+        params.append('ua', navigator.userAgent || '');
+        params.append('kind', kind);
+        await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: params.toString()
+        });
+      } catch (e) { }
+    }
+
+    async function loadMetrics() {
+      try {
+        const res = await fetch(ENDPOINT + '?mode=view_breakdown&id_token=' + encodeURIComponent(ID_TOKEN || ''));
+        const data = await res.json();
+        const wrap = document.getElementById('adminMetrics');
+        const body = document.getElementById('metricsBody');
+        const totals = document.getElementById('metricsTotals');
+
+        if (!data || !data.ok) {
+          wrap.style.display = 'none';
+          return;
+        }
+
+        wrap.style.display = 'block';
+        totals.textContent = 'Totals — Views: ' + (data.totalViews || 0) +
+                             ' • Unique People: ' + (data.unique || 0) +
+                             ' • Submits: ' + (data.totalSubmits || 0);
+
+        body.innerHTML = '';
+        (data.rows || []).forEach(row => {
+          body.insertAdjacentHTML(
+            'beforeend',
+            '<tr><td>' + (row.email || '') + '</td><td>' +
+            (row.submits || 0) + '</td><td>' + (row.views || 0) + '</td></tr>'
+          );
+        });
+      } catch (e) {
+        document.getElementById('adminMetrics').style.display = 'none';
       }
     }
 
@@ -392,6 +442,13 @@
 
       await refreshAvailability();
       await refreshRoster();
+      await logView('load');
+
+      if (isAdmin(USER_EMAIL)) {
+        await loadMetrics();
+        setTimeout(loadMetrics, 600);
+        setInterval(loadMetrics, 60000);
+      }
 
       if (!closed) {
         const phoneEl = document.getElementById('phone');
@@ -459,6 +516,7 @@
               form.reset();
               await refreshAvailability();
               await refreshRoster();
+              if (isAdmin(USER_EMAIL)) setTimeout(loadMetrics, 800);
             } else {
               error.textContent = (data && data.error) ? data.error : 'Submission failed. Please try again.';
               error.style.display = 'block';
