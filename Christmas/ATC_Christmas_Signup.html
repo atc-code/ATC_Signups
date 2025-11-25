@@ -436,6 +436,36 @@
              re.test(last) && last.trim().length >= 4;
     }
 
+    function validateEmail(email) {
+      // Simple but solid email pattern
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.trim());
+   }
+    
+    function validatePhone(phone) {
+      const digits = phone.replace(/\D/g, '');
+    
+      // Must be exactly 10 digits
+      if (digits.length !== 10) return false;
+    
+      // 1) Reject all-same digit (0000000000, 1111111111, etc.)
+      const allSame = digits.split('').every(ch => ch === digits[0]);
+      if (allSame) return false;
+    
+      // 2) Reject strictly increasing or strictly decreasing by 1
+      let inc = true;
+      let dec = true;
+      for (let i = 1; i < digits.length; i++) {
+        const diff = Number(digits[i]) - Number(digits[i - 1]);
+        if (diff !== 1) inc = false;
+        if (diff !== -1) dec = false;
+      }
+      if (inc || dec) return false;
+    
+      // Otherwise accept
+      return true;
+    }
+
     async function initApp() {
       updateRosterTitle();
       const closed = toggleUIForClosed();
@@ -485,11 +515,12 @@
             return;
           }
 
-          if (!validateNames(firstName, lastName) || !email || !phone || teams.length === 0) {
-            error.textContent = 'Please enter a valid First and Last Name (at least 4 letters each), email, phone, and pick at least one team.';
-            error.style.display = 'block';
-            return;
+          if (!validateNames(firstName, lastName) || !validateEmail(email) || !validatePhone(phone) || teams.length === 0) {
+             error.textContent ='Please enter a valid First and Last Name (min 4 letters), a valid email address, a 10-digit phone number, and pick at least one team.';
+             error.style.display = 'block';
+             return;
           }
+
 
           submitBtn.disabled = true;
           submitBtn.textContent = 'Submitting…';
