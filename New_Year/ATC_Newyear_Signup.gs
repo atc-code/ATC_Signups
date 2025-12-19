@@ -1,6 +1,6 @@
-// ATC_Christmas_Signup_HardcodedTeams.gs
+// ATC_Newyear_Signup_HardcodedTeams.gs
 //
-// Backend for ATC Christmas Signup
+// Backend for ATC New Year Signup
 //
 // - Google Sign-In via id_token
 // - Teams & caps defined in TEAM_LIST / TEAM_CAPS below (NO Teams sheet)
@@ -11,7 +11,7 @@
 // - Optional raw page views logging in "PageViews"
 
 // ===== CONFIG =====
-const SHEET_ID = '1lWnymJ1yijiyvwJxk-4gnYMqtKCSLw7M2Sjr9NzmdV4';
+const SHEET_ID = '1iGcYpiCjWdku36FPIEbAD_TtBMA3avQU9mZKa8XohIk';
 
 const SIGNUPS_SHEET_NAME    = 'Signups';
 const BLOCKLIST_SHEET_NAME  = 'Blocklist';
@@ -19,7 +19,7 @@ const USER_STATS_SHEET      = 'UserStats';   // sub | email | views | submits | 
 const LOG_RAW_VIEWS         = false;        // set true if you want raw logs
 const RAW_VIEWS_SHEET       = 'PageViews';
 
-const EVENT_DATE_ISO        = '2025-12-25T23:59:59-05:00';
+const EVENT_DATE_ISO        = '2026-01-01T23:59:59-05:00';
 const CLIENT_ID             = '180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com';
 
 // ===== TEAM CONFIG (EDIT HERE WHEN YOU WANT TO CHANGE TEAMS) =====
@@ -560,12 +560,12 @@ function doPost(e) {
     // Confirmation email (best-effort)
     try {
       if (email) {
-        const eventDateText = 'Thu, Dec 25, 2025';
-        const subject = 'Thanks for serving — ATC Christmas 2025';
+        const eventDateText = 'Thu, Jan 01, 2026';
+        const subject = 'Thanks for serving — ATC New year 2026 Service';
         const lines = [];
         lines.push('Hi ' + fullName + ',');
         lines.push('');
-        lines.push('Thank you for your signup to serve at ATC Christmas Service (' + eventDateText + ').');
+        lines.push('Thank you for your signup to serve at ATC New Year Service (' + eventDateText + ').');
         lines.push('Teams: ' + teams.join(', '));
         lines.push('');
         lines.push('We appreciate your heart to serve. We will reach out with any additional details.');
