@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATC Christmas 2025 (Dec 25th) — Signup</title>
+  <title>ATC New Year 2026 — Signup</title>
   <style>
     :root { --max: 960px; --pad: 18px; --radius: 16px; --accent:#2b6cb0; }
     * { box-sizing: border-box; }
@@ -95,7 +95,7 @@
              alt="Church Logo" class="logo" />
         <h2 style="margin:0">Sign in to Volunteer at ATC</h2>
       </div>
-      <p>Please sign in with your Google account to access this ATC Christmas Signup page.</p>
+      <p>Please sign in with your Google account to access this ATC New Year Signup page.</p>
       <div id="gSignIn" style="display:inline-block;"></div>
       <div style="margin-top:10px;font-size:.9rem;opacity:.8;">
         Your email is used only to confirm your ATC Signup.
@@ -110,8 +110,8 @@
         <img src="https://raw.githubusercontent.com/atc-code/ATC_Signups/main/images/ATC_Logo1.png"
              alt="Church Logo" class="logo" />
         <div>
-          <h1>ATC Christmas Service 2025 (Dec 25th) — Signup</h1>
-          <p>Luke 2:11 — “Today in the town of David a Savior has been born to you; he is the Messiah, the Lord.”</p>
+          <h1>ATC New Year Service 2026 — Signup</h1>
+          <p>Isaiah 43:18–19 — “Forget the former things… See, I am doing a new thing…”</p>
         </div>
       </div>
     </header>
@@ -120,7 +120,7 @@
       <!-- Banner when signup is closed -->
       <section class="card hero" id="closedBanner" style="display:none">
         <h2>Thanks for your heart to serve. God bless you!</h2>
-        <p>Signup for this Christmas service is now closed.</p>
+        <p>Signup for this New Year service is now closed.</p>
       </section>
 
       <!-- Signup form -->
@@ -182,7 +182,7 @@
 
       <!-- Roster -->
       <section class="card" id="rosterCard">
-        <h2 id="rosterTitle" style="margin-top:0;">ATC Christmas Signup STATUS</h2>
+        <h2 id="rosterTitle" style="margin-top:0;">ATC New Year Signup STATUS</h2>
         <div class="tableWrap">
           <table class="roster" id="rosterTable">
             <thead><tr><th>Team</th><th>Volunteers</th></tr></thead>
@@ -214,7 +214,7 @@
     // === CONFIG (EDIT THESE) ===
     const ENDPOINT = "https://script.google.com/macros/s/AKfycbzFs7IWCkzfctrI2j6Xg9riJbJupoNs-BYtfm1pGFJBsmEJb0pLflhWpwSo8bHfLqztfA/exec"; // Apps Script web app URL
     const GOOGLE_CLIENT_ID = "180743986209-prt051o1bp6namb57ababodokq0eadfv.apps.googleusercontent.com";
-    const EVENT_DATE_ISO = "2025-12-25T23:59:59-05:00"; // controls close banner & year
+    const EVENT_DATE_ISO = "2026-01-01T23:59:59-05:00"; // controls close banner & year
     const ADMIN_EMAILS = ["atc.noting@gmail.com","chakdom@gmail.com"];
 
     const EVENT_YEAR = new Date(EVENT_DATE_ISO).getFullYear();
@@ -267,7 +267,7 @@
 
     function updateRosterTitle() {
       const el = document.getElementById('rosterTitle');
-      if (el) el.textContent = "ATC Christmas " + EVENT_YEAR + " Signup STATUS";
+      if (el) el.textContent = "ATC New Year " + EVENT_YEAR + " Signup STATUS";
     }
 
     function teamCheckboxes() {
