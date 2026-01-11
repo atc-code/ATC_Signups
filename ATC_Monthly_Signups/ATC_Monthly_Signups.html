@@ -312,7 +312,7 @@
 
   async function checkMaintenance(){
     try{
-      const resp = await jsonp(`${ENDPOINT}?mode=maintenance`);
+      const resp = await jsonp(`${ENDPOINT}?mode1=maintenance`);
       const raw = resp && (resp.maintenance ?? resp.maintenanceOn ?? resp.on);
       const on  = (raw === true) || (String(raw || '').trim().toLowerCase() === 'yes') || (String(raw || '').trim().toLowerCase() === 'true') || (String(raw || '').trim().toLowerCase() === 'on') || (String(raw || '').trim() === '1');
 
